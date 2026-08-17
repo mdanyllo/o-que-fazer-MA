@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DestinosIndexRouteImport } from './routes/destinos.index'
+import { Route as DestinosSlugRouteImport } from './routes/destinos.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DestinosIndexRoute = DestinosIndexRouteImport.update({
+  id: '/destinos/',
+  path: '/destinos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DestinosSlugRoute = DestinosSlugRouteImport.update({
+  id: '/destinos/$slug',
+  path: '/destinos/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/destinos/$slug': typeof DestinosSlugRoute
+  '/destinos/': typeof DestinosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/destinos/$slug': typeof DestinosSlugRoute
+  '/destinos': typeof DestinosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/destinos/$slug': typeof DestinosSlugRoute
+  '/destinos/': typeof DestinosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/destinos/$slug' | '/destinos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/destinos/$slug' | '/destinos'
+  id: '__root__' | '/' | '/destinos/$slug' | '/destinos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DestinosSlugRoute: typeof DestinosSlugRoute
+  DestinosIndexRoute: typeof DestinosIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/destinos/': {
+      id: '/destinos/'
+      path: '/destinos'
+      fullPath: '/destinos/'
+      preLoaderRoute: typeof DestinosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/destinos/$slug': {
+      id: '/destinos/$slug'
+      path: '/destinos/$slug'
+      fullPath: '/destinos/$slug'
+      preLoaderRoute: typeof DestinosSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DestinosSlugRoute: DestinosSlugRoute,
+  DestinosIndexRoute: DestinosIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
