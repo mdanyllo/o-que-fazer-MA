@@ -10,12 +10,44 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as EventosRouteImport } from './routes/eventos'
+import { Route as ExperienciasRouteImport } from './routes/experiencias'
+import { Route as MapaRouteImport } from './routes/mapa'
+import { Route as PlanejarRouteImport } from './routes/planejar'
 import { Route as DestinosIndexRouteImport } from './routes/destinos.index'
 import { Route as DestinosSlugRouteImport } from './routes/destinos.$slug'
+import { Route as RoteirosIndexRouteImport } from './routes/roteiros.index'
+import { Route as RoteirosSlugRouteImport } from './routes/roteiros.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmpresasRoute = EmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventosRoute = EventosRouteImport.update({
+  id: '/eventos',
+  path: '/eventos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperienciasRoute = ExperienciasRouteImport.update({
+  id: '/experiencias',
+  path: '/experiencias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapaRoute = MapaRouteImport.update({
+  id: '/mapa',
+  path: '/mapa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlanejarRoute = PlanejarRouteImport.update({
+  id: '/planejar',
+  path: '/planejar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DestinosIndexRoute = DestinosIndexRouteImport.update({
@@ -28,35 +60,104 @@ const DestinosSlugRoute = DestinosSlugRouteImport.update({
   path: '/destinos/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RoteirosIndexRoute = RoteirosIndexRouteImport.update({
+  id: '/roteiros/',
+  path: '/roteiros/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoteirosSlugRoute = RoteirosSlugRouteImport.update({
+  id: '/roteiros/$slug',
+  path: '/roteiros/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/empresas': typeof EmpresasRoute
+  '/eventos': typeof EventosRoute
+  '/experiencias': typeof ExperienciasRoute
+  '/mapa': typeof MapaRoute
+  '/planejar': typeof PlanejarRoute
   '/destinos/$slug': typeof DestinosSlugRoute
+  '/roteiros/$slug': typeof RoteirosSlugRoute
   '/destinos/': typeof DestinosIndexRoute
+  '/roteiros/': typeof RoteirosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/empresas': typeof EmpresasRoute
+  '/eventos': typeof EventosRoute
+  '/experiencias': typeof ExperienciasRoute
+  '/mapa': typeof MapaRoute
+  '/planejar': typeof PlanejarRoute
   '/destinos/$slug': typeof DestinosSlugRoute
+  '/roteiros/$slug': typeof RoteirosSlugRoute
   '/destinos': typeof DestinosIndexRoute
+  '/roteiros': typeof RoteirosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/empresas': typeof EmpresasRoute
+  '/eventos': typeof EventosRoute
+  '/experiencias': typeof ExperienciasRoute
+  '/mapa': typeof MapaRoute
+  '/planejar': typeof PlanejarRoute
   '/destinos/$slug': typeof DestinosSlugRoute
+  '/roteiros/$slug': typeof RoteirosSlugRoute
   '/destinos/': typeof DestinosIndexRoute
+  '/roteiros/': typeof RoteirosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/destinos/$slug' | '/destinos/'
+  fullPaths:
+    | '/'
+    | '/empresas'
+    | '/eventos'
+    | '/experiencias'
+    | '/mapa'
+    | '/planejar'
+    | '/destinos/$slug'
+    | '/roteiros/$slug'
+    | '/destinos/'
+    | '/roteiros/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/destinos/$slug' | '/destinos'
-  id: '__root__' | '/' | '/destinos/$slug' | '/destinos/'
+  to:
+    | '/'
+    | '/empresas'
+    | '/eventos'
+    | '/experiencias'
+    | '/mapa'
+    | '/planejar'
+    | '/destinos/$slug'
+    | '/roteiros/$slug'
+    | '/destinos'
+    | '/roteiros'
+  id:
+    | '__root__'
+    | '/'
+    | '/empresas'
+    | '/eventos'
+    | '/experiencias'
+    | '/mapa'
+    | '/planejar'
+    | '/destinos/$slug'
+    | '/roteiros/$slug'
+    | '/destinos/'
+    | '/roteiros/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EmpresasRoute: typeof EmpresasRoute
+  EventosRoute: typeof EventosRoute
+  ExperienciasRoute: typeof ExperienciasRoute
+  MapaRoute: typeof MapaRoute
+  PlanejarRoute: typeof PlanejarRoute
   DestinosSlugRoute: typeof DestinosSlugRoute
+  RoteirosSlugRoute: typeof RoteirosSlugRoute
   DestinosIndexRoute: typeof DestinosIndexRoute
+  RoteirosIndexRoute: typeof RoteirosIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -66,6 +167,41 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/empresas': {
+      id: '/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eventos': {
+      id: '/eventos'
+      path: '/eventos'
+      fullPath: '/eventos'
+      preLoaderRoute: typeof EventosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiencias': {
+      id: '/experiencias'
+      path: '/experiencias'
+      fullPath: '/experiencias'
+      preLoaderRoute: typeof ExperienciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mapa': {
+      id: '/mapa'
+      path: '/mapa'
+      fullPath: '/mapa'
+      preLoaderRoute: typeof MapaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/planejar': {
+      id: '/planejar'
+      path: '/planejar'
+      fullPath: '/planejar'
+      preLoaderRoute: typeof PlanejarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/destinos/': {
@@ -82,13 +218,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DestinosSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/roteiros/': {
+      id: '/roteiros/'
+      path: '/roteiros'
+      fullPath: '/roteiros/'
+      preLoaderRoute: typeof RoteirosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roteiros/$slug': {
+      id: '/roteiros/$slug'
+      path: '/roteiros/$slug'
+      fullPath: '/roteiros/$slug'
+      preLoaderRoute: typeof RoteirosSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EmpresasRoute: EmpresasRoute,
+  EventosRoute: EventosRoute,
+  ExperienciasRoute: ExperienciasRoute,
+  MapaRoute: MapaRoute,
+  PlanejarRoute: PlanejarRoute,
   DestinosSlugRoute: DestinosSlugRoute,
+  RoteirosSlugRoute: RoteirosSlugRoute,
   DestinosIndexRoute: DestinosIndexRoute,
+  RoteirosIndexRoute: RoteirosIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
