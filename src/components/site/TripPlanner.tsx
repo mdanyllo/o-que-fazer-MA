@@ -32,8 +32,8 @@ export function TripPlanner() {
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [done, setDone] = useState(false);
 
-  const step = steps[index];
-  const current = answers[step?.key ?? ""] ?? [];
+  const step = steps[index]!;
+  const current = answers[step.key] ?? [];
   const progress = done ? 100 : Math.round((index / steps.length) * 100);
 
   const select = (option: string) => {
@@ -137,9 +137,9 @@ function PlannerResult({
   answers: Record<string, string[]>;
   onRestart: () => void;
 }) {
-  const days = answers.dias?.[0] ?? "5 dias";
-  const budget = budgetMap[answers.orcamento?.[0] ?? "Confortável"];
-  const base = itineraries[0];
+  const days = answers['dias']?.[0] ?? "5 dias";
+  const budget = budgetMap[answers['orcamento']?.[0] ?? "Confortável"] ?? budgetMap['Confortável'];
+  const base = itineraries[0]!;
   const stops = [
     { name: "São Luís", note: "Centro histórico e gastronomia", image: img.saoLuis },
     { name: "Barreirinhas", note: "Base para os Lençóis", image: img.barreirinhas },
