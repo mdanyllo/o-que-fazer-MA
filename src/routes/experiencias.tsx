@@ -7,20 +7,22 @@ import { cn } from "@/lib/utils";
 import { categories, destinations, experiences, img } from "@/data/maranhao";
 
 type Search = {
-  categoria?: string;
-  destino?: string;
-  preco?: string;
-  duracao?: string;
-  dificuldade?: string;
+  categoria: string | undefined;
+  destino: string | undefined;
+  preco: string | undefined;
+  duracao: string | undefined;
+  dificuldade: string | undefined;
 };
+
+const str = (v: unknown) => (typeof v === "string" && v.length > 0 ? v : undefined);
 
 export const Route = createFileRoute("/experiencias")({
   validateSearch: (search: Record<string, unknown>): Search => ({
-    categoria: typeof search.categoria === "string" ? search.categoria : undefined,
-    destino: typeof search.destino === "string" ? search.destino : undefined,
-    preco: typeof search.preco === "string" ? search.preco : undefined,
-    duracao: typeof search.duracao === "string" ? search.duracao : undefined,
-    dificuldade: typeof search.dificuldade === "string" ? search.dificuldade : undefined,
+    categoria: str(search["categoria"]),
+    destino: str(search["destino"]),
+    preco: str(search["preco"]),
+    duracao: str(search["duracao"]),
+    dificuldade: str(search["dificuldade"]),
   }),
   head: () => ({
     meta: [
