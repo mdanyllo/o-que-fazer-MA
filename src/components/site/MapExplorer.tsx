@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Plus, Minus, Star, X, Route as RouteIcon, Locate } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { mapPoints, mapRoute, mapTypes, type MapPoint } from "@/data/maranhao";
+import { getDestinationName, mapPoints, mapRoute, mapTypes, type MapPoint } from "@/data/maranhao";
 
 const typeColor: Record<MapPoint["type"], string> = {
   atracao: "bg-gold text-gold-foreground",
@@ -62,7 +62,7 @@ export function MapExplorer({ compact = false }: { compact?: boolean }) {
         <div
           className={cn(
             "relative overflow-hidden rounded-2xl border border-border bg-[oklch(0.93_0.03_200)] shadow-soft",
-            compact ? "h-[420px]" : "h-[520px] lg:h-[640px]",
+            compact ? "h-[320px] sm:h-[420px]" : "h-[380px] sm:h-[520px] lg:h-[640px]",
           )}
         >
           <div
@@ -72,7 +72,11 @@ export function MapExplorer({ compact = false }: { compact?: boolean }) {
             <MapBackdrop />
 
             {showRoute && (
-              <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+              <svg
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                className="absolute inset-0 h-full w-full"
+              >
                 <polyline
                   points={routeStops.map((s) => `${s.x},${s.y}`).join(" ")}
                   fill="none"
@@ -95,13 +99,13 @@ export function MapExplorer({ compact = false }: { compact?: boolean }) {
               >
                 <span
                   className={cn(
-                    "flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold whitespace-nowrap shadow-soft ring-2 ring-white/70",
+                    "flex items-center gap-1.5 rounded-full p-2 text-[11px] font-semibold whitespace-nowrap shadow-soft ring-2 ring-white/70 xl:px-2.5 xl:py-1.5",
                     typeColor[p.type],
                     selected?.id === p.id && "ring-4 ring-turquoise",
                   )}
                 >
-                  <span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" />
-                  {p.name}
+                  <span className="h-2 w-2 rounded-full bg-current opacity-80 xl:h-1.5 xl:w-1.5" />
+                  <span className="hidden xl:inline">{p.name}</span>
                 </span>
                 <span className="mx-auto block h-2 w-0.5 bg-white/70" />
               </button>
@@ -146,16 +150,16 @@ export function MapExplorer({ compact = false }: { compact?: boolean }) {
           <button
             onClick={() => setShowRoute((v) => !v)}
             className={cn(
-              "absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold shadow-soft backdrop-blur-sm transition-colors",
+              "absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold shadow-soft backdrop-blur-sm transition-colors sm:bottom-4 sm:left-4 sm:px-4 sm:py-2.5 sm:text-sm",
               showRoute ? "bg-primary text-primary-foreground" : "bg-background/95 text-foreground",
             )}
           >
-            <RouteIcon className="h-4 w-4" />
+            <RouteIcon className="h-4 w-4 shrink-0" />
             {mapRoute.name}
           </button>
 
-          <p className="absolute right-4 bottom-4 rounded-full bg-background/85 px-3 py-1 text-[11px] text-muted-foreground backdrop-blur-sm">
-            Mapa ilustrativo · {visible.length} pontos
+          <p className="absolute right-4 bottom-4 hidden rounded-full bg-background/85 px-3 py-1 text-[11px] text-muted-foreground backdrop-blur-sm sm:block">
+            Mapa ilustrativo com {visible.length} pontos
           </p>
         </div>
       </div>
@@ -164,7 +168,11 @@ export function MapExplorer({ compact = false }: { compact?: boolean }) {
         {selected ? (
           <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft animate-rise">
             <div className="relative aspect-16/10">
-              <img src={selected.image} alt={selected.name} className="h-full w-full object-cover" />
+              <img
+                src={selected.image}
+                alt={selected.name}
+                className="h-full w-full object-cover"
+              />
               <button
                 aria-label="Fechar"
                 onClick={() => setSelected(null)}
@@ -174,11 +182,18 @@ export function MapExplorer({ compact = false }: { compact?: boolean }) {
               </button>
             </div>
             <div className="p-5">
-              <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold", typeColor[selected.type])}>
+              <span
+                className={cn(
+                  "rounded-full px-2.5 py-1 text-[11px] font-semibold",
+                  typeColor[selected.type],
+                )}
+              >
                 {typeLabel[selected.type]}
               </span>
               <h3 className="mt-3 font-display text-2xl">{selected.name}</h3>
-              <p className="text-sm text-muted-foreground">{selected.city}</p>
+              <p className="text-sm text-muted-foreground">
+                {getDestinationName(selected.destinationSlug)}
+              </p>
               <p className="mt-3 text-sm">{selected.description}</p>
               <p className="mt-3 inline-flex items-center gap-1.5 text-sm">
                 <Star className="h-4 w-4 fill-gold text-gold" />
@@ -206,7 +221,9 @@ export function MapExplorer({ compact = false }: { compact?: boolean }) {
                   <span className="min-w-0">
                     <span className="block text-sm font-semibold">{label}</span>
                     <span className="block text-xs text-muted-foreground">
-                      {routeStops[i]?.city ?? "Lençóis Maranhenses"}
+                      {routeStops[i]
+                        ? getDestinationName(routeStops[i].destinationSlug)
+                        : "Lençóis Maranhenses"}
                     </span>
                   </span>
                 </li>
@@ -224,7 +241,11 @@ export function MapExplorer({ compact = false }: { compact?: boolean }) {
 
 function MapBackdrop() {
   return (
-    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+    <svg
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      className="absolute inset-0 h-full w-full"
+    >
       <rect width="100" height="100" fill="oklch(0.9 0.045 205)" />
       <path
         d="M0,38 C12,30 22,44 34,40 C48,35 60,44 74,38 C84,33 92,40 100,36 L100,100 L0,100 Z"
@@ -236,7 +257,11 @@ function MapBackdrop() {
         opacity="0.75"
       />
       <path d="M30,14 C44,8 62,14 74,26 C60,32 44,30 32,24 Z" fill="oklch(0.97 0.02 95)" />
-      <path d="M20,66 C34,58 50,64 62,74 C48,86 30,84 22,76 Z" fill="oklch(0.88 0.06 140)" opacity="0.7" />
+      <path
+        d="M20,66 C34,58 50,64 62,74 C48,86 30,84 22,76 Z"
+        fill="oklch(0.88 0.06 140)"
+        opacity="0.7"
+      />
       <path
         d="M58,32 C64,28 70,30 76,34 C80,37 86,36 92,34"
         stroke="oklch(0.72 0.09 220)"

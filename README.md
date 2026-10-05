@@ -1,3 +1,6 @@
+desenvolvedor: eu quero que as pessoas possam postar e avaliar os lugares. restaurantes, hoteis, etc..
+
+
 # Maranhão Explorer
 
 Crie um MVP VISUAL, extremamente caprichado e navegável, de uma plataforma SaaS de turismo focada inicialmente no estado do Maranhão, Brasil.
@@ -996,23 +999,30 @@ Quero um PROTÓTIPO VISUAL MUITO BEM ACABADO que demonstre claramente como esse 
 
 Faça parecer que estamos vendo a primeira versão de um produto que poderia ser lançado comercialmente amanhã.
 
-This project was built with [Lovable](https://lovable.dev).
+## Stack
 
-## Build with Lovable
+- [TanStack Start](https://tanstack.com/start) + [TanStack Router](https://tanstack.com/router)
+- React 19, TypeScript, Vite
+- Tailwind CSS v4 + shadcn/ui (Radix)
+- Nitro (build do servidor SSR)
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/aee9fb8e-e6ac-47e0-9b17-78b0233613e8).
+## Desenvolvimento
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Requisitos: [Bun](https://bun.sh) (ou Node.js 20+ com npm).
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+git clone https://github.com/mdanyllo/o-que-fazer-MA.git
+cd o-que-fazer-MA
+bun install
+bun run dev
 ```
+
+Scripts disponíveis:
+
+| Script | Descrição |
+| --- | --- |
+| `bun run dev` | Servidor de desenvolvimento |
+| `bun run build` | Build de produção |
+| `bun run preview` | Pré-visualiza o build |
+| `bun run lint` | ESLint |
+| `bun run format` | Prettier |

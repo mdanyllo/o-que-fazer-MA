@@ -1,64 +1,62 @@
 import { Link } from "@tanstack/react-router";
-import { Compass, Instagram, Youtube, Mail } from "lucide-react";
+import { Instagram, Youtube, Mail } from "lucide-react";
+import { BrandMark } from "./SiteHeader";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-24 border-t border-border bg-primary text-primary-foreground">
-      <div className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <div>
-            <div className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-turquoise text-turquoise-foreground">
-                <Compass className="h-5 w-5" />
-              </span>
-              <span className="font-display text-lg font-semibold">Descubra Maranhão</span>
+    <footer className="mt-24 px-2 pb-2 sm:px-3 sm:pb-3">
+      <div className="mx-auto max-w-350 overflow-hidden rounded-3xl bg-deep bg-stripes text-deep-foreground sm:rounded-4xl">
+        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
+          <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+            <div>
+              <BrandMark />
+              <p className="mt-4 max-w-sm text-sm text-white/65">
+                Destinos, experiências e roteiros reunidos em um só lugar. Protótipo demonstrativo
+                com conteúdo fictício para avaliação do produto.
+              </p>
+              <div className="mt-6 flex gap-2">
+                {[Instagram, Youtube, Mail].map((Icon, i) => (
+                  <span
+                    key={i}
+                    className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/5"
+                  >
+                    <Icon className="h-4 w-4" />
+                  </span>
+                ))}
+              </div>
             </div>
-            <p className="mt-4 max-w-sm text-sm text-primary-foreground/70">
-              Destinos, experiências e roteiros reunidos em um só lugar. Protótipo demonstrativo com
-              conteúdo fictício para avaliação do produto.
-            </p>
-            <div className="mt-5 flex gap-2">
-              {[Instagram, Youtube, Mail].map((Icon, i) => (
-                <span
-                  key={i}
-                  className="grid h-9 w-9 place-items-center rounded-full bg-primary-foreground/10"
-                >
-                  <Icon className="h-4 w-4" />
-                </span>
-              ))}
-            </div>
+
+            <FooterCol
+              title="Explorar"
+              links={[
+                { to: "/destinos", label: "Destinos" },
+                { to: "/experiencias", label: "Experiências" },
+                { to: "/mapa", label: "Mapa turístico" },
+              ]}
+            />
+            <FooterCol
+              title="Planejar"
+              links={[
+                { to: "/roteiros", label: "Roteiros" },
+                { to: "/planejar", label: "Monte minha viagem" },
+                { to: "/eventos", label: "Eventos" },
+              ]}
+            />
+            <FooterCol
+              title="Local"
+              links={[
+                { to: "/empresas", label: "Empresas locais" },
+                { to: "/destinos/sao-luis", label: "São Luís" },
+                { to: "/destinos/carolina", label: "Chapada das Mesas" },
+              ]}
+            />
           </div>
 
-          <FooterCol
-            title="Explorar"
-            links={[
-              { to: "/destinos", label: "Destinos" },
-              { to: "/experiencias", label: "Experiências" },
-              { to: "/mapa", label: "Mapa turístico" },
-            ]}
-          />
-          <FooterCol
-            title="Planejar"
-            links={[
-              { to: "/roteiros", label: "Roteiros" },
-              { to: "/planejar", label: "Monte minha viagem" },
-              { to: "/eventos", label: "Eventos" },
-            ]}
-          />
-          <FooterCol
-            title="Local"
-            links={[
-              { to: "/empresas", label: "Empresas locais" },
-              { to: "/destinos/sao-luis", label: "São Luís" },
-              { to: "/destinos/chapada-das-mesas", label: "Chapada das Mesas" },
-            ]}
-          />
+          <p className="mt-12 border-t border-white/10 pt-6 text-xs text-white/50">
+            © {new Date().getFullYear()} Descubra Maranhão. Preços, avaliações e empresas são dados
+            demonstrativos.
+          </p>
         </div>
-
-        <p className="mt-12 border-t border-primary-foreground/15 pt-6 text-xs text-primary-foreground/60">
-          © {new Date().getFullYear()} Descubra Maranhão · Preços, avaliações e empresas são dados
-          demonstrativos.
-        </p>
       </div>
     </footer>
   );
@@ -67,14 +65,11 @@ export function SiteFooter() {
 function FooterCol({ title, links }: { title: string; links: { to: string; label: string }[] }) {
   return (
     <div>
-      <h3 className="font-display text-sm tracking-wide text-primary-foreground/90">{title}</h3>
+      <h3 className="text-xs font-medium tracking-[0.08em] text-white/50 uppercase">{title}</h3>
       <ul className="mt-4 space-y-2.5">
         {links.map((l) => (
           <li key={l.to + l.label}>
-            <Link
-              to={l.to}
-              className="text-sm text-primary-foreground/70 transition-colors hover:text-primary-foreground"
-            >
+            <Link to={l.to} className="text-sm text-white/80 transition-colors hover:text-white">
               {l.label}
             </Link>
           </li>

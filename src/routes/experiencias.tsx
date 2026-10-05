@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils";
 import { categories, destinations, experiences, img } from "@/data/maranhao";
 
 type Search = {
-  categoria: string | undefined;
-  destino: string | undefined;
-  preco: string | undefined;
-  duracao: string | undefined;
-  dificuldade: string | undefined;
+  categoria?: string | undefined;
+  destino?: string | undefined;
+  preco?: string | undefined;
+  duracao?: string | undefined;
+  dificuldade?: string | undefined;
 };
 
 const str = (v: unknown) => (typeof v === "string" && v.length > 0 ? v : undefined);
@@ -26,14 +26,17 @@ export const Route = createFileRoute("/experiencias")({
   }),
   head: () => ({
     meta: [
-      { title: "Experiências no Maranhão — passeios, trilhas e sabores" },
+      { title: "Experiências no Maranhão | Passeios, trilhas e sabores" },
       {
         name: "description",
         content:
           "Filtre experiências por destino, categoria, preço, duração e dificuldade: dunas, cachoeiras, cultura e gastronomia.",
       },
       { property: "og:title", content: "Experiências no Maranhão" },
-      { property: "og:description", content: "Passeios, trilhas e sabores para viver no Maranhão." },
+      {
+        property: "og:description",
+        content: "Passeios, trilhas e sabores para viver no Maranhão.",
+      },
     ],
   }),
   component: ExperienciasPage,
@@ -79,7 +82,7 @@ function ExperienciasPage() {
   }, [search]);
 
   return (
-    <PageShell transparentHeader>
+    <PageShell>
       <PageHero
         image={img.rioPreguicas}
         eyebrow="Experiências"
@@ -87,44 +90,64 @@ function ExperienciasPage() {
         subtitle="Passeios de 4x4 nas dunas, descidas de rio, trilhas de cachoeira, cultura e gastronomia."
       />
 
-      <section className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-10 sm:py-14 lg:px-8">
         <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
           <p className="mb-4 inline-flex items-center gap-2 text-sm font-semibold">
-            <SlidersHorizontal className="h-4 w-4 text-turquoise" /> Filtros
+            <SlidersHorizontal className="h-4 w-4 text-lagoon" /> Filtros
           </p>
           <div className="space-y-4">
             <FilterRow label="Destino">
               {destinations.map((d) => (
-                <Chip key={d.slug} active={search.destino === d.slug} onClick={() => set("destino", d.slug)}>
+                <Chip
+                  key={d.slug}
+                  active={search.destino === d.slug}
+                  onClick={() => set("destino", d.slug)}
+                >
                   {d.name}
                 </Chip>
               ))}
             </FilterRow>
             <FilterRow label="Categoria">
               {categories.map((c) => (
-                <Chip key={c.id} active={search.categoria === c.id} onClick={() => set("categoria", c.id)}>
-                  {c.emoji} {c.name}
+                <Chip
+                  key={c.id}
+                  active={search.categoria === c.id}
+                  onClick={() => set("categoria", c.id)}
+                >
+                  {c.name}
                 </Chip>
               ))}
             </FilterRow>
             <div className="grid gap-4 md:grid-cols-3">
               <FilterRow label="Preço">
                 {precos.map((p) => (
-                  <Chip key={p.id} active={search.preco === p.id} onClick={() => set("preco", p.id)}>
+                  <Chip
+                    key={p.id}
+                    active={search.preco === p.id}
+                    onClick={() => set("preco", p.id)}
+                  >
                     {p.label}
                   </Chip>
                 ))}
               </FilterRow>
               <FilterRow label="Duração">
                 {duracoes.map((d) => (
-                  <Chip key={d.id} active={search.duracao === d.id} onClick={() => set("duracao", d.id)}>
+                  <Chip
+                    key={d.id}
+                    active={search.duracao === d.id}
+                    onClick={() => set("duracao", d.id)}
+                  >
                     {d.label}
                   </Chip>
                 ))}
               </FilterRow>
               <FilterRow label="Dificuldade">
                 {dificuldades.map((d) => (
-                  <Chip key={d.id} active={search.dificuldade === d.id} onClick={() => set("dificuldade", d.id)}>
+                  <Chip
+                    key={d.id}
+                    active={search.dificuldade === d.id}
+                    onClick={() => set("dificuldade", d.id)}
+                  >
                     {d.label}
                   </Chip>
                 ))}
@@ -148,7 +171,9 @@ function ExperienciasPage() {
           {list.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border p-16 text-center">
               <p className="font-display text-2xl">Nada com esses filtros</p>
-              <p className="mt-2 text-muted-foreground">Tente combinar menos filtros para ver mais opções.</p>
+              <p className="mt-2 text-muted-foreground">
+                Tente combinar menos filtros para ver mais opções.
+              </p>
             </div>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -166,7 +191,9 @@ function ExperienciasPage() {
 function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="min-w-0">
-      <p className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">{label}</p>
+      <p className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+        {label}
+      </p>
       <div className="flex flex-wrap gap-2">{children}</div>
     </div>
   );

@@ -6,14 +6,17 @@ import { destinations, img } from "@/data/maranhao";
 export const Route = createFileRoute("/destinos/")({
   head: () => ({
     meta: [
-      { title: "Destinos do Maranhão — cidades, parques e vilas" },
+      { title: "Destinos do Maranhão | Cidades, parques e vilas" },
       {
         name: "description",
         content:
           "Conheça São Luís, Barreirinhas, Lençóis Maranhenses, Atins, Santo Amaro, Alcântara e a Chapada das Mesas.",
       },
       { property: "og:title", content: "Destinos do Maranhão" },
-      { property: "og:description", content: "Cidades, parques e vilas para explorar no Maranhão." },
+      {
+        property: "og:description",
+        content: "Cidades, parques e vilas para explorar no Maranhão.",
+      },
     ],
   }),
   component: DestinosPage,
@@ -21,14 +24,14 @@ export const Route = createFileRoute("/destinos/")({
 
 function DestinosPage() {
   return (
-    <PageShell transparentHeader>
+    <PageShell>
       <PageHero
         image={img.santoAmaro}
         eyebrow="Destinos"
         title="Todo o Maranhão em um só lugar"
         subtitle="Do centro histórico da capital às dunas do parque e às cachoeiras do sul do estado."
       />
-      <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-12 sm:py-16 lg:px-8">
         <SectionHeading
           title="Escolha por onde começar"
           description={`${destinations.length} destinos mapeados com experiências, mapas e roteiros.`}

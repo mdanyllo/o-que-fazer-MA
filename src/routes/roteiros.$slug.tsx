@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { Clock, Car, Utensils, MapPin, Play, Check, Wallet } from "lucide-react";
 import { toast } from "sonner";
-import { PageShell } from "@/components/site/PageShell";
+import { HeroFrame, PageShell } from "@/components/site/PageShell";
 import { SectionHeading } from "@/components/site/cards";
 import { cn } from "@/lib/utils";
 import { getItinerary, itineraries } from "@/data/maranhao";
@@ -15,14 +15,16 @@ export const Route = createFileRoute("/roteiros/$slug")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Roteiro não encontrado" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [{ title: "Roteiro não encontrado" }, { name: "robots", content: "noindex" }],
+      };
     }
     const i = loaderData.itinerary;
     return {
       meta: [
-        { title: `${i.title} — roteiro de ${i.days} dias no Maranhão` },
+        { title: `${i.title} | Roteiro de ${i.days} dias no Maranhão` },
         { name: "description", content: i.subtitle },
-        { property: "og:title", content: `${i.title} — Descubra Maranhão` },
+        { property: "og:title", content: `${i.title} | Descubra Maranhão` },
         { property: "og:description", content: i.subtitle },
       ],
     };
@@ -51,26 +53,33 @@ function RoteiroPage() {
   const others = itineraries.filter((i) => i.slug !== itinerary.slug).slice(0, 3);
 
   return (
-    <PageShell transparentHeader>
-      <section className="relative flex min-h-[70vh] items-end overflow-hidden">
-        <img src={itinerary.image} alt={itinerary.title} className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 hero-scrim" />
-        <div className="relative mx-auto w-full max-w-7xl px-5 pt-32 pb-12 lg:px-8">
+    <PageShell>
+      <HeroFrame image={itinerary.image} alt={itinerary.title} className="min-h-[60vh]">
+        <div className="mx-auto max-w-7xl px-6 pt-24 pb-10 sm:px-10 sm:pb-12 lg:pb-14">
           <p className="text-xs font-semibold tracking-[0.22em] text-white/80 uppercase">
-            Roteiro · {itinerary.days} {itinerary.days === 1 ? "dia" : "dias"}
+            Roteiro de {itinerary.days} {itinerary.days === 1 ? "dia" : "dias"}
           </p>
-          <h1 className="mt-3 max-w-3xl font-display text-5xl text-white sm:text-6xl">{itinerary.title}</h1>
-          <p className="mt-4 max-w-2xl text-lg text-white/85">{itinerary.subtitle}</p>
+          <h1 className="mt-3 max-w-3xl font-display text-4xl text-white text-balance-title sm:text-5xl lg:text-6xl">
+            {itinerary.title}
+          </h1>
+          <p className="mt-4 max-w-2xl text-base text-white/85 text-pretty sm:text-lg">
+            {itinerary.subtitle}
+          </p>
           <p className="mt-4 text-sm font-medium text-turquoise">{itinerary.destinationsLabel}</p>
         </div>
-      </section>
+      </HeroFrame>
 
-      <section className="sticky top-[68px] z-30 border-b border-border bg-background/95 backdrop-blur-md">
+      <section className="sticky top-18 z-30 border-b border-border bg-background/95 backdrop-blur-md">
         <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-4 lg:px-8">
           <div className="min-w-0">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span className="truncate">
-                Progresso do roteiro · {doneDays.length}/{itinerary.days_detail.length} dias
+                <span className="sm:hidden">
+                  {doneDays.length}/{itinerary.days_detail.length} dias
+                </span>
+                <span className="hidden sm:inline">
+                  Progresso do roteiro: {doneDays.length}/{itinerary.days_detail.length} dias
+                </span>
               </span>
               <span>{progress}%</span>
             </div>
@@ -84,19 +93,23 @@ function RoteiroPage() {
           <button
             onClick={() => {
               setStarted(true);
-              toast.success("Roteiro iniciado", { description: "Marque cada dia conforme for avançando." });
+              toast.success("Roteiro iniciado", {
+                description: "Marque cada dia conforme for avançando.",
+              });
             }}
             className={cn(
-              "inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors",
+              "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold transition-colors sm:px-5 sm:text-sm",
               started ? "bg-secondary text-foreground" : "bg-primary text-primary-foreground",
             )}
           >
-            <Play className="h-4 w-4" /> {started ? "Em andamento" : "Começar roteiro"}
+            <Play className="h-4 w-4 shrink-0" />
+            <span className="sm:hidden">{started ? "Em andamento" : "Começar"}</span>
+            <span className="hidden sm:inline">{started ? "Em andamento" : "Começar roteiro"}</span>
           </button>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-10 sm:py-14 lg:px-8">
         <dl className="grid gap-4 sm:grid-cols-4">
           {[
             { label: "Duração", value: `${itinerary.days} dias` },
@@ -112,7 +125,7 @@ function RoteiroPage() {
         </dl>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 pb-16 lg:px-8">
+      <section className="mx-auto max-w-7xl px-5 pb-12 sm:pb-16 lg:px-8">
         <SectionHeading eyebrow="Dia a dia" title="Como a viagem acontece" />
         <ol className="relative space-y-6 border-l border-dashed border-border pl-6 sm:pl-10">
           {itinerary.days_detail.map((d) => {
@@ -129,14 +142,19 @@ function RoteiroPage() {
                 </span>
                 <article className="grid overflow-hidden rounded-2xl border border-border bg-card shadow-soft md:grid-cols-[1fr_1.3fr]">
                   <div className="relative aspect-16/10 md:aspect-auto md:min-h-[240px]">
-                    <img src={d.image} alt={d.title} loading="lazy" className="h-full w-full object-cover" />
+                    <img
+                      src={d.image}
+                      alt={d.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
                     <span className="absolute top-3 left-3 rounded-full bg-background/90 px-3 py-1 text-xs font-bold backdrop-blur-sm">
                       DIA {d.day}
                     </span>
                   </div>
                   <div className="p-6">
                     <h3 className="font-display text-2xl">{d.title}</h3>
-                    <p className="mt-1 text-sm font-medium text-turquoise">{d.route}</p>
+                    <p className="mt-1 text-sm font-medium text-lagoon">{d.route}</p>
                     <p className="mt-3 text-muted-foreground">{d.summary}</p>
 
                     <div className="mt-5 flex flex-wrap gap-4 text-sm">
@@ -167,7 +185,9 @@ function RoteiroPage() {
                       <button
                         onClick={() =>
                           setDoneDays((prev) =>
-                            prev.includes(d.day) ? prev.filter((x) => x !== d.day) : [...prev, d.day],
+                            prev.includes(d.day)
+                              ? prev.filter((x) => x !== d.day)
+                              : [...prev, d.day],
                           )
                         }
                         className={cn(
@@ -175,7 +195,8 @@ function RoteiroPage() {
                           complete ? "bg-forest text-white" : "bg-secondary hover:bg-accent",
                         )}
                       >
-                        <Check className="h-3.5 w-3.5" /> {complete ? "Dia concluído" : "Marcar como feito"}
+                        <Check className="h-3.5 w-3.5" />{" "}
+                        {complete ? "Dia concluído" : "Marcar como feito"}
                       </button>
                       <Link
                         to="/mapa"
@@ -192,10 +213,10 @@ function RoteiroPage() {
         </ol>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 pb-16 lg:px-8">
+      <section className="mx-auto max-w-7xl px-5 pb-12 sm:pb-16 lg:px-8">
         <div className="grid items-center gap-6 rounded-3xl bg-deep p-8 text-deep-foreground sm:grid-cols-[1fr_auto] lg:p-12">
           <div>
-            <p className="inline-flex items-center gap-2 text-sm text-turquoise">
+            <p className="inline-flex items-center gap-2 text-sm text-lagoon">
               <Wallet className="h-4 w-4" /> Estimativa demonstrativa
             </p>
             <h2 className="mt-2 font-display text-3xl">Quer ajustar esse roteiro ao seu jeito?</h2>
@@ -223,10 +244,17 @@ function RoteiroPage() {
               className="group relative block overflow-hidden rounded-2xl"
             >
               <div className="aspect-16/10 overflow-hidden">
-                <img src={i.image} alt={i.title} loading="lazy" className="h-full w-full object-cover img-zoom" />
+                <img
+                  src={i.image}
+                  alt={i.title}
+                  loading="lazy"
+                  className="h-full w-full object-cover img-zoom"
+                />
               </div>
               <div className="absolute inset-0 hero-scrim" />
-              <span className="absolute bottom-4 left-4 font-display text-lg text-white">{i.title}</span>
+              <span className="absolute bottom-4 left-4 font-display text-lg text-white">
+                {i.title}
+              </span>
             </Link>
           ))}
         </div>

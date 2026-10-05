@@ -14,17 +14,43 @@ type Step = {
 };
 
 const steps: Step[] = [
-  { key: "dias", question: "Quantos dias você tem?", hint: "Isso define o ritmo do roteiro.", options: ["3 dias", "5 dias", "7 dias", "10+ dias"] },
-  { key: "companhia", question: "Quem vai viajar?", hint: "Adaptamos as sugestões ao grupo.", options: ["Sozinho", "Casal", "Família", "Amigos"] },
-  { key: "interesses", question: "O que você quer viver?", hint: "Escolha quantos quiser.", options: ["Natureza", "Praia", "Aventura", "Cultura", "Gastronomia", "Descanso"], multi: true },
-  { key: "orcamento", question: "Quanto pretende gastar?", hint: "Estimativa por pessoa, sem passagens.", options: ["Econômico", "Confortável", "Premium"] },
-  { key: "transporte", question: "Como você prefere viajar?", hint: "Podemos ajustar depois.", options: ["Carro", "Transfer", "Passeios", "Ainda não sei"] },
+  {
+    key: "dias",
+    question: "Quantos dias você tem?",
+    hint: "Isso define o ritmo do roteiro.",
+    options: ["3 dias", "5 dias", "7 dias", "10+ dias"],
+  },
+  {
+    key: "companhia",
+    question: "Quem vai viajar?",
+    hint: "Adaptamos as sugestões ao grupo.",
+    options: ["Sozinho", "Casal", "Família", "Amigos"],
+  },
+  {
+    key: "interesses",
+    question: "O que você quer viver?",
+    hint: "Escolha quantos quiser.",
+    options: ["Natureza", "Praia", "Aventura", "Cultura", "Gastronomia", "Descanso"],
+    multi: true,
+  },
+  {
+    key: "orcamento",
+    question: "Quanto pretende gastar?",
+    hint: "Estimativa por pessoa, sem passagens.",
+    options: ["Econômico", "Confortável", "Premium"],
+  },
+  {
+    key: "transporte",
+    question: "Como você prefere viajar?",
+    hint: "Podemos ajustar depois.",
+    options: ["Carro", "Transfer", "Passeios", "Ainda não sei"],
+  },
 ];
 
 const budgetMap: Record<string, string> = {
-  Econômico: "R$ 1.800 – R$ 2.400",
-  Confortável: "R$ 2.400 – R$ 3.600",
-  Premium: "R$ 4.200 – R$ 6.500",
+  Econômico: "R$ 1.800 a R$ 2.400",
+  Confortável: "R$ 2.400 a R$ 3.600",
+  Premium: "R$ 4.200 a R$ 6.500",
 };
 
 export function TripPlanner() {
@@ -57,7 +83,17 @@ export function TripPlanner() {
     }
   };
 
-  if (done) return <PlannerResult answers={answers} onRestart={() => { setDone(false); setIndex(0); setAnswers({}); }} />;
+  if (done)
+    return (
+      <PlannerResult
+        answers={answers}
+        onRestart={() => {
+          setDone(false);
+          setIndex(0);
+          setAnswers({});
+        }}
+      />
+    );
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -98,7 +134,9 @@ export function TripPlanner() {
                 <span
                   className={cn(
                     "grid h-6 w-6 place-items-center rounded-full border transition-colors",
-                    active ? "border-turquoise bg-turquoise text-turquoise-foreground" : "border-border",
+                    active
+                      ? "border-turquoise bg-turquoise text-turquoise-foreground"
+                      : "border-border",
                   )}
                 >
                   {active && <Check className="h-3.5 w-3.5" />}
@@ -137,8 +175,8 @@ function PlannerResult({
   answers: Record<string, string[]>;
   onRestart: () => void;
 }) {
-  const days = answers['dias']?.[0] ?? "5 dias";
-  const budget = budgetMap[answers['orcamento']?.[0] ?? "Confortável"] ?? budgetMap['Confortável'];
+  const days = answers["dias"]?.[0] ?? "5 dias";
+  const budget = budgetMap[answers["orcamento"]?.[0] ?? "Confortável"] ?? budgetMap["Confortável"];
   const base = itineraries[0]!;
   const stops = [
     { name: "São Luís", note: "Centro histórico e gastronomia", image: img.saoLuis },
@@ -150,12 +188,14 @@ function PlannerResult({
   return (
     <div className="mx-auto max-w-5xl animate-rise">
       <div className="text-center">
-        <span className="inline-flex items-center gap-2 rounded-full bg-turquoise/15 px-4 py-1.5 text-xs font-semibold tracking-wide text-turquoise uppercase">
+        <span className="inline-flex items-center gap-2 rounded-full bg-turquoise/15 px-4 py-1.5 text-xs font-semibold tracking-wide text-lagoon uppercase">
           <Sparkles className="h-3.5 w-3.5" /> Seu roteiro está pronto
         </span>
-        <h2 className="mt-4 font-display text-4xl sm:text-5xl">{days.replace("+", " ou mais")} no Maranhão</h2>
+        <h2 className="mt-4 font-display text-4xl sm:text-5xl">
+          {days.replace("+", " ou mais")} no Maranhão
+        </h2>
         <p className="mt-3 text-muted-foreground">
-          Montado a partir das suas respostas: {Object.values(answers).flat().join(" · ")}
+          Montado a partir das suas respostas: {Object.values(answers).flat().join(", ")}
         </p>
       </div>
 
@@ -170,7 +210,12 @@ function PlannerResult({
                 {i + 1}
               </span>
               <div className="h-16 w-24 shrink-0 overflow-hidden rounded-xl">
-                <img src={s.image} alt={s.name} loading="lazy" className="h-full w-full object-cover" />
+                <img
+                  src={s.image}
+                  alt={s.name}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
               </div>
               <div className="min-w-0">
                 <p className="truncate font-display text-lg">{s.name}</p>
@@ -204,7 +249,7 @@ function PlannerResult({
             </div>
             <div className="p-5">
               <p className="inline-flex items-center gap-2 text-sm font-semibold">
-                <MapPin className="h-4 w-4 text-turquoise" /> 4 paradas · {base.places} lugares
+                <MapPin className="h-4 w-4 text-lagoon" /> 4 paradas, {base.places} lugares
               </p>
               <p className="mt-3 inline-flex items-center gap-2 text-sm">
                 <Wallet className="h-4 w-4 text-gold" />
@@ -215,7 +260,11 @@ function PlannerResult({
           </div>
 
           <button
-            onClick={() => toast.success("Viagem salva", { description: "Protótipo: nada é enviado a um servidor." })}
+            onClick={() =>
+              toast.success("Viagem salva", {
+                description: "Protótipo: nada é enviado a um servidor.",
+              })
+            }
             className="flex w-full items-center justify-center gap-2 rounded-full bg-turquoise px-6 py-3.5 text-sm font-semibold text-turquoise-foreground transition-transform hover:scale-[1.02]"
           >
             <Heart className="h-4 w-4" /> Salvar viagem

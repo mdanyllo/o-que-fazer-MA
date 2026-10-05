@@ -1,8 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { MapPin, CalendarRange, Navigation, ArrowRight, Sparkles } from "lucide-react";
-import { PageShell } from "@/components/site/PageShell";
+import { HeroFrame, PageShell } from "@/components/site/PageShell";
 import { ExperienceCard, RouteCard, SectionHeading } from "@/components/site/cards";
-import { destinations, experiences, getDestination, itineraries } from "@/data/maranhao";
+import {
+  destinations,
+  getDestination,
+  getExperiencesByDestination,
+  getItinerariesByDestination,
+} from "@/data/maranhao";
 
 export const Route = createFileRoute("/destinos/$slug")({
   loader: ({ params }) => {
@@ -12,14 +17,16 @@ export const Route = createFileRoute("/destinos/$slug")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Destino não encontrado" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [{ title: "Destino não encontrado" }, { name: "robots", content: "noindex" }],
+      };
     }
     const d = loaderData.destination;
     return {
       meta: [
-        { title: `${d.name} — o que fazer | Descubra Maranhão` },
+        { title: `O que fazer em ${d.name} | Descubra Maranhão` },
         { name: "description", content: d.tagline },
-        { property: "og:title", content: `${d.name} — Descubra Maranhão` },
+        { property: "og:title", content: `${d.name} | Descubra Maranhão` },
         { property: "og:description", content: d.tagline },
       ],
     };
@@ -47,27 +54,31 @@ function DestinoNotFound() {
 
 function DestinoPage() {
   const { destination } = Route.useLoaderData();
-  const related = experiences.filter(
-    (e) => e.destinationSlug === destination.slug || destination.categories.includes(e.category),
-  );
-  const routes = itineraries.filter(
-    (i) =>
-      i.destinationsLabel.toLowerCase().includes(destination.name.toLowerCase()) ||
-      i.tags.some((t) => destination.categories.includes(t.toLowerCase())),
-  );
-  const others = destinations.filter((d) => d.slug !== destination.slug).slice(0, 3);
+  const related = getExperiencesByDestination(destination.slug);
+  const routes = getItinerariesByDestination(destination.slug);
+  // Prioriza outras cidades da mesma região antes das demais.
+  const others = destinations
+    .filter((d) => d.slug !== destination.slug)
+    .sort(
+      (a, b) =>
+        Number(b.regionSlug === destination.regionSlug) -
+        Number(a.regionSlug === destination.regionSlug),
+    )
+    .slice(0, 3);
 
   return (
-    <PageShell transparentHeader>
-      <section className="relative flex min-h-[85vh] items-end overflow-hidden">
-        <img src={destination.image} alt={destination.name} className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 hero-scrim" />
-        <div className="relative mx-auto w-full max-w-7xl px-5 pt-32 pb-14 lg:px-8">
+    <PageShell>
+      <HeroFrame image={destination.image} alt={destination.name} className="min-h-[75vh]">
+        <div className="mx-auto max-w-7xl px-6 pt-24 pb-10 sm:px-10 sm:pb-12 lg:pb-14">
           <p className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
             <MapPin className="h-3.5 w-3.5" /> {destination.state}
           </p>
-          <h1 className="mt-4 font-display text-5xl text-white sm:text-6xl lg:text-7xl">{destination.name}</h1>
-          <p className="mt-4 max-w-2xl text-lg text-white/85">{destination.tagline}</p>
+          <h1 className="mt-4 font-display text-4xl text-white text-balance-title sm:text-5xl lg:text-7xl">
+            {destination.name}
+          </h1>
+          <p className="mt-4 max-w-2xl text-base text-white/85 text-pretty sm:text-lg">
+            {destination.tagline}
+          </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a
               href="#experiencias"
@@ -83,16 +94,21 @@ function DestinoPage() {
             </Link>
           </div>
         </div>
-      </section>
+      </HeroFrame>
 
-      <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-12 sm:py-16 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
           <div>
             <h2 className="font-display text-3xl">Sobre {destination.name}</h2>
-            <p className="mt-4 text-lg leading-relaxed text-muted-foreground">{destination.description}</p>
+            <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
+              {destination.description}
+            </p>
             <div className="mt-8 flex flex-wrap gap-2">
               {destination.categories.map((c) => (
-                <span key={c} className="rounded-full bg-secondary px-3.5 py-1.5 text-sm capitalize">
+                <span
+                  key={c}
+                  className="rounded-full bg-secondary px-3.5 py-1.5 text-sm capitalize"
+                >
                   {c.replace("-", " ")}
                 </span>
               ))}
@@ -100,21 +116,21 @@ function DestinoPage() {
           </div>
           <dl className="grid gap-4 self-start rounded-2xl border border-border bg-card p-6 shadow-soft">
             <div className="flex items-start gap-3">
-              <CalendarRange className="mt-0.5 h-5 w-5 shrink-0 text-turquoise" />
+              <CalendarRange className="mt-0.5 h-5 w-5 shrink-0 text-lagoon" />
               <div>
                 <dt className="text-sm text-muted-foreground">Melhor época</dt>
                 <dd className="font-semibold">{destination.bestTime}</dd>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <Navigation className="mt-0.5 h-5 w-5 shrink-0 text-turquoise" />
+              <Navigation className="mt-0.5 h-5 w-5 shrink-0 text-lagoon" />
               <div>
                 <dt className="text-sm text-muted-foreground">Como chegar</dt>
                 <dd className="font-semibold">{destination.distance}</dd>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-turquoise" />
+              <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-lagoon" />
               <div>
                 <dt className="text-sm text-muted-foreground">Experiências mapeadas</dt>
                 <dd className="font-semibold">{destination.experiences}</dd>
@@ -130,9 +146,12 @@ function DestinoPage() {
         </div>
       </section>
 
-      <section id="experiencias" className="bg-sand/60 py-16 scroll-mt-20">
+      <section id="experiencias" className="bg-sand/60 py-12 sm:py-16 scroll-mt-20">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
-          <SectionHeading eyebrow="Não deixe de conhecer" title={`Experiências em ${destination.name}`} />
+          <SectionHeading
+            eyebrow="Não deixe de conhecer"
+            title={`Experiências em ${destination.name}`}
+          />
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {destination.highlights.map((h) => (
               <article
@@ -140,7 +159,12 @@ function DestinoPage() {
                 className="group overflow-hidden rounded-2xl border border-border bg-card shadow-soft card-lift"
               >
                 <div className="aspect-16/10 overflow-hidden">
-                  <img src={h.image} alt={h.name} loading="lazy" className="h-full w-full object-cover img-zoom" />
+                  <img
+                    src={h.image}
+                    alt={h.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover img-zoom"
+                  />
                 </div>
                 <div className="p-5">
                   <h3 className="font-display text-xl">{h.name}</h3>
@@ -157,7 +181,7 @@ function DestinoPage() {
       </section>
 
       {related.length > 0 && (
-        <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+        <section className="mx-auto max-w-7xl px-5 py-12 sm:py-16 lg:px-8">
           <SectionHeading title="Experiências relacionadas" />
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {related.slice(0, 4).map((e) => (
@@ -168,7 +192,7 @@ function DestinoPage() {
       )}
 
       {routes.length > 0 && (
-        <section className="mx-auto max-w-7xl px-5 pb-16 lg:px-8">
+        <section className="mx-auto max-w-7xl px-5 pb-12 sm:pb-16 lg:px-8">
           <SectionHeading title={`Roteiros com ${destination.name}`} />
           <div className="grid gap-5 lg:grid-cols-2">
             {routes.slice(0, 2).map((i) => (
@@ -189,10 +213,17 @@ function DestinoPage() {
               className="group relative block overflow-hidden rounded-2xl"
             >
               <div className="aspect-16/10 overflow-hidden">
-                <img src={d.image} alt={d.name} loading="lazy" className="h-full w-full object-cover img-zoom" />
+                <img
+                  src={d.image}
+                  alt={d.name}
+                  loading="lazy"
+                  className="h-full w-full object-cover img-zoom"
+                />
               </div>
               <div className="absolute inset-0 hero-scrim" />
-              <span className="absolute bottom-4 left-4 font-display text-xl text-white">{d.name}</span>
+              <span className="absolute bottom-4 left-4 font-display text-xl text-white">
+                {d.name}
+              </span>
             </Link>
           ))}
         </div>

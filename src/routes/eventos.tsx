@@ -8,14 +8,17 @@ import { events, img } from "@/data/maranhao";
 export const Route = createFileRoute("/eventos")({
   head: () => ({
     meta: [
-      { title: "Eventos no Maranhão — festas, cultura e gastronomia" },
+      { title: "Eventos no Maranhão | Festas, cultura e gastronomia" },
       {
         name: "description",
         content:
           "Calendário demonstrativo de eventos no Maranhão: São João, Bumba Meu Boi, festivais gastronômicos e festas tradicionais.",
       },
       { property: "og:title", content: "Eventos no Maranhão" },
-      { property: "og:description", content: "Um calendário visual das festas e festivais do estado." },
+      {
+        property: "og:description",
+        content: "Um calendário visual das festas e festivais do estado.",
+      },
     ],
   }),
   component: EventosPage,
@@ -28,7 +31,7 @@ function EventosPage() {
   const list = month ? events.filter((e) => e.month === month) : events;
 
   return (
-    <PageShell transparentHeader>
+    <PageShell>
       <PageHero
         image={img.cultura}
         eyebrow="Agenda"
@@ -36,14 +39,16 @@ function EventosPage() {
         subtitle="Festas tradicionais, cultura popular, shows e festivais gastronômicos ao longo do ano."
       />
 
-      <section className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-10 sm:py-14 lg:px-8">
         <div className="overflow-x-auto">
           <div className="flex min-w-max gap-2 pb-2">
             <button
               onClick={() => setMonth(null)}
               className={cn(
                 "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-                month === null ? "border-transparent bg-primary text-primary-foreground" : "border-border",
+                month === null
+                  ? "border-transparent bg-primary text-primary-foreground"
+                  : "border-border",
               )}
             >
               Ano todo
@@ -62,7 +67,12 @@ function EventosPage() {
                   )}
                 >
                   <span className="text-sm font-semibold">{m}</span>
-                  <span className={cn("text-xs", m === month ? "text-primary-foreground/70" : "text-muted-foreground")}>
+                  <span
+                    className={cn(
+                      "text-xs",
+                      m === month ? "text-primary-foreground/70" : "text-muted-foreground",
+                    )}
+                  >
                     {count} {count === 1 ? "evento" : "eventos"}
                   </span>
                 </button>

@@ -6,14 +6,17 @@ import { img, itineraries } from "@/data/maranhao";
 export const Route = createFileRoute("/roteiros/")({
   head: () => ({
     meta: [
-      { title: "Roteiros no Maranhão — 1, 3, 4 e 5 dias" },
+      { title: "Roteiros no Maranhão | De 1 a 5 dias" },
       {
         name: "description",
         content:
           "Roteiros prontos pelo Maranhão: São Luís em 1 dia, Lençóis em 3 dias, Chapada das Mesas em 4 dias e Maranhão Essencial em 5 dias.",
       },
       { property: "og:title", content: "Roteiros no Maranhão" },
-      { property: "og:description", content: "Viagens prontas com dia a dia, mapa e estimativa de custo." },
+      {
+        property: "og:description",
+        content: "Viagens prontas com dia a dia, mapa e estimativa de custo.",
+      },
     ],
   }),
   component: RoteirosPage,
@@ -21,14 +24,14 @@ export const Route = createFileRoute("/roteiros/")({
 
 function RoteirosPage() {
   return (
-    <PageShell transparentHeader>
+    <PageShell>
       <PageHero
         image={img.porDoSol}
         eyebrow="Roteiros"
         title="Viagens prontas para seguir"
         subtitle="Cada roteiro traz duração, dificuldade, lugares e estimativa de gastos."
       />
-      <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-12 sm:py-16 lg:px-8">
         <SectionHeading
           title="Escolha o seu ritmo"
           description="De um fim de semana nos Lençóis a cinco dias cruzando o estado."
