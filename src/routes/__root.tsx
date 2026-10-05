@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { themeBootScript } from "../lib/tema";
 
 function NotFoundComponent() {
   return (
@@ -77,21 +78,35 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Azulejo — o que fazer no Maranhão" },
+      {
+        name: "description",
+        content:
+          "O que fazer no Maranhão, sem precisar procurar em dezenas de lugares diferentes. Destinos, experiências, roteiros, mapa e eventos.",
+      },
+      { name: "theme-color", content: "#1F4E8C" },
+      { property: "og:title", content: "Azulejo — o que fazer no Maranhão" },
+      {
+        property: "og:description",
+        content: "Destinos, experiências, roteiros, mapa e eventos do Maranhão num lugar só.",
+      },
       { property: "og:type", content: "website" },
+      { property: "og:locale", content: "pt_BR" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;700&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/brand/azulejo-simbolo.svg", type: "image/svg+xml" },
+      { rel: "apple-touch-icon", href: "/brand/azulejo-simbolo.svg" },
     ],
   }),
   shellComponent: RootShell,
@@ -102,8 +117,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR" suppressHydrationWarning>
       <head>
+        {/* Antes da primeira pintura: marca que há JS (animações de entrada) e aplica o tema salvo. */}
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <HeadContent />
       </head>
       <body>

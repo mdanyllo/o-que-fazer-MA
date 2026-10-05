@@ -1,15 +1,16 @@
-import lencois from "@/assets/lencois-hero.jpg";
-import saoLuis from "@/assets/sao-luis.jpg";
-import barreirinhas from "@/assets/barreirinhas.jpg";
-import atins from "@/assets/atins.jpg";
-import chapada from "@/assets/chapada.jpg";
-import rioPreguicas from "@/assets/rio-preguicas.jpg";
-import cultura from "@/assets/cultura.jpg";
-import gastronomia from "@/assets/gastronomia.jpg";
-import alcantara from "@/assets/alcantara.jpg";
-import santoAmaro from "@/assets/santo-amaro.jpg";
-import porDoSol from "@/assets/por-do-sol.jpg";
-import hospedagem from "@/assets/hospedagem.jpg";
+// Arquivo legado: substituído por src/data/*.ts e removido na etapa (d).
+const lencois = "/images/home/hero.jpg";
+const saoLuis = "/images/destinos/sao-luis.jpg";
+const barreirinhas = "/images/destinos/barreirinhas.jpg";
+const atins = "/images/destinos/atins.jpg";
+const chapada = "/images/destinos/carolina.jpg";
+const rioPreguicas = "/images/experiencias/passeio-rio-preguicas.jpg";
+const cultura = "/images/eventos/sao-joao.jpg";
+const gastronomia = "/images/categorias/gastronomia.jpg";
+const alcantara = "/images/destinos/alcantara.jpg";
+const santoAmaro = "/images/destinos/santo-amaro.jpg";
+const porDoSol = "/images/lugares/lagoa-bonita.jpg";
+const hospedagem = "/images/categorias/hospedagem.jpg";
 
 export const img = {
   lencois,
