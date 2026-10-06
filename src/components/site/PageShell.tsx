@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { Foto } from "@/components/azulejo/Foto";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "./BottomNav";
 import { SiteFooter } from "./SiteFooter";
@@ -15,8 +14,6 @@ export function PageShell({
 }: {
   children: ReactNode;
   semRodape?: boolean;
-  /** @deprecated o header não fica mais sobre a foto; ignorado */
-  transparentHeader?: boolean;
 }) {
   return (
     <div className="flex min-h-svh flex-col bg-louca">
@@ -37,36 +34,6 @@ export function PageShell({
       {!semRodape && <SiteFooter />}
       <BottomNav />
     </div>
-  );
-}
-
-/** Capa de página legada (telas antigas, refeitas na etapa d). */
-export function PageHero({
-  image,
-  eyebrow,
-  title,
-  subtitle,
-  children,
-  tall = false,
-}: {
-  image: string;
-  eyebrow?: string;
-  title: string;
-  subtitle?: string;
-  children?: ReactNode;
-  tall?: boolean;
-}) {
-  return (
-    <section className={cn("relative flex items-end", tall ? "min-h-[70svh]" : "min-h-[48svh]")}>
-      <Foto src={image} alt={title} rotulo={title} prioridade className="absolute inset-0" />
-      <div className="absolute inset-0 veu-foto" />
-      <div className="relative mx-auto w-full max-w-7xl px-5 pt-24 pb-12 text-sobre-foto md:px-12 md:pb-16">
-        {eyebrow && <p className="mb-3 text-rotulo">{eyebrow}</p>}
-        <h1 className="max-w-4xl text-t1">{title}</h1>
-        {subtitle && <p className="mt-4 medida text-lg">{subtitle}</p>}
-        {children}
-      </div>
-    </section>
   );
 }
 

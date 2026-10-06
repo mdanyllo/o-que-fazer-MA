@@ -1,42 +1,56 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PageHero, PageShell } from "@/components/site/PageShell";
-import { RouteCard, SectionHeading } from "@/components/site/cards";
-import { img, itineraries } from "@/data/maranhao";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { botao } from "@/components/azulejo/botao";
+import { CardRoteiro } from "@/components/azulejo/cards";
+import { CabecalhoPagina, PageShell } from "@/components/site/PageShell";
+import { roteiros } from "@/data";
 
 export const Route = createFileRoute("/roteiros/")({
   head: () => ({
     meta: [
-      { title: "Roteiros no Maranhão — 1, 3, 4 e 5 dias" },
+      { title: "Roteiros prontos | Azulejo" },
       {
         name: "description",
         content:
-          "Roteiros prontos pelo Maranhão: São Luís em 1 dia, Lençóis em 3 dias, Chapada das Mesas em 4 dias e Maranhão Essencial em 5 dias.",
+          "Roteiros dia a dia pelo Maranhão: São Luís, Lençóis, Santo Amaro e Chapada das Mesas.",
       },
-      { property: "og:title", content: "Roteiros no Maranhão" },
-      { property: "og:description", content: "Viagens prontas com dia a dia, mapa e estimativa de custo." },
     ],
   }),
-  component: RoteirosPage,
+  component: Roteiros,
 });
 
-function RoteirosPage() {
+function Roteiros() {
   return (
-    <PageShell transparentHeader>
-      <PageHero
-        image={img.porDoSol}
-        eyebrow="Roteiros"
-        title="Viagens prontas para seguir"
-        subtitle="Cada roteiro traz duração, dificuldade, lugares e estimativa de gastos."
+    <PageShell>
+      <CabecalhoPagina
+        titulo="Roteiros prontos"
+        apoio="Dias contados, paradas escolhidas e tempo de estrada. Use como está ou mude o que quiser em Minha viagem."
       />
-      <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <SectionHeading
-          title="Escolha o seu ritmo"
-          description="De um fim de semana nos Lençóis a cinco dias cruzando o estado."
-        />
-        <div className="grid gap-5 lg:grid-cols-2">
-          {itineraries.map((i) => (
-            <RouteCard key={i.slug} itinerary={i} />
+      <section
+        aria-label="Lista de roteiros"
+        className="mx-auto max-w-7xl px-5 pb-12 md:px-12 md:pb-20"
+      >
+        <div className="grid gap-x-8 gap-y-14 md:grid-cols-2 lg:grid-cols-3">
+          {roteiros.map((r) => (
+            <CardRoteiro key={r.slug} roteiro={r} destaque />
           ))}
+        </div>
+      </section>
+      <section
+        aria-labelledby="sob-medida"
+        className="mx-auto max-w-7xl px-5 pb-12 md:px-12 md:pb-22"
+      >
+        <div className="flex flex-wrap items-end justify-between gap-6 rounded-md bg-areia p-6 md:p-12">
+          <div className="flex max-w-xl flex-col gap-2">
+            <h2 id="sob-medida" className="text-t1">
+              Nenhum serve direitinho?
+            </h2>
+            <p className="text-ink-suave">
+              Responda cinco perguntas e a gente monta um roteiro do seu jeito.
+            </p>
+          </div>
+          <Link to="/planejar" className={botao({ tamanho: "lg" })}>
+            Planejar viagem
+          </Link>
         </div>
       </section>
     </PageShell>

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { urlFoto } from "@/lib/imagens";
 import { cn } from "@/lib/utils";
 import { COR, type CorMaranhense } from "./cores";
 import { PadraoAzulejo } from "./PadraoAzulejo";
 
 type Props = {
-  /** caminho em /public (ex.: /images/destinos/barreirinhas.jpg) */
+  /** caminho lógico da foto (ex.: /images/destinos/barreirinhas.jpg), ver src/lib/imagens.ts */
   src?: string;
   /** texto alternativo descritivo (obrigatório) */
   alt: string;
@@ -37,14 +38,16 @@ export function Foto({
   prioridade = false,
   children,
 }: Props) {
-  const [falhou, setFalhou] = useState(!src);
+  const url = urlFoto(src);
+  const [falhou, setFalhou] = useState(!url);
   const ref = useRef<HTMLImageElement>(null);
 
-  // A imagem pode ter falhado antes da hidratação, quando o onError ainda não existia.
+  // a imagem pode ter falhado antes da hidratação, quando o onError ainda não existia
   useEffect(() => {
+    setFalhou(!url);
     const img = ref.current;
     if (img && img.complete && img.naturalWidth === 0) setFalhou(true);
-  }, [src]);
+  }, [url]);
 
   return (
     <div className={cn("relative overflow-hidden", COR[cor].bg, className)}>
@@ -61,10 +64,10 @@ export function Foto({
           Foto: {rotulo}
         </span>
       </div>
-      {src && !falhou && (
+      {url && !falhou && (
         <img
           ref={ref}
-          src={src}
+          src={url}
           alt={alt}
           width={1600}
           height={1067}

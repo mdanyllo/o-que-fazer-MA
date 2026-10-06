@@ -3,10 +3,19 @@ import "leaflet/dist/leaflet.css";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
 import L from "leaflet";
 import { useEffect, useMemo, type ReactNode } from "react";
-import { MapContainer, Marker, Polyline, TileLayer, Tooltip, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Polyline,
+  TileLayer,
+  Tooltip,
+  useMap,
+  ZoomControl,
+} from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { corDaCategoria } from "@/components/azulejo/cores";
 import type { Coordenada, Item } from "@/data";
+import { cn } from "@/lib/utils";
 
 /** Enquadramento inicial do Maranhão. */
 const LIMITES_MARANHAO: L.LatLngBoundsExpression = [
@@ -134,11 +143,11 @@ export default function MapaLeaflet({
   );
 
   return (
-    <div className={className} style={{ position: "relative" }}>
+    <div className={cn("relative", className)}>
       <MapContainer
         bounds={LIMITES_MARANHAO}
         scrollWheelZoom={rolagemZoom}
-        zoomControl
+        zoomControl={false}
         attributionControl
         className="mapa-azulejo h-full w-full"
       >
@@ -164,6 +173,7 @@ export default function MapaLeaflet({
         ) : (
           marcadores
         )}
+        <ZoomControl position="bottomright" zoomInTitle="Aproximar" zoomOutTitle="Afastar" />
         <Controle pontos={pontos} selecionado={selecionado} enquadrar={enquadrar} />
       </MapContainer>
       {children}

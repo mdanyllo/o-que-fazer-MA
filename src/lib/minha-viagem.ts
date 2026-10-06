@@ -103,7 +103,14 @@ export function salvarRoteiro(roteiro: Omit<RoteiroSalvo, "id" | "criadoEm"> & {
   const atual = ler();
   const id = roteiro.id ?? `r-${Date.now().toString(36)}`;
   const novo: RoteiroSalvo = { ...roteiro, id, criadoEm: new Date().toISOString() };
-  salvar({ ...atual, roteiros: [novo, ...atual.roteiros.filter((r) => r.id !== id)] });
+  // se já existe, atualiza no mesmo lugar da lista; se é novo, entra no topo
+  const existe = atual.roteiros.some((r) => r.id === id);
+  salvar({
+    ...atual,
+    roteiros: existe
+      ? atual.roteiros.map((r) => (r.id === id ? novo : r))
+      : [novo, ...atual.roteiros],
+  });
   return id;
 }
 

@@ -1,41 +1,36 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHero, PageShell } from "@/components/site/PageShell";
-import { DestinationCard, SectionHeading } from "@/components/site/cards";
-import { destinations, img } from "@/data/maranhao";
+import { CardDestino } from "@/components/azulejo/cards";
+import { CabecalhoPagina, PageShell } from "@/components/site/PageShell";
+import { destinos } from "@/data";
 
 export const Route = createFileRoute("/destinos/")({
   head: () => ({
     meta: [
-      { title: "Destinos do Maranhão — cidades, parques e vilas" },
+      { title: "Destinos | Azulejo" },
       {
         name: "description",
         content:
-          "Conheça São Luís, Barreirinhas, Lençóis Maranhenses, Atins, Santo Amaro, Alcântara e a Chapada das Mesas.",
+          "São Luís, Lençóis, Alcântara, Chapada das Mesas e mais: por onde começar no Maranhão.",
       },
-      { property: "og:title", content: "Destinos do Maranhão" },
-      { property: "og:description", content: "Cidades, parques e vilas para explorar no Maranhão." },
     ],
   }),
-  component: DestinosPage,
+  component: Destinos,
 });
 
-function DestinosPage() {
+function Destinos() {
   return (
-    <PageShell transparentHeader>
-      <PageHero
-        image={img.santoAmaro}
-        eyebrow="Destinos"
-        title="Todo o Maranhão em um só lugar"
-        subtitle="Do centro histórico da capital às dunas do parque e às cachoeiras do sul do estado."
+    <PageShell>
+      <CabecalhoPagina
+        titulo="Destinos"
+        apoio="Do casario de São Luís às cachoeiras do sul do estado. Cada cidade com melhor época, como chegar e o que fazer."
       />
-      <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <SectionHeading
-          title="Escolha por onde começar"
-          description={`${destinations.length} destinos mapeados com experiências, mapas e roteiros.`}
-        />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {destinations.map((d) => (
-            <DestinationCard key={d.slug} destination={d} />
+      <section
+        aria-label="Lista de destinos"
+        className="mx-auto max-w-7xl px-5 pb-16 md:px-12 md:pb-24"
+      >
+        <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          {destinos.map((d) => (
+            <CardDestino key={d.slug} destino={d} />
           ))}
         </div>
       </section>

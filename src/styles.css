@@ -410,64 +410,6 @@
   stroke-linejoin: round;
 }
 
-/* Compatibilidade temporária com as telas antigas, removida na etapa (d). */
-@theme inline {
-  --color-sand: var(--areia);
-  --color-sand-deep: var(--linha);
-  --color-turquoise: var(--lagoa);
-  --color-turquoise-foreground: var(--ink);
-  --color-deep: var(--cobalto);
-  --color-deep-foreground: var(--sobre-cobalto);
-  --color-forest: var(--babacu);
-  --color-gold: var(--ouro);
-  --color-gold-foreground: var(--ink);
-  --shadow-soft: var(--shadow-flutua);
-  --shadow-lift: var(--shadow-flutua);
-}
-@utility hero-scrim {
-  background-image: linear-gradient(
-    to top,
-    rgb(var(--veu-foto) / 0.82) 0%,
-    rgb(var(--veu-foto) / 0.4) 45%,
-    rgb(var(--veu-foto) / 0.08) 100%
-  );
-}
-@utility text-balance-title {
-  text-wrap: balance;
-}
-@utility card-lift {
-  transition: transform 300ms var(--ease-saida);
-}
-@utility img-zoom {
-  transition: transform 600ms var(--ease-saida);
-  .group:hover & {
-    transform: scale(1.04);
-  }
-}
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-@utility animate-rise {
-  animation: rise 600ms var(--ease-saida) both;
-}
-@keyframes pin-drop {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -140%) scale(0.7);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -100%) scale(1);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -71,7 +71,16 @@ export function CardDestino({
   );
 }
 
-export function CardItem({ item, className }: { item: Item; className?: string }) {
+export function CardItem({
+  item,
+  nota,
+  className,
+}: {
+  item: Item;
+  /** informação extra em destaque (ex.: distância no "perto de mim") */
+  nota?: string;
+  className?: string;
+}) {
   const categoria = categoriaPorId[item.categoria];
   return (
     <article className={cn("group relative flex min-w-0 flex-col gap-3", className)}>
@@ -108,6 +117,11 @@ export function CardItem({ item, className }: { item: Item; className?: string }
       </h3>
       <p className="text-base text-ink-suave">{item.resumo}</p>
       <div className="mt-auto flex flex-wrap gap-2">
+        {nota && (
+          <Tag className="bg-cobalto text-sobre-cobalto">
+            <MapPin className="size-3.5" aria-hidden /> {nota}
+          </Tag>
+        )}
         {item.horas > 0 && (
           <Tag>
             <Clock className="size-3.5" aria-hidden /> {formatarHoras(item.horas)}

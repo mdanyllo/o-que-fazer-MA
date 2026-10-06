@@ -1,39 +1,36 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { Foto } from "@/components/azulejo/Foto";
-import { corDaCategoria } from "@/components/azulejo/cores";
-import { CabecalhoPagina, PageShell } from "@/components/site/PageShell";
+import { PaginaItem } from "@/components/paginas/PaginaItem";
+import { Pagina404 } from "@/components/site/Pagina404";
 import { getExperiencia } from "@/data";
 
-// Provisório (etapa c): a página completa do lugar/experiência é feita na etapa (d).
 export const Route = createFileRoute("/experiencias/$slug")({
   loader: ({ params }) => {
-    const item = getExperiencia(params.slug);
-    if (!item) throw notFound();
-    return { item };
+    const dados = getExperiencia(params.slug);
+    if (!dados) throw notFound();
+    return { dados };
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      { title: loaderData ? `${loaderData.item.nome} | Azulejo` : "Não encontrado | Azulejo" },
-    ],
-  }),
+  head: ({ loaderData }) => {
+    if (!loaderData) return { meta: [{ title: "Experiência não encontrada | Azulejo" }] };
+    const { dados } = loaderData;
+    return {
+      meta: [
+        { title: `${dados.nome} | Azulejo` },
+        { name: "description", content: dados.resumo },
+        { property: "og:title", content: `${dados.nome} | Azulejo` },
+        { property: "og:description", content: dados.resumo },
+      ],
+    };
+  },
+  notFoundComponent: () => (
+    <Pagina404
+      titulo="Experiência não encontrada"
+      texto="Talvez ela ainda não esteja no Azulejo. Veja o que fazer no Maranhão."
+    />
+  ),
   component: Pagina,
 });
 
 function Pagina() {
-  const { item } = Route.useLoaderData();
-  return (
-    <PageShell>
-      <CabecalhoPagina titulo={item.nome} apoio={item.resumo} />
-      <div className="mx-auto max-w-7xl px-5 pb-20 md:px-12">
-        <Foto
-          src={item.foto}
-          alt={item.nome}
-          rotulo={item.nome}
-          cor={corDaCategoria(item.categoria)}
-          className="aspect-[16/9] rounded-md"
-        />
-        <p className="mt-8 medida">{item.descricao}</p>
-      </div>
-    </PageShell>
-  );
+  const { dados } = Route.useLoaderData();
+  return <PaginaItem tipo="experiencia" dados={dados} />;
 }
