@@ -537,7 +537,7 @@ html.js .entra-painel {
   animation: painel-desliza var(--dur-hero) var(--ease-saida) 200ms both;
 }
 
-/* revelação no scroll (uma vez); fallback: aparece sozinho depois de 4s */
+/* revelação no scroll (uma vez); se o app não hidratar, tudo aparece depois de 4s (abaixo) */
 [data-revelar] {
   transition:
     opacity var(--dur-revela) var(--ease-saida),
@@ -547,7 +547,6 @@ html.js .entra-painel {
 html.js [data-revelar]:not([data-visivel]) {
   opacity: 0;
   transform: translateY(24px);
-  animation: aparece 1ms 4s forwards;
 }
 /* revelação lateral só em telas largas; no celular vira vertical (sem vazar para os lados) */
 @media (min-width: 1024px) {
@@ -611,6 +610,88 @@ html.js [data-revelar]:not([data-visivel]) .trilho {
   animation-play-state: paused;
 }
 
+/* títulos de seção: palavra por palavra quando o bloco entra na tela */
+html.js .titulo-rolagem .palavra-mascara > span {
+  animation: none;
+  transition: transform var(--dur-hero) var(--ease-saida);
+  transition-delay: calc(var(--i, 0) * 60ms + var(--atraso-base, 0ms));
+}
+html.js [data-revelar]:not([data-visivel]) .titulo-rolagem .palavra-mascara > span {
+  transform: translateY(110%);
+}
+/* o bloco do título não se move; o apoio e o link vêm depois das palavras */
+html.js [data-revelar="titulo"]:not([data-visivel]),
+html.js [data-revelar="cortina"]:not([data-visivel]) {
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+.depois-do-titulo {
+  transition:
+    opacity var(--dur-revela) var(--ease-saida) 280ms,
+    transform var(--dur-revela) var(--ease-saida) 280ms;
+}
+html.js [data-revelar]:not([data-visivel]) .depois-do-titulo {
+  opacity: 0;
+  transform: translateY(12px);
+}
+@keyframes volta-ao-lugar {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* cortina nas fotos grandes: cobalto e guará recolhem para a direita, a foto assenta */
+.cortina::before,
+.cortina::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform-origin: right;
+  transform: scaleX(0);
+  transition: transform 1000ms var(--ease-saida);
+}
+.cortina::before {
+  background: var(--guara);
+  transition-delay: 160ms;
+}
+.cortina::after {
+  background: var(--cobalto);
+}
+.cortina-zoom {
+  transition: transform 1400ms var(--ease-saida);
+}
+html.js [data-revelar="cortina"]:not([data-visivel]) .cortina::before,
+html.js [data-revelar="cortina"]:not([data-visivel]) .cortina::after {
+  transform: scaleX(1);
+}
+html.js [data-revelar="cortina"]:not([data-visivel]) .cortina-zoom {
+  transform: scale(1.15);
+}
+@keyframes cortina-abre {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* rede de segurança: a classe revelar-pronto entra quando o app hidrata (ver Revelar.tsx);
+   sem ela, depois de 4s tudo o que espera a rolagem aparece sozinho */
+html.js:not(.revelar-pronto) [data-revelar]:not([data-visivel]),
+html.js:not(.revelar-pronto)
+  [data-revelar]:not([data-visivel])
+  .titulo-rolagem
+  .palavra-mascara
+  > span,
+html.js:not(.revelar-pronto) [data-revelar]:not([data-visivel]) .depois-do-titulo,
+html.js:not(.revelar-pronto) [data-revelar]:not([data-visivel]) .cortina-zoom {
+  animation: volta-ao-lugar 1ms 4s forwards;
+}
+html.js:not(.revelar-pronto) [data-revelar]:not([data-visivel]) .cortina::before,
+html.js:not(.revelar-pronto) [data-revelar]:not([data-visivel]) .cortina::after {
+  animation: cortina-abre 1ms 4s forwards;
+}
+
 /* coração ao favoritar */
 .favoritar svg {
   transition: fill var(--dur-toque) ease-out;
@@ -626,6 +707,7 @@ html.js [data-revelar]:not([data-visivel]) .trilho {
     animation: aparece var(--dur-ui) ease-out both !important;
   }
   html.js .entra-foto img,
+  html.js .titulo-rolagem .palavra-mascara > span,
   .pin-azulejo.pin-entra,
   .faixa-movimento {
     animation: none !important;
@@ -636,8 +718,27 @@ html.js [data-revelar]:not([data-visivel]) .trilho {
   [data-revelar] {
     transition: opacity var(--dur-ui) ease-out;
   }
-  .trilho {
+  .trilho,
+  .cortina::before,
+  .cortina::after,
+  .cortina-zoom,
+  html.js .titulo-rolagem .palavra-mascara > span {
     transition: none;
+  }
+  html.js [data-revelar]:not([data-visivel]) .titulo-rolagem .palavra-mascara > span,
+  html.js [data-revelar="cortina"]:not([data-visivel]) .cortina-zoom {
+    transform: none;
+  }
+  html.js [data-revelar="cortina"]:not([data-visivel]) .cortina::before,
+  html.js [data-revelar="cortina"]:not([data-visivel]) .cortina::after {
+    transform: scaleX(0);
+    animation: none;
+  }
+  .depois-do-titulo {
+    transition: opacity var(--dur-ui) ease-out;
+  }
+  html.js [data-revelar]:not([data-visivel]) .depois-do-titulo {
+    transform: none;
   }
   html.js [data-revelar]:not([data-visivel]) .trilho {
     transform: none;

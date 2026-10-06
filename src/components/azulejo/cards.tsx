@@ -153,10 +153,13 @@ export function CardItem({
 export function CardRoteiro({
   roteiro,
   destaque = false,
+  cortina = false,
   className,
 }: {
   roteiro: Roteiro;
   destaque?: boolean;
+  /** foto abre com a cortina ao entrar na tela (só no destaque) */
+  cortina?: boolean;
   className?: string;
 }) {
   return (
@@ -174,6 +177,7 @@ export function CardRoteiro({
         alt={roteiro.titulo}
         rotulo={roteiro.titulo}
         sizes={destaque ? "(min-width: 768px) 50vw, 100vw" : "160px"}
+        cortina={destaque && cortina}
         className={cn("rounded-md", destaque ? "aspect-[3/2]" : "aspect-square")}
         imgClassName="transition-transform duration-600 ease-saida group-hover:scale-[1.04]"
       >

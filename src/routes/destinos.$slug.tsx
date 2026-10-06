@@ -9,9 +9,9 @@ import { CardItem, CardRoteiro } from "@/components/azulejo/cards";
 import { MarcaCategoria, PontoGuara, Tag } from "@/components/azulejo/etiquetas";
 import { Favoritar } from "@/components/azulejo/Favoritar";
 import { Foto } from "@/components/azulejo/Foto";
-import { FaixaAzulejo } from "@/components/azulejo/PadraoAzulejo";
 import { linkTexto, SecaoTitulo } from "@/components/azulejo/SecaoTitulo";
 import { MapaInterativo } from "@/components/mapa/MapaInterativo";
+import { FaixaAzulejoRolagem } from "@/components/movimento/FaixaAzulejoRolagem";
 import { Pagina404 } from "@/components/site/Pagina404";
 import { PageShell } from "@/components/site/PageShell";
 import { FAIXAS, getDestino, itensDoDestino, roteirosQuePassamPor, type Item } from "@/data";
@@ -155,7 +155,7 @@ function PaginaDestino() {
         </dl>
       </section>
 
-      <FaixaAzulejo azulejo={40} />
+      <FaixaAzulejoRolagem azulejo={40} />
 
       {oQueFazer.length > 0 && (
         <section aria-labelledby="fazer" className={secao}>

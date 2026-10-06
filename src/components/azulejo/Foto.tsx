@@ -3,6 +3,7 @@ import { urlFoto } from "@/lib/imagens";
 import { cn } from "@/lib/utils";
 import { COR, type CorMaranhense } from "./cores";
 import { Parallax } from "@/components/movimento/Parallax";
+import { Revelar } from "@/components/movimento/Revelar";
 import { PadraoAzulejo } from "./PadraoAzulejo";
 
 type Props = {
@@ -25,6 +26,8 @@ type Props = {
   parallax?: boolean;
   /** entrada do hero: aparece e assenta de scale 1.08 para 1 */
   entrada?: boolean;
+  /** foto grande no meio da página: uma cortina azul e vermelha abre quando ela entra na tela */
+  cortina?: boolean;
   children?: ReactNode;
 };
 
@@ -43,6 +46,7 @@ export function Foto({
   prioridade = false,
   parallax = false,
   entrada = false,
+  cortina = false,
   children,
 }: Props) {
   const url = urlFoto(src);
@@ -56,8 +60,8 @@ export function Foto({
     if (img && img.complete && img.naturalWidth === 0) setFalhou(true);
   }, [url]);
 
-  return (
-    <div className={cn("relative overflow-hidden", COR[cor].bg, className)}>
+  const conteudo = (
+    <>
       {/* fallback de azulejos só quando a foto não existe ou falhou;
           enquanto carrega, a cor da categoria serve de placeholder */}
       {falhou && (
@@ -89,10 +93,19 @@ export function Foto({
               className={cn("absolute inset-0 h-full w-full object-cover", imgClassName)}
             />
           );
-          const camada = entrada ? <div className="entra-foto absolute inset-0">{img}</div> : img;
+          let camada = entrada ? <div className="entra-foto absolute inset-0">{img}</div> : img;
+          if (cortina) camada = <div className="cortina-zoom absolute inset-0">{camada}</div>;
           return parallax ? <Parallax>{camada}</Parallax> : camada;
         })()}
+      {cortina && <span aria-hidden className="cortina pointer-events-none absolute inset-0" />}
       {children}
-    </div>
+    </>
+  );
+  return cortina ? (
+    <Revelar variante="cortina" className={cn("relative overflow-hidden", COR[cor].bg, className)}>
+      {conteudo}
+    </Revelar>
+  ) : (
+    <div className={cn("relative overflow-hidden", COR[cor].bg, className)}>{conteudo}</div>
   );
 }

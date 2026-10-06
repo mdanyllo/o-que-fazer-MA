@@ -1,10 +1,12 @@
 import type { ReactNode } from "react";
 import { Revelar } from "@/components/movimento/Revelar";
+import { TituloAnimado } from "@/components/movimento/TituloAnimado";
 import { cn } from "@/lib/utils";
 
 /**
  * Título de seção como na referência: H2 forte, uma frase de apoio e, opcionalmente,
  * um link à direita ("Ver todos…"). Sem etiqueta em maiúsculas acima.
+ * Quando entra na tela, o título sobe palavra por palavra e o apoio vem logo depois.
  */
 export function SecaoTitulo({
   titulo,
@@ -13,21 +15,22 @@ export function SecaoTitulo({
   id,
   className,
 }: {
-  titulo: ReactNode;
+  titulo: string;
   apoio?: ReactNode;
   acao?: ReactNode;
   id?: string;
   className?: string;
 }) {
   return (
-    <Revelar className={cn("flex flex-wrap items-end justify-between gap-4", className)}>
+    <Revelar
+      variante="titulo"
+      className={cn("flex flex-wrap items-end justify-between gap-4", className)}
+    >
       <div className="flex max-w-2xl flex-col gap-2">
-        <h2 id={id} className="text-t1">
-          {titulo}
-        </h2>
-        {apoio && <p className="text-ink-suave">{apoio}</p>}
+        <TituloAnimado as="h2" id={id} texto={titulo} atraso={0} rolagem className="text-t1" />
+        {apoio && <p className="depois-do-titulo text-ink-suave">{apoio}</p>}
       </div>
-      {acao}
+      {acao && <div className="depois-do-titulo">{acao}</div>}
     </Revelar>
   );
 }

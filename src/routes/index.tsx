@@ -11,7 +11,9 @@ import {
 } from "@/components/azulejo/cards";
 import { Chip } from "@/components/azulejo/etiquetas";
 import { Foto } from "@/components/azulejo/Foto";
+import { FaixaAzulejoRolagem } from "@/components/movimento/FaixaAzulejoRolagem";
 import { FaixaMovimento } from "@/components/movimento/FaixaMovimento";
+import { TituloAnimado } from "@/components/movimento/TituloAnimado";
 import { GradeRevelar, Revelar } from "@/components/movimento/Revelar";
 import { PadraoAzulejo } from "@/components/azulejo/PadraoAzulejo";
 import { linkTexto, SecaoTitulo } from "@/components/azulejo/SecaoTitulo";
@@ -89,7 +91,7 @@ function Home() {
     <PageShell>
       <HeroHome />
 
-      <PadraoAzulejo azulejo={24} style={{ height: 72 }} />
+      <FaixaAzulejoRolagem azulejo={24} linhas={3} />
 
       {/* Por onde começar */}
       <section aria-labelledby="comecar" className={`${secao} flex flex-col gap-8`}>
@@ -144,7 +146,7 @@ function Home() {
         <div className="grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-12">
           {roteiroDestaque && (
             <Revelar variante="esquerda">
-              <CardRoteiro roteiro={roteiroDestaque} destaque />
+              <CardRoteiro roteiro={roteiroDestaque} destaque cortina />
             </Revelar>
           )}
           <GradeRevelar colunas={3} passo={90} className="flex flex-col gap-6">
@@ -223,12 +225,14 @@ function Home() {
             className="absolute -top-6 -right-6 hidden h-32 w-48 opacity-50 md:block"
           />
           <div className="relative flex max-w-xl flex-col gap-2">
-            <h2
+            <TituloAnimado
+              as="h2"
               id="planejar"
+              texto="Monte sua viagem em cinco perguntas"
+              atraso={150}
+              rolagem
               className="font-display text-[clamp(1.75rem,1.4rem+1.2vw,2.25rem)] leading-tight font-extrabold"
-            >
-              Monte sua viagem em cinco perguntas
-            </h2>
+            />
             <p className="text-ink-suave">
               Dias, interesses, ritmo, orçamento e cidade de chegada. A gente sugere um roteiro, e
               você muda o que quiser.
@@ -309,7 +313,7 @@ function MesDeBoi() {
   return (
     <section aria-labelledby="boi" className="bg-areia">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-12 md:px-12 md:py-24 lg:grid-cols-2 lg:gap-16">
-        <Revelar variante="esquerda">
+        <div>
           <Foto
             src="/images/eventos/sao-joao.jpg"
             alt="Grupo de Bumba-meu-boi se apresentando à noite, com o boi bordado e brincantes com chapéus de fita"
@@ -317,13 +321,19 @@ function MesDeBoi() {
             cor="guara"
             sizes="(min-width: 1024px) 50vw, 100vw"
             parallax
+            cortina
             className="aspect-[4/5] rounded-md"
           />
-        </Revelar>
+        </div>
         <Revelar variante="direita" atraso={120} className="flex flex-col gap-5">
-          <h2 id="boi" className="text-t1">
-            Junho é mês de boi
-          </h2>
+          <TituloAnimado
+            as="h2"
+            id="boi"
+            texto="Junho é mês de boi"
+            atraso={0}
+            rolagem
+            className="text-t1"
+          />
           <p className="max-w-[34em]">
             No São João, São Luís inteira vira arraial. Cada grupo de Bumba-meu-boi tem seu sotaque,
             com ritmo, instrumentos e roupas próprios: matraca, zabumba, orquestra, baixada e

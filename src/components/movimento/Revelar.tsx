@@ -12,7 +12,7 @@ type Tag = "div" | "section" | "li" | "article" | "ul" | "ol" | "p" | "header" |
 
 /**
  * Revela o conteúdo uma vez, quando entra na tela: fade + 24px para cima (ou para o lado).
- * Sem JS ou com falha, o CSS mostra tudo (ver [data-revelar] em styles.css).
+ * Sem JS, ou se o app não hidratar, o CSS mostra tudo (ver [data-revelar] em styles.css).
  */
 export function Revelar({
   as = "div",
@@ -26,7 +26,8 @@ export function Revelar({
   as?: Tag;
   /** em ms, para escalonar itens de uma lista (60–80ms entre eles) */
   atraso?: number;
-  variante?: "esquerda" | "direita" | "escala";
+  /** "titulo" e "cortina" não movem o bloco: animam só as partes de dentro (ver styles.css) */
+  variante?: "esquerda" | "direita" | "escala" | "titulo" | "cortina";
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
@@ -36,6 +37,8 @@ export function Revelar({
   const [visivel, setVisivel] = useState(false);
 
   useEffect(() => {
+    // hidratou: desliga a rede de segurança de 4s do CSS
+    document.documentElement.classList.add("revelar-pronto");
     const el = ref.current;
     if (!el) return;
     if (typeof IntersectionObserver === "undefined") return setVisivel(true);

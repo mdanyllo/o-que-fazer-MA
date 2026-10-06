@@ -1,4 +1,5 @@
 import { createElement, Fragment, type CSSProperties, type ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 /**
  * Título que entra palavra por palavra, subindo de trás de uma máscara.
@@ -12,6 +13,7 @@ export function TituloAnimado({
   atraso = 100,
   id,
   final,
+  rolagem = false,
 }: {
   texto: string;
   /** colado à última palavra, entra junto com ela (ex.: o ponto final em guará) */
@@ -20,7 +22,9 @@ export function TituloAnimado({
   className?: string;
   /** atraso antes da primeira palavra, em ms */
   atraso?: number;
-  id?: string;
+  id?: string | undefined;
+  /** entra quando o bloco [data-revelar] em volta aparece na tela, em vez de ao carregar */
+  rolagem?: boolean;
 }) {
   // cada palavra guarda se começa uma linha nova (vinha depois de um "\n")
   const palavras = texto.split("\n").flatMap((linha, l) =>
@@ -31,7 +35,11 @@ export function TituloAnimado({
   );
   return createElement(
     as,
-    { className, id, style: { "--atraso-base": `${atraso}ms` } as CSSProperties },
+    {
+      className: rolagem ? cn("titulo-rolagem", className) : className,
+      id,
+      style: { "--atraso-base": `${atraso}ms` } as CSSProperties,
+    },
     palavras.map(({ p, quebra }, i) => (
       <Fragment key={i}>
         {i > 0 ? " " : null}

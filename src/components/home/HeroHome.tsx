@@ -1,7 +1,14 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
-import { useId, useState, type CSSProperties, type FormEvent } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from "motion/react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { Selo } from "@/components/azulejo/etiquetas";
 import { Foto } from "@/components/azulejo/Foto";
 import { PadraoAzulejo } from "@/components/azulejo/PadraoAzulejo";
@@ -26,6 +33,7 @@ export function HeroHome() {
   const [termo, setTermo] = useState("");
   const navigate = useNavigate();
   const idBusca = useId();
+  const camadas = useCamadas();
 
   function buscar(e: FormEvent) {
     e.preventDefault();
@@ -47,9 +55,15 @@ export function HeroHome() {
   }
 
   return (
-    <section className="@container relative overflow-hidden lg:grid lg:min-h-[720px] lg:grid-cols-[max(520px,calc(max(48px,(100%-1280px)/2+48px)+min(620px,49%)))_minmax(0,1fr)]">
+    <section
+      ref={camadas.ref}
+      className="@container relative overflow-hidden lg:grid lg:min-h-[720px] lg:grid-cols-[max(520px,calc(max(48px,(100%-1280px)/2+48px)+min(620px,49%)))_minmax(0,1fr)]"
+    >
       {/* esquerda: texto, cartão de busca e "Mais procurados" */}
-      <div className="relative z-10 flex min-w-0 flex-col justify-center gap-6 px-5 pt-8 pb-12 md:px-12 md:pt-12 lg:pt-12 lg:pr-10 lg:pb-18 lg:pl-[max(48px,calc((100cqw-1280px)/2+48px))]">
+      <motion.div
+        style={camadas.estilo("texto")}
+        className="relative z-10 flex min-w-0 flex-col justify-center gap-6 px-5 pt-8 pb-12 md:px-12 md:pt-12 lg:pt-12 lg:pr-10 lg:pb-18 lg:pl-[max(48px,calc((100cqw-1280px)/2+48px))]"
+      >
         <Selo className="entra self-start rounded-[4px] px-3 py-1.5 text-[0.8125rem] font-bold">
           Guia do Maranhão
         </Selo>
@@ -143,7 +157,7 @@ export function HeroHome() {
             </motion.div>
           </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
 
       {/* direita: painel cobalto até a borda, foto inteira e legenda */}
       <div className="relative flex min-w-0 items-center px-5 pt-20 pb-6 md:px-12 lg:py-[clamp(48px,5vw,80px)] lg:pr-[clamp(40px,6vw,96px)] lg:pl-0">
@@ -151,17 +165,30 @@ export function HeroHome() {
           aria-hidden
           className="entra-painel absolute inset-0 overflow-hidden bg-painel lg:left-[24%] lg:rounded-l-[10px]"
         >
-          <PadraoAzulejo azulejo={30} className="absolute inset-0 opacity-[0.12]" />
+          <motion.div
+            style={camadas.estilo("padrao")}
+            className="absolute -inset-y-[20%] inset-x-0"
+          >
+            <PadraoAzulejo azulejo={30} className="absolute inset-0 opacity-[0.12]" />
+          </motion.div>
         </div>
-        <img
-          src="/brand/azulejo-simbolo.svg"
-          alt=""
-          width={48}
-          height={48}
-          className="entra absolute top-[clamp(16px,2vw,24px)] right-[clamp(16px,2vw,24px)] size-12"
-          style={seq(1000)}
-        />
-        <figure className="relative m-0 flex w-full flex-col gap-3.5">
+        <motion.div
+          style={camadas.estilo("simbolo")}
+          className="absolute top-[clamp(16px,2vw,24px)] right-[clamp(16px,2vw,24px)]"
+        >
+          <img
+            src="/brand/azulejo-simbolo.svg"
+            alt=""
+            width={48}
+            height={48}
+            className="entra size-12"
+            style={seq(1000)}
+          />
+        </motion.div>
+        <motion.figure
+          style={camadas.estilo("foto")}
+          className="relative m-0 flex w-full flex-col gap-3.5"
+        >
           <Foto
             src="/images/home/hero.jpg"
             alt="Dunas brancas e lagoas azuis dos Lençóis Maranhenses vistas do alto"
@@ -179,10 +206,36 @@ export function HeroHome() {
           >
             Lençóis Maranhenses, Barreirinhas
           </figcaption>
-        </figure>
+        </motion.figure>
       </div>
     </section>
   );
+}
+
+type Camada = "texto" | "padrao" | "simbolo" | "foto";
+
+/**
+ * Parallax em camadas enquanto o hero sai da tela: o padrão do painel fica para trás,
+ * a foto sobe um pouco mais rápido que a página e o símbolo mais ainda, girando.
+ * O texto desce devagar. Desligado com movimento reduzido e antes de montar.
+ */
+function useCamadas() {
+  const ref = useRef<HTMLElement>(null);
+  const reduzido = useReducedMotion();
+  const [montado, setMontado] = useState(false);
+  useEffect(() => setMontado(true), []);
+  const { scrollYProgress: p } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const valores: Record<Camada, Record<string, MotionValue>> = {
+    texto: { y: useTransform(p, [0, 1], [0, 60]) },
+    padrao: { y: useTransform(p, [0, 1], ["0%", "16%"]) },
+    foto: { y: useTransform(p, [0, 1], [0, -70]) },
+    simbolo: {
+      y: useTransform(p, [0, 1], [0, -160]),
+      rotate: useTransform(p, [0, 1], [0, 90]),
+    },
+  };
+  const ligado = montado && !reduzido;
+  return { ref, estilo: (c: Camada) => (ligado ? valores[c] : {}) };
 }
 
 function SugestoesCheguei() {
