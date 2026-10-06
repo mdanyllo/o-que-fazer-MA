@@ -1,3 +1,4 @@
+import { Revelar } from "@/components/movimento/Revelar";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MapPin } from "lucide-react";
 import { useState } from "react";
@@ -47,32 +48,33 @@ function Eventos() {
             const tem = eventos.some((e) => e.mes === m);
             const ativo = mes === m;
             return (
-              <button
-                key={nome}
-                type="button"
-                aria-pressed={ativo}
-                onClick={() => setMes(ativo ? null : m)}
-                className={cn(
-                  "relative flex min-h-14 flex-col items-center justify-center rounded-sm border-2 font-bold transition-colors duration-150",
-                  ativo
-                    ? "border-cobalto bg-cobalto text-sobre-cobalto"
-                    : tem
-                      ? "border-linha bg-areia hover:border-cobalto"
-                      : "border-linha text-ink-suave hover:border-cobalto",
-                )}
-              >
-                {maiuscula(nome.slice(0, 3))}
-                {tem && (
-                  <span
-                    aria-hidden
-                    className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-guara"
-                  />
-                )}
-                {m === mesAtual && <span className="text-[11px] font-normal">agora</span>}
-                <span className="sr-only">
-                  {tem ? ", com eventos" : ", sem eventos no calendário"}
-                </span>
-              </button>
+              <Revelar key={nome} variante="escala" atraso={i * 35} className="grid">
+                <button
+                  type="button"
+                  aria-pressed={ativo}
+                  onClick={() => setMes(ativo ? null : m)}
+                  className={cn(
+                    "relative flex min-h-14 flex-col items-center justify-center rounded-sm border-2 font-bold transition-colors duration-150",
+                    ativo
+                      ? "border-cobalto bg-cobalto text-sobre-cobalto"
+                      : tem
+                        ? "border-linha bg-areia hover:border-cobalto"
+                        : "border-linha text-ink-suave hover:border-cobalto",
+                  )}
+                >
+                  {maiuscula(nome.slice(0, 3))}
+                  {tem && (
+                    <span
+                      aria-hidden
+                      className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-guara"
+                    />
+                  )}
+                  {m === mesAtual && <span className="text-[11px] font-normal">agora</span>}
+                  <span className="sr-only">
+                    {tem ? ", com eventos" : ", sem eventos no calendário"}
+                  </span>
+                </button>
+              </Revelar>
             );
           })}
         </div>
@@ -97,7 +99,7 @@ function Eventos() {
           </p>
         )}
 
-        <div className="mt-12 flex flex-col gap-16">
+        <div key={mes ?? "todos"} className="mt-12 flex flex-col gap-16">
           {meses.map((m) => (
             <section key={m} aria-labelledby={`mes-${m}`}>
               <h2 id={`mes-${m}`} className="text-t1">
@@ -120,7 +122,7 @@ function Eventos() {
 
 function CardEvento({ evento }: { evento: Evento }) {
   return (
-    <li className="grid gap-5 rounded-md bg-areia p-4 sm:grid-cols-[240px_1fr] md:p-5">
+    <Revelar as="li" className="grid gap-5 rounded-md bg-areia p-4 sm:grid-cols-[240px_1fr] md:p-5">
       <Foto
         src={evento.foto}
         alt={evento.nome}
@@ -151,6 +153,6 @@ function CardEvento({ evento }: { evento: Evento }) {
           ))}
         </div>
       </div>
-    </li>
+    </Revelar>
   );
 }

@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "motion/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { List, LocateFixed, Map as MapIcon, Search, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
@@ -230,13 +231,28 @@ function Explorar() {
             />
           ) : (
             <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3">
-              {resultado.map((i) => (
-                <CardItem
-                  key={`${i.tipo}:${i.slug}`}
-                  item={i}
-                  {...(i.km !== undefined ? { nota: formatarDistancia(i.km) } : {})}
-                />
-              ))}
+              <AnimatePresence mode="popLayout" initial={false}>
+                {resultado.map((i, idx) => (
+                  <motion.div
+                    key={`${i.tipo}:${i.slug}`}
+                    layout
+                    className="grid"
+                    initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.96 }}
+                    transition={{
+                      duration: 0.35,
+                      ease: [0.22, 1, 0.36, 1],
+                      delay: Math.min(idx, 8) * 0.03,
+                    }}
+                  >
+                    <CardItem
+                      item={i}
+                      {...(i.km !== undefined ? { nota: formatarDistancia(i.km) } : {})}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           )}
         </section>

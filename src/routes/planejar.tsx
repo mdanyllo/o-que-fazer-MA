@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "motion/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Check, RotateCcw } from "lucide-react";
 import { useId, useMemo, useState, type ReactNode } from "react";
@@ -46,7 +47,12 @@ const INTERESSES: CategoriaId[] = ["lagoas-praias", "cultura", "natureza", "gast
 type Rascunho = Omit<Respostas, "dias"> & { dias: number | null };
 
 function Planejar() {
-  const [passo, setPasso] = useState(0);
+  const [passo, setPassoBruto] = useState(0);
+  const [direcao, setDirecao] = useState(1);
+  const setPasso = (n: number) => {
+    setDirecao(n >= passo ? 1 : -1);
+    setPassoBruto(n);
+  };
   const [r, setR] = useState<Rascunho>({
     dias: null,
     interesses: [],
@@ -132,96 +138,116 @@ function Planejar() {
             else gerar();
           }}
         >
-          {passo === 0 && <PassoDias r={r} setR={setR} />}
-          {passo === 1 && (
-            <Pergunta
-              titulo="O que você quer viver?"
-              apoio="Escolha quantos quiser. Se não escolher nenhum, a gente mistura um pouco de tudo."
+          {/* troca de passo: o novo entra pela direita (ou esquerda, ao voltar) */}
+          <AnimatePresence mode="wait" initial={false} custom={direcao}>
+            <motion.div
+              key={passo}
+              custom={direcao}
+              variants={{
+                entra: (d: number) => ({ opacity: 0, x: d * 32 }),
+                fica: { opacity: 1, x: 0 },
+                sai: (d: number) => ({ opacity: 0, x: d * -32 }),
+              }}
+              initial="entra"
+              animate="fica"
+              exit="sai"
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="grid gap-3 sm:grid-cols-2">
-                {INTERESSES.map((id) => {
-                  const ativo = r.interesses.includes(id);
-                  return (
-                    <Opcao
-                      key={id}
-                      ativo={ativo}
-                      onClick={() =>
-                        setR({
-                          ...r,
-                          interesses: ativo
-                            ? r.interesses.filter((x) => x !== id)
-                            : [...r.interesses, id],
-                        })
-                      }
-                      titulo={categoriaPorId[id].nome}
-                      detalhe={categoriaPorId[id].chamada}
-                      icone={<MarcaCategoria categoria={id} />}
-                    />
-                  );
-                })}
-              </div>
-            </Pergunta>
-          )}
-          {passo === 2 && (
-            <Pergunta titulo="Em que ritmo?" apoio="Quantas paradas por dia, mais ou menos.">
-              <div className="grid gap-3 sm:grid-cols-3">
-                {(
-                  [
-                    ["Tranquilo", "Duas paradas por dia, tempo para rede e almoço longo"],
-                    ["Equilibrado", "Três paradas por dia"],
-                    ["Intenso", "Quatro paradas por dia, acordando cedo"],
-                  ] as [Ritmo, string][]
-                ).map(([v, d]) => (
-                  <Opcao
-                    key={v}
-                    ativo={r.ritmo === v}
-                    onClick={() => setR({ ...r, ritmo: v })}
-                    titulo={v}
-                    detalhe={d}
-                  />
-                ))}
-              </div>
-            </Pergunta>
-          )}
-          {passo === 3 && (
-            <Pergunta
-              titulo="Quanto pretende gastar?"
-              apoio="Faixas de exemplo, por passeio e por pessoa."
-            >
-              <div className="grid gap-3 sm:grid-cols-3">
-                {(
-                  [
-                    ["Econômico", FAIXAS[1].texto],
-                    ["Confortável", `Até ${FAIXAS[2].texto.toLowerCase()}`],
-                    ["Premium", "Sem limite de faixa"],
-                  ] as [Orcamento, string][]
-                ).map(([v, d]) => (
-                  <Opcao
-                    key={v}
-                    ativo={r.orcamento === v}
-                    onClick={() => setR({ ...r, orcamento: v })}
-                    titulo={v}
-                    detalhe={d}
-                  />
-                ))}
-              </div>
-            </Pergunta>
-          )}
-          {passo === 4 && (
-            <Pergunta titulo="Por onde você chega?" apoio="Isso decide por onde o roteiro começa.">
-              <div className="grid gap-3">
-                {CHEGADAS.map((c) => (
-                  <Opcao
-                    key={c.valor}
-                    ativo={r.chegada === c.valor}
-                    onClick={() => setR({ ...r, chegada: c.valor as Chegada })}
-                    titulo={c.rotulo}
-                    detalhe={c.detalhe}
-                  />
-                ))}
-              </div>
-            </Pergunta>
-          )}
+              {passo === 0 && <PassoDias r={r} setR={setR} />}
+              {passo === 1 && (
+                <Pergunta
+                  titulo="O que você quer viver?"
+                  apoio="Escolha quantos quiser. Se não escolher nenhum, a gente mistura um pouco de tudo."
+                >
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {INTERESSES.map((id) => {
+                      const ativo = r.interesses.includes(id);
+                      return (
+                        <Opcao
+                          key={id}
+                          ativo={ativo}
+                          onClick={() =>
+                            setR({
+                              ...r,
+                              interesses: ativo
+                                ? r.interesses.filter((x) => x !== id)
+                                : [...r.interesses, id],
+                            })
+                          }
+                          titulo={categoriaPorId[id].nome}
+                          detalhe={categoriaPorId[id].chamada}
+                          icone={<MarcaCategoria categoria={id} />}
+                        />
+                      );
+                    })}
+                  </div>
+                </Pergunta>
+              )}
+              {passo === 2 && (
+                <Pergunta titulo="Em que ritmo?" apoio="Quantas paradas por dia, mais ou menos.">
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    {(
+                      [
+                        ["Tranquilo", "Duas paradas por dia, tempo para rede e almoço longo"],
+                        ["Equilibrado", "Três paradas por dia"],
+                        ["Intenso", "Quatro paradas por dia, acordando cedo"],
+                      ] as [Ritmo, string][]
+                    ).map(([v, d]) => (
+                      <Opcao
+                        key={v}
+                        ativo={r.ritmo === v}
+                        onClick={() => setR({ ...r, ritmo: v })}
+                        titulo={v}
+                        detalhe={d}
+                      />
+                    ))}
+                  </div>
+                </Pergunta>
+              )}
+              {passo === 3 && (
+                <Pergunta
+                  titulo="Quanto pretende gastar?"
+                  apoio="Faixas de exemplo, por passeio e por pessoa."
+                >
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    {(
+                      [
+                        ["Econômico", FAIXAS[1].texto],
+                        ["Confortável", `Até ${FAIXAS[2].texto.toLowerCase()}`],
+                        ["Premium", "Sem limite de faixa"],
+                      ] as [Orcamento, string][]
+                    ).map(([v, d]) => (
+                      <Opcao
+                        key={v}
+                        ativo={r.orcamento === v}
+                        onClick={() => setR({ ...r, orcamento: v })}
+                        titulo={v}
+                        detalhe={d}
+                      />
+                    ))}
+                  </div>
+                </Pergunta>
+              )}
+              {passo === 4 && (
+                <Pergunta
+                  titulo="Por onde você chega?"
+                  apoio="Isso decide por onde o roteiro começa."
+                >
+                  <div className="grid gap-3">
+                    {CHEGADAS.map((c) => (
+                      <Opcao
+                        key={c.valor}
+                        ativo={r.chegada === c.valor}
+                        onClick={() => setR({ ...r, chegada: c.valor as Chegada })}
+                        titulo={c.rotulo}
+                        detalhe={c.detalhe}
+                      />
+                    ))}
+                  </div>
+                </Pergunta>
+              )}
+            </motion.div>
+          </AnimatePresence>
 
           <div className="mt-10 flex flex-wrap gap-3">
             {passo > 0 && (

@@ -1,9 +1,9 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { motion } from "motion/react";
 import { useState } from "react";
 import { Heart, Menu } from "lucide-react";
 import { Logo } from "@/components/azulejo/Logo";
 import { botao } from "@/components/azulejo/botao";
-import { PontoGuara } from "@/components/azulejo/etiquetas";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useMinhaViagem } from "@/lib/minha-viagem";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,8 @@ import { NAV_EXTRA, NAV_INFERIOR, NAV_PRINCIPAL } from "./nav";
 export function SiteHeader() {
   const { favoritos, roteiros } = useMinhaViagem();
   const salvos = favoritos.length + roteiros.length;
+  const caminho = useRouterState({ select: (st) => st.location.pathname });
+  const ativo = (to: string) => caminho === to || caminho.startsWith(`${to}/`);
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-linha bg-louca/95 text-ink backdrop-blur-sm">
@@ -34,7 +36,14 @@ export function SiteHeader() {
               className="group relative flex min-h-11 items-center rounded-md px-3 text-base font-bold transition-colors duration-150 hover:text-cobalto data-[status=active]:text-cobalto"
             >
               {item.rotulo}
-              <PontoGuara className="absolute bottom-0.5 left-1/2 -translate-x-1/2 scale-0 transition-transform duration-300 ease-saida group-data-[status=active]:scale-100" />
+              {ativo(item.to) && (
+                <motion.span
+                  layoutId="ponto-nav"
+                  aria-hidden
+                  className="absolute bottom-0.5 left-1/2 -ml-1 size-2 rounded-full bg-guara"
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                />
+              )}
             </Link>
           ))}
         </nav>

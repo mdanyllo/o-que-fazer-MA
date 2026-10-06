@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { Car, UtensilsCrossed } from "lucide-react";
+import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { MarcaCategoria } from "@/components/azulejo/etiquetas";
+import { Revelar } from "@/components/movimento/Revelar";
 import { formatarHoras, nomeDestino, resolverParada, type DiaRoteiro } from "@/data";
 
 /** Linha do tempo dia a dia de um roteiro. `acoesParada` permite editar (Minha viagem/planejador). */
@@ -17,10 +19,18 @@ export function LinhaDoTempo({
   return (
     <ol className="flex flex-col">
       {dias.map((dia, d) => (
-        <li key={d} className="relative grid grid-cols-[56px_1fr] gap-4 pb-10 last:pb-0">
+        <Revelar
+          as="li"
+          key={d}
+          atraso={Math.min(d, 3) * 80}
+          className="relative grid grid-cols-[56px_1fr] gap-4 pb-10 last:pb-0"
+        >
           {/* trilho vertical entre os dias */}
           {d < dias.length - 1 && (
-            <span aria-hidden className="absolute top-14 bottom-0 left-[27px] w-0.5 bg-linha" />
+            <span
+              aria-hidden
+              className="trilho absolute top-14 bottom-0 left-[27px] w-0.5 bg-linha"
+            />
           )}
           <span className="grid size-14 place-items-center rounded-sm bg-cobalto text-center leading-none text-sobre-cobalto">
             <span>
@@ -38,11 +48,17 @@ export function LinhaDoTempo({
             )}
             <ul className="mt-4 flex flex-col gap-2">
               {dia.paradas.map((p, i) => {
+                // chave estável (sem o índice) para animar a troca de posição
+                const repeticoes = dia.paradas
+                  .slice(0, i)
+                  .filter((x) => x.ref.tipo === p.ref.tipo && x.ref.slug === p.ref.slug).length;
                 const item = resolverParada(p);
                 if (!item) return null;
                 return (
-                  <li
-                    key={`${p.ref.tipo}:${p.ref.slug}:${i}`}
+                  <motion.li
+                    layout="position"
+                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                    key={`${p.ref.tipo}:${p.ref.slug}:${repeticoes}`}
                     className="flex items-center gap-3 rounded-md bg-areia p-3"
                   >
                     <MarcaCategoria categoria={item.categoria} tamanho="sm" />
@@ -61,7 +77,7 @@ export function LinhaDoTempo({
                       </p>
                     </div>
                     {acoesParada?.(d, i)}
-                  </li>
+                  </motion.li>
                 );
               })}
             </ul>
@@ -73,7 +89,7 @@ export function LinhaDoTempo({
             )}
             {rodapeDia?.(d)}
           </div>
-        </li>
+        </Revelar>
       ))}
     </ol>
   );

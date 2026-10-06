@@ -2,7 +2,7 @@
 import "leaflet/dist/leaflet.css";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
 import L from "leaflet";
-import { useEffect, useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import {
   MapContainer,
   Marker,
@@ -40,10 +40,14 @@ export type MapaProps = {
   children?: ReactNode;
 };
 
-function iconePin(item: Item, ativo: boolean) {
+/** `entra`: primeira vez que o pin aparece, cai em sequência (índice `i`). */
+function iconePin(item: Item, ativo: boolean, entra: boolean, i: number) {
+  const classes = ["pin-azulejo", ativo && "is-ativo", entra && "pin-entra"]
+    .filter(Boolean)
+    .join(" ");
   return L.divIcon({
     className: "pin-azulejo-wrap",
-    html: `<span class="pin-azulejo${ativo ? " is-ativo" : ""}" data-cor="${corDaCategoria(item.categoria)}"><span class="pin-azulejo-ponto"></span></span>`,
+    html: `<span class="${classes}" style="--i:${i}" data-cor="${corDaCategoria(item.categoria)}"><span class="pin-azulejo-ponto"></span></span>`,
     iconSize: [32, 32],
     iconAnchor: [16, 16],
     tooltipAnchor: [0, -18],
@@ -58,6 +62,36 @@ function iconeGrupo(cluster: L.MarkerCluster) {
     iconSize: [40, 40],
     iconAnchor: [20, 20],
   });
+}
+
+/** A linha da rota se desenha (stroke-dashoffset) quando o mapa entra na tela. */
+function desenharRota(path: SVGPathElement) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const comprimento = path.getTotalLength();
+  if (!comprimento) return;
+  path.style.strokeDasharray = `${comprimento}`;
+  path.style.strokeDashoffset = `${comprimento}`;
+  const animar = () => {
+    const anim = path.animate([{ strokeDashoffset: comprimento }, { strokeDashoffset: 0 }], {
+      duration: 1600,
+      easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+      delay: 300,
+      fill: "forwards",
+    });
+    // depois de desenhada, volta ao traço normal (o zoom muda o comprimento)
+    anim.onfinish = () => {
+      anim.cancel();
+      path.style.strokeDasharray = "";
+      path.style.strokeDashoffset = "";
+    };
+  };
+  const io = new IntersectionObserver(([e]) => {
+    if (e?.isIntersecting) {
+      io.disconnect();
+      animar();
+    }
+  });
+  io.observe(path.closest(".leaflet-container") ?? path);
 }
 
 /** Voa até o ponto selecionado; respeita movimento reduzido. */
@@ -106,16 +140,22 @@ export default function MapaLeaflet({
   className,
   children,
 }: MapaProps) {
+  // pins que já apareceram não caem de novo (ex.: ao selecionar)
+  const jaVistos = useRef(new Set<string>());
+  useEffect(() => {
+    pontos.forEach((p) => jaVistos.current.add(chaveItem(p)));
+  }, [pontos]);
+
   const marcadores = useMemo(
     () =>
-      pontos.map((p) => {
+      pontos.map((p, i) => {
         const chave = chaveItem(p);
         const ativo = chave === selecionado;
         return (
           <Marker
             key={chave}
             position={[p.lat, p.lng]}
-            icon={iconePin(p, ativo)}
+            icon={iconePin(p, ativo, !jaVistos.current.has(chave), i)}
             zIndexOffset={ativo ? 1000 : 0}
             keyboard
             eventHandlers={{
@@ -159,6 +199,12 @@ export default function MapaLeaflet({
           <Polyline
             positions={rota.map((c) => [c.lat, c.lng] as [number, number])}
             pathOptions={{ className: "rota-mapa", weight: 4 }}
+            eventHandlers={{
+              add: (e) => {
+                const el = (e.target as L.Polyline).getElement();
+                if (el instanceof SVGPathElement) desenharRota(el);
+              },
+            }}
           />
         )}
         {agrupar ? (

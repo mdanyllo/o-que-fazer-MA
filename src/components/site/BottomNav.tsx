@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { motion } from "motion/react";
 import { useMinhaViagem } from "@/lib/minha-viagem";
 import { NAV_INFERIOR } from "./nav";
 
@@ -6,6 +7,7 @@ import { NAV_INFERIOR } from "./nav";
 export function BottomNav() {
   const { favoritos, roteiros } = useMinhaViagem();
   const salvos = favoritos.length + roteiros.length;
+  const caminho = useRouterState({ select: (st) => st.location.pathname });
 
   return (
     <nav
@@ -20,10 +22,14 @@ export function BottomNav() {
               activeOptions={{ exact: item.to === "/" }}
               className="group relative flex min-h-16 flex-col items-center justify-center gap-1 text-[11px] leading-none min-[380px]:text-[12px] font-bold tracking-tight whitespace-nowrap text-ink-suave transition-colors duration-150 data-[status=active]:text-cobalto"
             >
-              <span
-                aria-hidden
-                className="absolute top-1.5 size-1.5 scale-0 rounded-full bg-guara transition-transform duration-300 ease-saida group-data-[status=active]:scale-100"
-              />
+              {(item.to === "/" ? caminho === "/" : caminho.startsWith(item.to)) && (
+                <motion.span
+                  layoutId="ponto-nav-inferior"
+                  aria-hidden
+                  className="absolute top-1.5 size-1.5 rounded-full bg-guara"
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                />
+              )}
               <span className="relative">
                 <item.icone className="size-6" strokeWidth={2} />
                 {item.to === "/minha-viagem" && salvos > 0 && (

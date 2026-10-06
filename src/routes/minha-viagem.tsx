@@ -1,3 +1,5 @@
+import { AnimatePresence, motion } from "motion/react";
+import { GradeRevelar } from "@/components/movimento/Revelar";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronDown, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -67,33 +69,42 @@ function MinhaViagem() {
         {lugares.length > 0 && (
           <section aria-labelledby="lugares" className="flex flex-col gap-6">
             <SecaoTitulo id="lugares" titulo="Lugares e experiências" />
-            <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            <GradeRevelar
+              colunas={3}
+              className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3"
+            >
               {lugares.map((i) => (
                 <CardItem key={`${i.tipo}:${i.slug}`} item={i} />
               ))}
-            </div>
+            </GradeRevelar>
           </section>
         )}
 
         {destinos.length > 0 && (
           <section aria-labelledby="destinos" className="flex flex-col gap-6">
             <SecaoTitulo id="destinos" titulo="Destinos" />
-            <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+            <GradeRevelar
+              colunas={4}
+              className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"
+            >
               {destinos.map((d) => (
                 <CardDestino key={d.slug} destino={d} />
               ))}
-            </div>
+            </GradeRevelar>
           </section>
         )}
 
         {roteirosFavoritos.length > 0 && (
           <section aria-labelledby="roteiros-fav" className="flex flex-col gap-6">
             <SecaoTitulo id="roteiros-fav" titulo="Roteiros favoritos" />
-            <div className="grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+            <GradeRevelar
+              colunas={3}
+              className="grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3"
+            >
               {roteirosFavoritos.map((r) => (
                 <CardRoteiro key={r.slug} roteiro={r} destaque />
               ))}
-            </div>
+            </GradeRevelar>
           </section>
         )}
       </div>
@@ -159,27 +170,35 @@ function RoteiroSalvoItem({ roteiro }: { roteiro: RoteiroSalvo }) {
           </button>
         </div>
       </div>
-      {aberto && (
-        <div className="border-t border-linha p-4 md:p-6">
-          {editando ? (
-            <EditorRoteiro
-              dias={roteiro.dias}
-              aoMudar={(dias) => salvarRoteiro({ ...roteiro, dias })}
-            />
-          ) : (
-            <LinhaDoTempo dias={roteiro.dias} />
-          )}
-          {roteiro.baseSlug && !editando && (
-            <Link
-              to="/roteiros/$slug"
-              params={{ slug: roteiro.baseSlug }}
-              className="mt-6 inline-flex min-h-11 items-center font-bold text-cobalto underline-offset-4 hover:underline"
-            >
-              Ver a página do roteiro original
-            </Link>
-          )}
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {aberto && (
+          <motion.div
+            className="border-t border-linha p-4 md:p-6"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {editando ? (
+              <EditorRoteiro
+                dias={roteiro.dias}
+                aoMudar={(dias) => salvarRoteiro({ ...roteiro, dias })}
+              />
+            ) : (
+              <LinhaDoTempo dias={roteiro.dias} />
+            )}
+            {roteiro.baseSlug && !editando && (
+              <Link
+                to="/roteiros/$slug"
+                params={{ slug: roteiro.baseSlug }}
+                className="mt-6 inline-flex min-h-11 items-center font-bold text-cobalto underline-offset-4 hover:underline"
+              >
+                Ver a página do roteiro original
+              </Link>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </li>
   );
 }

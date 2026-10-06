@@ -1,3 +1,6 @@
+import type { CSSProperties } from "react";
+import { TituloAnimado } from "@/components/movimento/TituloAnimado";
+import { GradeRevelar } from "@/components/movimento/Revelar";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { CalendarDays, Car, ChevronRight, MapPin } from "lucide-react";
 import { useMemo, type ReactNode } from "react";
@@ -77,8 +80,13 @@ function PaginaDestino() {
             <p className="flex items-center gap-1.5 text-legenda text-ink-suave">
               <MapPin className="size-4" aria-hidden /> {destino.regiao}, Maranhão
             </p>
-            <h1 className="text-display text-cobalto">{destino.nome}</h1>
-            <p className="medida text-[1.1875rem] text-ink-suave">{destino.chamada}</p>
+            <TituloAnimado texto={destino.nome} className="text-display text-pretty text-cobalto" />
+            <p
+              className="entra medida text-[1.1875rem] text-ink-suave"
+              style={{ "--atraso": "500ms" } as CSSProperties}
+            >
+              {destino.chamada}
+            </p>
           </div>
           <div className="flex gap-2">
             <Favoritar
@@ -97,6 +105,8 @@ function PaginaDestino() {
           alt={`${destino.nome}, ${destino.regiao}`}
           rotulo={destino.nome}
           prioridade
+          entrada
+          parallax
           className="mt-10 aspect-[4/3] rounded-md md:aspect-[21/9]"
         />
       </div>
@@ -158,14 +168,14 @@ function PaginaDestino() {
               </Link>
             }
           />
-          <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          <GradeRevelar colunas={3} className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {oQueFazer
               .filter((i) => i.categoria !== "gastronomia" || i.tipo === "experiencia")
               .slice(0, 6)
               .map((i) => (
                 <CardItem key={`${i.tipo}:${i.slug}`} item={i} />
               ))}
-          </div>
+          </GradeRevelar>
         </section>
       )}
 
@@ -189,11 +199,11 @@ function PaginaDestino() {
       {roteiros.length > 0 && (
         <section aria-labelledby="roteiros" className={secao}>
           <SecaoTitulo id="roteiros" titulo={`Roteiros que passam por ${destino.nome}`} />
-          <div className="grid gap-6 md:grid-cols-2">
+          <GradeRevelar colunas={2} className="grid gap-6 md:grid-cols-2">
             {roteiros.map((r) => (
               <CardRoteiro key={r.slug} roteiro={r} />
             ))}
-          </div>
+          </GradeRevelar>
         </section>
       )}
 

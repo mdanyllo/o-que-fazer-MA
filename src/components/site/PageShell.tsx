@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { TituloAnimado } from "@/components/movimento/TituloAnimado";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "./BottomNav";
 import { SiteFooter } from "./SiteFooter";
@@ -16,7 +17,7 @@ export function PageShell({
   semRodape?: boolean;
 }) {
   return (
-    <div className="flex min-h-svh flex-col bg-louca">
+    <div className="flex min-h-svh flex-col overflow-x-clip bg-louca">
       <a
         href="#conteudo"
         className="fixed top-2 left-2 z-[60] -translate-y-20 rounded-md bg-cobalto px-4 py-3 font-bold text-sobre-cobalto focus:translate-y-0"
@@ -37,14 +38,17 @@ export function PageShell({
   );
 }
 
-/** Abertura padrão das páginas internas: título grande + apoio, sem etiqueta acima. */
+/**
+ * Abertura padrão das páginas internas: título grande entrando palavra por palavra
+ * e o texto de apoio logo depois. Sem etiqueta acima do título.
+ */
 export function CabecalhoPagina({
   titulo,
   apoio,
   children,
   className,
 }: {
-  titulo: ReactNode;
+  titulo: string;
   apoio?: ReactNode;
   children?: ReactNode;
   className?: string;
@@ -53,9 +57,23 @@ export function CabecalhoPagina({
     <section
       className={cn("mx-auto max-w-7xl px-5 pt-10 pb-10 md:px-12 md:pt-16 md:pb-14", className)}
     >
-      <h1 className="max-w-4xl text-display text-cobalto">{titulo}</h1>
-      {apoio && <p className="mt-6 medida text-[1.1875rem] text-ink-suave">{apoio}</p>}
-      {children}
+      <TituloAnimado texto={titulo} className="max-w-4xl text-display text-pretty text-cobalto" />
+      {apoio && (
+        <p
+          className="entra mt-6 medida text-[1.1875rem] text-ink-suave"
+          style={{ "--atraso": `${200 + titulo.split(" ").length * 70}ms` } as CSSProperties}
+        >
+          {apoio}
+        </p>
+      )}
+      {children && (
+        <div
+          className="entra"
+          style={{ "--atraso": `${300 + titulo.split(" ").length * 70}ms` } as CSSProperties}
+        >
+          {children}
+        </div>
+      )}
     </section>
   );
 }

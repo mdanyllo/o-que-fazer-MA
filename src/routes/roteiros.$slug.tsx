@@ -1,3 +1,6 @@
+import type { CSSProperties } from "react";
+import { TituloAnimado } from "@/components/movimento/TituloAnimado";
+import { GradeRevelar } from "@/components/movimento/Revelar";
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { CalendarDays, ChevronRight, Gauge, MapPin, Wallet } from "lucide-react";
 import type { ReactNode } from "react";
@@ -87,8 +90,16 @@ function PaginaRoteiro() {
               <span className="font-bold text-cobalto">{roteiro.dias.length} dias</span> ·{" "}
               {roteiro.destinos.map(nomeDestino).join(" → ")}
             </p>
-            <h1 className="text-display text-cobalto">{roteiro.titulo}</h1>
-            <p className="medida text-[1.1875rem] text-ink-suave">{roteiro.resumo}</p>
+            <TituloAnimado
+              texto={roteiro.titulo}
+              className="text-display text-pretty text-cobalto"
+            />
+            <p
+              className="entra medida text-[1.1875rem] text-ink-suave"
+              style={{ "--atraso": "500ms" } as CSSProperties}
+            >
+              {roteiro.resumo}
+            </p>
           </div>
           <div className="flex gap-2">
             <Favoritar
@@ -107,6 +118,8 @@ function PaginaRoteiro() {
           alt={roteiro.titulo}
           rotulo={roteiro.titulo}
           prioridade
+          entrada
+          parallax
           className="mt-10 aspect-[4/3] rounded-md md:aspect-[21/9]"
         />
         <dl className="mt-6 grid gap-x-8 gap-y-2 rounded-md bg-areia p-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -156,11 +169,11 @@ function PaginaRoteiro() {
       <section aria-labelledby="outros" className="bg-areia">
         <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-12 md:px-12 md:py-20">
           <SecaoTitulo id="outros" titulo="Outros roteiros" />
-          <div className="grid gap-6 md:grid-cols-2">
+          <GradeRevelar colunas={2} className="grid gap-6 md:grid-cols-2">
             {outros.map((r) => (
               <CardRoteiro key={r.slug} roteiro={r} />
             ))}
-          </div>
+          </GradeRevelar>
         </div>
       </section>
     </PageShell>

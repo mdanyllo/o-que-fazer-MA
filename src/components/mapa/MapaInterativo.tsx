@@ -55,9 +55,17 @@ export function MapaInterativo({
     >
       {selecionado &&
         (card === "completo" ? (
-          <CardCompleto item={selecionado} fechar={() => setSelecionado(null)} />
+          <CardCompleto
+            key={`${selecionado.tipo}:${selecionado.slug}`}
+            item={selecionado}
+            fechar={() => setSelecionado(null)}
+          />
         ) : (
-          <CardCompacto item={selecionado} fechar={() => setSelecionado(null)} />
+          <CardCompacto
+            key={`${selecionado.tipo}:${selecionado.slug}`}
+            item={selecionado}
+            fechar={() => setSelecionado(null)}
+          />
         ))}
     </Mapa>
   );
@@ -78,7 +86,7 @@ function BotaoFechar({ fechar }: { fechar: () => void }) {
 
 function CardCompacto({ item, fechar }: { item: Item; fechar: () => void }) {
   return (
-    <div className="absolute right-3 bottom-3 left-3 z-[500] flex items-center gap-3 rounded-md border border-linha bg-louca p-3 text-ink shadow-flutua sm:right-auto sm:max-w-sm">
+    <div className="card-sobe absolute right-3 bottom-3 left-3 z-[500] flex items-center gap-3 rounded-md border border-linha bg-louca p-3 text-ink shadow-flutua sm:right-auto sm:max-w-sm">
       <MarcaCategoria categoria={item.categoria} />
       <div className="min-w-0 flex-1">
         <p className="truncate font-bold">{item.nome}</p>
@@ -102,7 +110,7 @@ function CardCompleto({ item, fechar }: { item: Item; fechar: () => void }) {
     <div
       role="dialog"
       aria-label={item.nome}
-      className="absolute inset-x-0 bottom-0 z-[500] rounded-t-md border-t border-linha bg-louca p-4 text-ink shadow-flutua sm:inset-x-auto sm:bottom-4 sm:left-4 sm:w-96 sm:rounded-md sm:border"
+      className="card-sobe folha absolute inset-x-0 bottom-0 z-[500] rounded-t-md border-t border-linha bg-louca p-4 text-ink shadow-flutua sm:inset-x-auto sm:bottom-4 sm:left-4 sm:w-96 sm:rounded-md sm:border"
     >
       <div aria-hidden className="mx-auto mb-3 h-1 w-10 rounded-full bg-linha sm:hidden" />
       <div className="flex gap-4">

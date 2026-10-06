@@ -1,3 +1,4 @@
+import { GradeRevelar } from "@/components/movimento/Revelar";
 import { createFileRoute } from "@tanstack/react-router";
 import { CardDestino } from "@/components/azulejo/cards";
 import { CabecalhoPagina, PageShell } from "@/components/site/PageShell";
@@ -28,11 +29,11 @@ function Destinos() {
         aria-label="Lista de destinos"
         className="mx-auto max-w-7xl px-5 pb-16 md:px-12 md:pb-24"
       >
-        <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        <GradeRevelar colunas={3} className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
           {destinos.map((d) => (
             <CardDestino key={d.slug} destino={d} />
           ))}
-        </div>
+        </GradeRevelar>
       </section>
     </PageShell>
   );

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Revelar } from "@/components/movimento/Revelar";
 import { cn } from "@/lib/utils";
 
 /**
@@ -19,7 +20,7 @@ export function SecaoTitulo({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-wrap items-end justify-between gap-4", className)}>
+    <Revelar className={cn("flex flex-wrap items-end justify-between gap-4", className)}>
       <div className="flex max-w-2xl flex-col gap-2">
         <h2 id={id} className="text-t1">
           {titulo}
@@ -27,7 +28,7 @@ export function SecaoTitulo({
         {apoio && <p className="text-ink-suave">{apoio}</p>}
       </div>
       {acao}
-    </div>
+    </Revelar>
   );
 }
 

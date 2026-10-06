@@ -1,3 +1,6 @@
+import type { CSSProperties } from "react";
+import { TituloAnimado } from "@/components/movimento/TituloAnimado";
+import { GradeRevelar } from "@/components/movimento/Revelar";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight, Gauge } from "lucide-react";
 import { useMemo } from "react";
@@ -129,8 +132,13 @@ export function PaginaItem(props: Props) {
               {tipo === "experiencia" && <Tag>Experiência</Tag>}
               {"ficticio" in dados && dados.ficticio && <Tag>Exemplo</Tag>}
             </p>
-            <h1 className="text-display text-cobalto">{dados.nome}</h1>
-            <p className="medida text-[1.1875rem] text-ink-suave">{dados.resumo}</p>
+            <TituloAnimado texto={dados.nome} className="text-display text-pretty text-cobalto" />
+            <p
+              className="entra medida text-[1.1875rem] text-ink-suave"
+              style={{ "--atraso": "500ms" } as CSSProperties}
+            >
+              {dados.resumo}
+            </p>
           </div>
           <Favoritar
             tipo={tipo}
@@ -156,6 +164,7 @@ export function PaginaItem(props: Props) {
               rotulo={g.rotulo}
               cor={cor}
               prioridade={i === 0}
+              entrada={i === 0}
               sizes={i === 0 ? "(min-width: 768px) 66vw, 100vw" : "(min-width: 768px) 33vw, 100vw"}
               className={
                 i === 0 && galeria.length === 1
@@ -265,11 +274,11 @@ export function PaginaItem(props: Props) {
         <section aria-labelledby="roteiros-aqui" className="bg-areia">
           <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-12 md:px-12 md:py-20">
             <SecaoTitulo id="roteiros-aqui" titulo="Roteiros que passam aqui" />
-            <div className="grid gap-6 md:grid-cols-2">
+            <GradeRevelar colunas={2} className="grid gap-6 md:grid-cols-2">
               {roteiros.slice(0, 4).map((r) => (
                 <CardRoteiro key={r.slug} roteiro={r} />
               ))}
-            </div>
+            </GradeRevelar>
           </div>
         </section>
       )}
@@ -280,11 +289,11 @@ export function PaginaItem(props: Props) {
           className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-12 md:px-12 md:py-20"
         >
           <SecaoTitulo id="perto" titulo="Perto daqui" apoio="Dá para encaixar no mesmo dia." />
-          <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          <GradeRevelar colunas={3} className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {perto.map(({ item: p }) => (
               <CardItem key={`${p.tipo}:${p.slug}`} item={p} />
             ))}
-          </div>
+          </GradeRevelar>
         </section>
       )}
     </PageShell>

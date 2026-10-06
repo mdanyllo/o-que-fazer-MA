@@ -16,6 +16,9 @@ import { botao } from "../components/azulejo/botao";
 import { FaixaAzulejo } from "../components/azulejo/PadraoAzulejo";
 import { Pagina404 } from "../components/site/Pagina404";
 import { Toaster } from "../components/ui/sonner";
+import { RolagemSuave } from "../components/movimento/RolagemSuave";
+import { TransicaoAzulejo } from "../components/movimento/TransicaoAzulejo";
+import { MotionConfig } from "motion/react";
 
 function NotFoundComponent() {
   return <Pagina404 />;
@@ -122,8 +125,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      {/* respeita prefers-reduced-motion em todas as animações do Motion */}
+      <MotionConfig reducedMotion="user">
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <TransicaoAzulejo />
+        <RolagemSuave />
+      </MotionConfig>
       <Toaster position="top-center" />
     </QueryClientProvider>
   );

@@ -67,6 +67,12 @@ export function CardDestino({
       <p className="mt-auto flex items-center gap-1.5 text-legenda text-ink-suave">
         <Clock className="size-4" aria-hidden /> {destino.tempoDeSaoLuis}
       </p>
+      <span
+        aria-hidden
+        className="sobe-no-hover inline-flex items-center gap-1 text-rotulo text-cobalto"
+      >
+        Ver destino <ArrowRight className="size-4" />
+      </span>
     </article>
   );
 }
@@ -133,6 +139,13 @@ export function CardItem({
         </Tag>
         {item.ficticio && <Tag>Exemplo</Tag>}
       </div>
+      <span
+        aria-hidden
+        className="sobe-no-hover inline-flex items-center gap-1 text-rotulo text-cobalto"
+      >
+        {item.tipo === "experiencia" ? "Ver experiência" : "Ver lugar"}{" "}
+        <ArrowRight className="size-4" />
+      </span>
     </article>
   );
 }
@@ -197,6 +210,12 @@ export function CardRoteiro({
             {roteiro.destinos.map(nomeDestino).join(" → ")}
           </p>
         )}
+        <span
+          aria-hidden
+          className="sobe-no-hover inline-flex items-center gap-1 text-rotulo text-cobalto"
+        >
+          Ver roteiro dia a dia <ArrowRight className="size-4" />
+        </span>
       </div>
     </article>
   );

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { botao } from "@/components/azulejo/botao";
 import {
@@ -10,7 +11,9 @@ import {
 } from "@/components/azulejo/cards";
 import { Chip } from "@/components/azulejo/etiquetas";
 import { Foto } from "@/components/azulejo/Foto";
-import { FaixaAzulejo } from "@/components/azulejo/PadraoAzulejo";
+import { FaixaMovimento } from "@/components/movimento/FaixaMovimento";
+import { GradeRevelar, Revelar } from "@/components/movimento/Revelar";
+import { FaixaAzulejo, PadraoAzulejo } from "@/components/azulejo/PadraoAzulejo";
 import { linkTexto, SecaoTitulo } from "@/components/azulejo/SecaoTitulo";
 import { HeroHome } from "@/components/home/HeroHome";
 import { MapaPrevia } from "@/components/home/MapaPrevia";
@@ -100,12 +103,29 @@ function Home() {
             </Link>
           }
         />
-        <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+        <GradeRevelar colunas={4} className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {comecar.map((c) => (
             <CardDestino key={c.slug} destino={c.destino} titulo={c.titulo} texto={c.texto} />
           ))}
-        </div>
+        </GradeRevelar>
       </section>
+
+      <FaixaMovimento
+        itens={[
+          "São Luís",
+          "Lagoa Bonita",
+          "Arroz de cuxá",
+          "Alcântara",
+          "Rio Preguiças",
+          "Bumba-meu-boi",
+          "Atins",
+          "Chapada das Mesas",
+          "Juçara",
+          "Poço Azul",
+          "Raposa",
+          "Delta das Américas",
+        ]}
+      />
 
       <ExperienciasPorCategoria />
 
@@ -122,12 +142,16 @@ function Home() {
           }
         />
         <div className="grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-12">
-          {roteiroDestaque && <CardRoteiro roteiro={roteiroDestaque} destaque />}
-          <div className="flex flex-col gap-6">
+          {roteiroDestaque && (
+            <Revelar variante="esquerda">
+              <CardRoteiro roteiro={roteiroDestaque} destaque />
+            </Revelar>
+          )}
+          <GradeRevelar colunas={3} passo={90} className="flex flex-col gap-6">
             {outrosRoteiros.map((r) => (
               <CardRoteiro key={r.slug} roteiro={r} />
             ))}
-          </div>
+          </GradeRevelar>
         </div>
       </section>
 
@@ -136,7 +160,7 @@ function Home() {
       {/* Mapa: a faixa forte da página, em cobalto */}
       <section aria-labelledby="mapa" className="bg-cobalto text-sobre-cobalto">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-12 md:px-12 md:py-22 lg:grid-cols-[1fr_1.3fr]">
-          <div className="flex flex-col gap-4">
+          <Revelar variante="esquerda" className="flex flex-col gap-4">
             <h2 id="mapa" className="text-t1">
               O Maranhão inteiro num mapa só
             </h2>
@@ -150,8 +174,10 @@ function Home() {
             >
               Explorar o mapa
             </Link>
-          </div>
-          <MapaPrevia />
+          </Revelar>
+          <Revelar variante="escala" atraso={150}>
+            <MapaPrevia />
+          </Revelar>
         </div>
       </section>
 
@@ -162,7 +188,7 @@ function Home() {
           titulo="O que comer primeiro"
           apoio="Três pratos para provar antes de qualquer outra coisa."
         />
-        <div className="grid gap-6 md:grid-cols-3">
+        <GradeRevelar className="grid gap-6 md:grid-cols-3">
           <CardComida
             nome="Juçara"
             texto="Fruto de palmeira, servido puro com farinha d'água e camarão seco."
@@ -180,7 +206,7 @@ function Home() {
             texto="Assada no forno, presença certa nos almoços de família e nas festas."
             cor="ouro"
           />
-        </div>
+        </GradeRevelar>
       </section>
 
       {/* Chamada para planejar */}
@@ -188,8 +214,15 @@ function Home() {
         aria-labelledby="planejar"
         className="mx-auto max-w-7xl px-5 pb-12 md:px-12 md:pb-22"
       >
-        <div className="flex flex-wrap items-end justify-between gap-6 rounded-md bg-areia p-6 md:p-12">
-          <div className="flex max-w-xl flex-col gap-2">
+        <Revelar
+          variante="escala"
+          className="relative flex flex-wrap items-end justify-between gap-6 overflow-hidden rounded-md bg-areia p-6 md:p-12"
+        >
+          <PadraoAzulejo
+            azulejo={48}
+            className="absolute -top-6 -right-6 hidden h-32 w-48 opacity-50 md:block"
+          />
+          <div className="relative flex max-w-xl flex-col gap-2">
             <h2
               id="planejar"
               className="font-display text-[clamp(1.75rem,1.4rem+1.2vw,2.25rem)] leading-tight font-extrabold"
@@ -201,10 +234,10 @@ function Home() {
               você muda o que quiser.
             </p>
           </div>
-          <Link to="/planejar" className={botao({ tamanho: "lg" })}>
+          <Link to="/planejar" className={`${botao({ tamanho: "lg" })} relative`}>
             Planejar viagem
           </Link>
-        </div>
+        </Revelar>
       </section>
     </PageShell>
   );
@@ -247,11 +280,20 @@ function ExperienciasPorCategoria() {
             </Chip>
           ))}
         </div>
-        <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {lista.map((item) => (
-            <CardItem key={`${item.tipo}:${item.slug}`} item={item} />
-          ))}
-        </div>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={categoria}
+            className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {lista.map((item) => (
+              <CardItem key={`${item.tipo}:${item.slug}`} item={item} />
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   );
@@ -267,15 +309,18 @@ function MesDeBoi() {
   return (
     <section aria-labelledby="boi" className="bg-areia">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-12 md:px-12 md:py-24 lg:grid-cols-2 lg:gap-16">
-        <Foto
-          src="/images/eventos/sao-joao.jpg"
-          alt="Grupo de Bumba-meu-boi se apresentando à noite, com o boi bordado e brincantes com chapéus de fita"
-          rotulo="Bumba-meu-boi no São João"
-          cor="guara"
-          sizes="(min-width: 1024px) 50vw, 100vw"
-          className="aspect-[4/5] rounded-md"
-        />
-        <div className="flex flex-col gap-5">
+        <Revelar variante="esquerda">
+          <Foto
+            src="/images/eventos/sao-joao.jpg"
+            alt="Grupo de Bumba-meu-boi se apresentando à noite, com o boi bordado e brincantes com chapéus de fita"
+            rotulo="Bumba-meu-boi no São João"
+            cor="guara"
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            parallax
+            className="aspect-[4/5] rounded-md"
+          />
+        </Revelar>
+        <Revelar variante="direita" atraso={120} className="flex flex-col gap-5">
           <h2 id="boi" className="text-t1">
             Junho é mês de boi
           </h2>
@@ -311,7 +356,7 @@ function MesDeBoi() {
               Ver a agenda do ano
             </Link>
           </div>
-        </div>
+        </Revelar>
       </div>
     </section>
   );

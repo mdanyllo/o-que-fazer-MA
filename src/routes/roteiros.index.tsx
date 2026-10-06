@@ -1,3 +1,4 @@
+import { GradeRevelar } from "@/components/movimento/Revelar";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { botao } from "@/components/azulejo/botao";
 import { CardRoteiro } from "@/components/azulejo/cards";
@@ -29,11 +30,11 @@ function Roteiros() {
         aria-label="Lista de roteiros"
         className="mx-auto max-w-7xl px-5 pb-12 md:px-12 md:pb-20"
       >
-        <div className="grid gap-x-8 gap-y-14 md:grid-cols-2 lg:grid-cols-3">
+        <GradeRevelar colunas={3} className="grid gap-x-8 gap-y-14 md:grid-cols-2 lg:grid-cols-3">
           {roteiros.map((r) => (
             <CardRoteiro key={r.slug} roteiro={r} destaque />
           ))}
-        </div>
+        </GradeRevelar>
       </section>
       <section
         aria-labelledby="sob-medida"

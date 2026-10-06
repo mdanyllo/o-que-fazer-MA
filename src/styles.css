@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "lenis/dist/lenis.css";
 
 @custom-variant dark (&:is([data-theme="noite"] *));
 @custom-variant noite (&:is([data-theme="noite"] *));
@@ -408,6 +409,219 @@
   stroke: var(--cobalto);
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+/* ——— Movimento ———
+ * Só transform e opacity. Os estados escondidos valem apenas com a classe `js` no <html>
+ * (posta antes da primeira pintura); se o JS do app falhar, tudo aparece mesmo assim.
+ */
+@keyframes sobe-da-mascara {
+  from {
+    transform: translateY(110%);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes aparece-sobe {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes aparece {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes foto-assenta {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes card-sobe {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes folha-sobe {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes pin-cai {
+  0% {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(2px) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes passa-faixa {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* título palavra por palavra, subindo de trás de uma máscara */
+.palavra-mascara {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  /* espaço para acentos e descendentes não serem cortados */
+  padding: 0.12em 0.02em 0.14em;
+  margin: -0.12em -0.02em -0.14em;
+}
+.palavra-mascara > span {
+  display: inline-block;
+}
+html.js .palavra-mascara > span {
+  animation: sobe-da-mascara var(--dur-hero) var(--ease-saida) both;
+  animation-delay: calc(var(--i, 0) * 70ms + var(--atraso-base, 100ms));
+}
+
+/* entrada em sequência (hero, cabeçalhos) */
+html.js .entra {
+  animation: aparece-sobe var(--dur-revela) var(--ease-saida) both;
+  animation-delay: var(--atraso, 0ms);
+}
+html.js .entra-foto {
+  animation: aparece var(--dur-hero) ease-out both;
+  animation-delay: var(--atraso, 0ms);
+}
+html.js .entra-foto img {
+  animation: foto-assenta 1600ms var(--ease-saida) both;
+  animation-delay: var(--atraso, 0ms);
+}
+
+/* revelação no scroll (uma vez); fallback: aparece sozinho depois de 4s */
+[data-revelar] {
+  transition:
+    opacity var(--dur-revela) var(--ease-saida),
+    transform var(--dur-revela) var(--ease-saida);
+  transition-delay: var(--atraso, 0ms);
+}
+html.js [data-revelar]:not([data-visivel]) {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: aparece 1ms 4s forwards;
+}
+/* revelação lateral só em telas largas; no celular vira vertical (sem vazar para os lados) */
+@media (min-width: 1024px) {
+  html.js [data-revelar="esquerda"]:not([data-visivel]) {
+    transform: translateX(-32px);
+  }
+  html.js [data-revelar="direita"]:not([data-visivel]) {
+    transform: translateX(32px);
+  }
+}
+html.js [data-revelar="escala"]:not([data-visivel]) {
+  transform: scale(0.96);
+}
+
+/* trilho da linha do tempo cresce quando o dia aparece */
+.trilho {
+  transform-origin: top;
+  transition: transform 900ms var(--ease-saida) 200ms;
+}
+html.js [data-revelar]:not([data-visivel]) .trilho {
+  transform: scaleY(0);
+}
+
+/* cards: informação extra sobe no hover (só em quem tem mouse) */
+@media (hover: hover) {
+  .sobe-no-hover {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity var(--dur-ui) var(--ease-saida),
+      transform var(--dur-ui) var(--ease-saida);
+  }
+  .group:hover .sobe-no-hover,
+  .group:focus-within .sobe-no-hover {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* cards que surgem sobre o mapa */
+.card-sobe {
+  animation: card-sobe var(--dur-ui) var(--ease-saida) both;
+}
+@media (max-width: 639px) {
+  .card-sobe.folha {
+    animation: folha-sobe var(--dur-ui) var(--ease-saida) both;
+  }
+}
+
+/* pins caindo em sequência na primeira vez */
+.pin-azulejo.pin-entra {
+  animation: pin-cai 520ms var(--ease-saida) backwards;
+  animation-delay: calc(min(var(--i, 0), 20) * 45ms + 150ms);
+}
+
+/* faixa em movimento lento (loop permitido) */
+.faixa-movimento {
+  animation: passa-faixa 60s linear infinite;
+}
+.faixa-movimento:hover {
+  animation-play-state: paused;
+}
+
+/* coração ao favoritar */
+.favoritar svg {
+  transition: fill var(--dur-toque) ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js .palavra-mascara > span,
+  html.js .entra,
+  html.js .entra-foto,
+  .card-sobe,
+  .card-sobe.folha {
+    animation: aparece var(--dur-ui) ease-out both !important;
+  }
+  html.js .entra-foto img,
+  .pin-azulejo.pin-entra,
+  .faixa-movimento {
+    animation: none !important;
+  }
+  html.js [data-revelar]:not([data-visivel]) {
+    transform: none !important;
+  }
+  [data-revelar] {
+    transition: opacity var(--dur-ui) ease-out;
+  }
+  .trilho {
+    transition: none;
+  }
+  html.js [data-revelar]:not([data-visivel]) .trilho {
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
