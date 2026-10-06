@@ -16,10 +16,10 @@ export function Chip({
       type="button"
       aria-pressed={ativo}
       className={cn(
-        "inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-legenda font-bold transition-colors duration-150 ease-saida",
+        "inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border-2 border-cobalto px-4 text-[0.9375rem] font-bold transition-colors duration-150 ease-saida",
         ativo
-          ? "border-cobalto bg-cobalto text-sobre-cobalto"
-          : "border-linha bg-louca text-ink hover:border-cobalto hover:text-cobalto",
+          ? "bg-cobalto text-sobre-cobalto"
+          : "bg-transparent text-cobalto hover:bg-cobalto hover:text-sobre-cobalto",
         className,
       )}
       {...props}

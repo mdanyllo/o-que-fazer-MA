@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Heart, Menu, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Heart, Menu } from "lucide-react";
 import { Logo } from "@/components/azulejo/Logo";
 import { botao } from "@/components/azulejo/botao";
 import { PontoGuara } from "@/components/azulejo/etiquetas";
@@ -10,59 +10,28 @@ import { cn } from "@/lib/utils";
 import { BotaoTema } from "./BotaoTema";
 import { NAV_EXTRA, NAV_INFERIOR, NAV_PRINCIPAL } from "./nav";
 
-/**
- * Header fixo. Com `sobreFoto`, começa transparente sobre o hero e fica sólido ao rolar.
- * Sem sombra: separa do conteúdo com a linha.
- */
-export function SiteHeader({ sobreFoto = false }: { sobreFoto?: boolean }) {
-  const [rolou, setRolou] = useState(false);
+/** Header fixo sobre fundo louça, separado do conteúdo pela linha (sem sombra). */
+export function SiteHeader() {
   const { favoritos, roteiros } = useMinhaViagem();
   const salvos = favoritos.length + roteiros.length;
 
-  useEffect(() => {
-    if (!sobreFoto) return;
-    const aoRolar = () => setRolou(window.scrollY > 24);
-    aoRolar();
-    window.addEventListener("scroll", aoRolar, { passive: true });
-    return () => window.removeEventListener("scroll", aoRolar);
-  }, [sobreFoto]);
-
-  const transparente = sobreFoto && !rolou;
-
   return (
-    <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-colors duration-300 ease-saida",
-        transparente
-          ? "bg-transparent text-sobre-foto"
-          : "border-b border-linha bg-louca/95 text-ink backdrop-blur-sm",
-      )}
-    >
-      {transparente && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-28 bg-gradient-to-b from-[rgb(var(--veu-foto)/0.55)] to-transparent"
-        />
-      )}
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 md:h-18 md:px-8">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-linha bg-louca/95 text-ink backdrop-blur-sm">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-5 md:h-20 md:px-12">
         <Link
           to="/"
           className="flex h-9 items-center rounded-md md:h-10"
           aria-label="Azulejo, início"
         >
-          <Logo sobre={transparente ? "foto" : "superficie"} className="h-full" />
+          <Logo className="h-full" />
         </Link>
 
-        <nav aria-label="Principal" className="ml-6 hidden flex-1 items-center gap-1 lg:flex">
+        <nav aria-label="Principal" className="ml-auto hidden items-center gap-1 lg:flex">
           {NAV_PRINCIPAL.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className={cn(
-                "group relative flex min-h-11 items-center rounded-md px-3 font-bold text-[0.9375rem] transition-colors duration-150",
-                transparente ? "hover:bg-sobre-foto/15" : "hover:text-cobalto",
-                !transparente && "data-[status=active]:text-cobalto",
-              )}
+              className="group relative flex min-h-11 items-center rounded-md px-3 text-base font-bold transition-colors duration-150 hover:text-cobalto data-[status=active]:text-cobalto"
             >
               {item.rotulo}
               <PontoGuara className="absolute bottom-0.5 left-1/2 -translate-x-1/2 scale-0 transition-transform duration-300 ease-saida group-data-[status=active]:scale-100" />
@@ -70,22 +39,12 @@ export function SiteHeader({ sobreFoto = false }: { sobreFoto?: boolean }) {
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-1">
-          <BotaoTema
-            className={cn(
-              "hidden sm:grid",
-              transparente ? "hover:bg-sobre-foto/15" : "hover:bg-areia",
-            )}
-          />
+        <div className="ml-auto flex items-center gap-1 lg:ml-4">
+          <BotaoTema className="hidden hover:bg-areia sm:grid" />
           <Link
             to="/minha-viagem"
             aria-label={`Minha viagem${salvos ? `, ${salvos} salvos` : ""}`}
-            className={cn(
-              "relative hidden size-11 place-items-center rounded-md transition-colors duration-150 md:grid",
-              transparente
-                ? "hover:bg-sobre-foto/15"
-                : "hover:bg-areia data-[status=active]:text-cobalto",
-            )}
+            className="relative hidden size-11 place-items-center rounded-md transition-colors duration-150 hover:bg-areia data-[status=active]:text-cobalto md:grid"
           >
             <Heart className="size-5" />
             {salvos > 0 && (
@@ -94,25 +53,18 @@ export function SiteHeader({ sobreFoto = false }: { sobreFoto?: boolean }) {
               </span>
             )}
           </Link>
-          <Link
-            to="/planejar"
-            className={cn(
-              botao({ variante: transparente ? "sobre-foto" : "principal" }),
-              "ml-1 px-3 sm:px-5",
-            )}
-          >
-            <Sparkles />
+          <Link to="/planejar" className={cn(botao(), "ml-1 px-4 sm:px-5")}>
             <span className="sm:hidden">Planejar</span>
             <span className="hidden sm:inline">Planejar viagem</span>
           </Link>
-          <MenuCelular transparente={transparente} />
+          <MenuCelular />
         </div>
       </div>
     </header>
   );
 }
 
-function MenuCelular({ transparente }: { transparente: boolean }) {
+function MenuCelular() {
   const [aberto, setAberto] = useState(false);
   const fechar = () => setAberto(false);
   const linkClasses =
@@ -122,10 +74,7 @@ function MenuCelular({ transparente }: { transparente: boolean }) {
     <Sheet open={aberto} onOpenChange={setAberto}>
       <SheetTrigger
         aria-label="Abrir menu"
-        className={cn(
-          "grid size-11 place-items-center rounded-md lg:hidden",
-          transparente ? "hover:bg-sobre-foto/15" : "hover:bg-areia",
-        )}
+        className="grid size-11 place-items-center rounded-md hover:bg-areia lg:hidden"
       >
         <Menu className="size-6" />
       </SheetTrigger>
@@ -153,7 +102,7 @@ function MenuCelular({ transparente }: { transparente: boolean }) {
         </div>
         <div className="mt-auto border-t border-linha p-4">
           <Link to="/planejar" onClick={fechar} className={cn(botao({ tamanho: "lg" }), "w-full")}>
-            <Sparkles /> Planejar viagem
+            Planejar viagem
           </Link>
         </div>
       </SheetContent>

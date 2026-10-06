@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/site/PageShell";
+import { validarBuscaExplorar } from "@/lib/busca";
 
 // Provisório (etapa b): a página completa é feita na etapa (d).
 export const Route = createFileRoute("/explorar")({
+  validateSearch: validarBuscaExplorar,
   head: () => ({ meta: [{ title: "O que fazer no Maranhão | Azulejo" }] }),
   component: ExplorarPage,
 });

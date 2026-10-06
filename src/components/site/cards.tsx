@@ -1,7 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Star, Clock, Mountain, Calendar, MessageCircle, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Business, Destination, EventItem, Experience, Itinerary, Category } from "@/data/maranhao";
+import type {
+  Business,
+  Destination,
+  EventItem,
+  Experience,
+  Itinerary,
+  Category,
+} from "@/data/maranhao";
 
 export function SectionHeading({
   eyebrow,
@@ -43,7 +50,12 @@ export function DestinationCard({
       params={{ slug: destination.slug }}
       className="group relative block overflow-hidden rounded-2xl card-lift"
     >
-      <div className={cn("relative overflow-hidden", size === "lg" ? "aspect-4/5 md:aspect-3/4" : "aspect-4/3")}>
+      <div
+        className={cn(
+          "relative overflow-hidden",
+          size === "lg" ? "aspect-4/5 md:aspect-3/4" : "aspect-4/3",
+        )}
+      >
         <img
           src={destination.image}
           alt={destination.name}
@@ -113,7 +125,9 @@ export function ExperienceCard({ experience }: { experience: Experience }) {
           <span className="text-muted-foreground">({experience.reviews})</span>
         </div>
         <h3 className="mt-2 font-display text-xl leading-snug">{experience.title}</h3>
-        <p className="mt-2 line-clamp-2 flex-1 text-sm text-muted-foreground">{experience.description}</p>
+        <p className="mt-2 line-clamp-2 flex-1 text-sm text-muted-foreground">
+          {experience.description}
+        </p>
         <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <Clock className="h-3.5 w-3.5" /> {experience.duration}
@@ -202,14 +216,21 @@ export function EventCard({ event }: { event: EventItem }) {
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft card-lift">
       <div className="relative aspect-16/10 overflow-hidden">
-        <img src={event.image} alt={event.name} loading="lazy" className="h-full w-full object-cover img-zoom" />
+        <img
+          src={event.image}
+          alt={event.name}
+          loading="lazy"
+          className="h-full w-full object-cover img-zoom"
+        />
         <div className="absolute top-3 left-3 rounded-xl bg-background/95 px-3 py-2 text-center backdrop-blur-sm">
           <p className="text-sm leading-none font-bold">{event.day}</p>
           <p className="mt-1 text-[10px] tracking-widest uppercase">{event.month}</p>
         </div>
       </div>
       <div className="flex flex-1 flex-col p-5">
-        <span className="text-xs font-semibold tracking-wide text-turquoise uppercase">{event.category}</span>
+        <span className="text-xs font-semibold tracking-wide text-turquoise uppercase">
+          {event.category}
+        </span>
         <h3 className="mt-1.5 font-display text-xl">{event.name}</h3>
         <p className="mt-2 flex-1 text-sm text-muted-foreground">{event.description}</p>
         <p className="mt-4 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -225,7 +246,12 @@ export function BusinessCard({ business }: { business: Business }) {
   return (
     <article className="group flex gap-4 overflow-hidden rounded-2xl border border-border bg-card p-3 shadow-soft card-lift">
       <div className="h-28 w-28 shrink-0 overflow-hidden rounded-xl">
-        <img src={business.image} alt={business.name} loading="lazy" className="h-full w-full object-cover img-zoom" />
+        <img
+          src={business.image}
+          alt={business.name}
+          loading="lazy"
+          className="h-full w-full object-cover img-zoom"
+        />
       </div>
       <div className="flex min-w-0 flex-1 flex-col py-1 pr-1">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">

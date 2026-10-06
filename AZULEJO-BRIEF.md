@@ -36,7 +36,7 @@ O nome Azulejo vem dos azulejos portugueses que cobrem os casarões do Centro Hi
 Os arquivos estão na pasta `azulejo-brand/` (mova para a pasta pública do projeto, por exemplo `public/brand/`):
 
 - `azulejo-logo.svg`: símbolo + nome, versão principal, sobre fundos claros
-- `azulejo-logo-negativo.svg`: para fundos escuros (cobalto, juçara)
+- `azulejo-logo-negativo.svg`: para fundos escuros (cobalto, cobalto-forte). Nunca sobre juçara
 - `azulejo-simbolo.svg` e `azulejo-simbolo-negativo.svg`: só o símbolo (favicon, ícone de app, avatar, loading)
 - `azulejo-padrao.svg`: padrão de azulejos repetidos
 
@@ -64,7 +64,7 @@ Crie estes tokens como variáveis CSS (e no tema do Tailwind, se o projeto usar 
   --ouro: #E8A33D;           /* selos, badges, destaques. Sempre com texto --ink */
   --lagoa: #1E9AA8;          /* ilustrações, mapas, gráficos. Não é cor de texto */
   --babacu: #3E6B3A;         /* sucesso, confirmações */
-  --jucara: #4A1E3D;         /* rodapé, faixas escuras, citações */
+  --jucara: #4A1E3D;         /* citações e detalhes pequenos. Nunca como fundo do logo */
 }
 
 [data-theme="noite"] {
@@ -76,7 +76,7 @@ Crie estes tokens como variáveis CSS (e no tema do Tailwind, se o projeto usar 
 ```
 
 Regras:
-- Fundo padrão `--louca`; seções alternadas em `--areia`; uma faixa forte por página em `--cobalto` ou `--jucara`, no máximo.
+- Fundo padrão `--louca`; seções alternadas em `--areia`; uma faixa forte por página em `--cobalto`, no máximo. Rodapé em `--cobalto-forte` com o logo negativo.
 - Botão principal: fundo `--cobalto`, texto `--sobre-cobalto`. Botão secundário: borda 2px `--cobalto`, texto `--cobalto`.
 - Numa mesma tela, no máximo duas cores maranhenses além do cobalto.
 - Texto pequeno só em `--ink`, `--ink-suave`, `--cobalto`, `--guara` ou `--babacu`. Contraste mínimo 4.5:1.

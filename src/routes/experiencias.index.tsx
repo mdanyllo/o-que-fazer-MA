@@ -16,7 +16,7 @@ type Search = {
 
 const str = (v: unknown) => (typeof v === "string" && v.length > 0 ? v : undefined);
 
-export const Route = createFileRoute("/experiencias")({
+export const Route = createFileRoute("/experiencias/")({
   validateSearch: (search: Record<string, unknown>): Search => ({
     categoria: str(search["categoria"]),
     destino: str(search["destino"]),

@@ -1,298 +1,318 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { Search, ArrowRight, Sparkles, Map as MapIcon, Star } from "lucide-react";
-import { toast } from "sonner";
-import { PageShell } from "@/components/site/PageShell";
-import { CategoryCard, DestinationCard, ExperienceCard, RouteCard, SectionHeading, BusinessCard } from "@/components/site/cards";
-import { MapExplorer } from "@/components/site/MapExplorer";
+import { useMemo, useState } from "react";
+import { botao } from "@/components/azulejo/botao";
 import {
-  businesses,
-  categories,
-  destinations,
-  experiences,
-  img,
-  itineraries,
-  searchSuggestions,
-} from "@/data/maranhao";
+  CardComida,
+  CardDestino,
+  CardItem,
+  CardRoteiro,
+  LinhaEvento,
+} from "@/components/azulejo/cards";
+import { Chip } from "@/components/azulejo/etiquetas";
+import { Foto } from "@/components/azulejo/Foto";
+import { FaixaAzulejo } from "@/components/azulejo/PadraoAzulejo";
+import { linkTexto, SecaoTitulo } from "@/components/azulejo/SecaoTitulo";
+import { HeroHome } from "@/components/home/HeroHome";
+import { MapaPrevia } from "@/components/home/MapaPrevia";
+import { PageShell } from "@/components/site/PageShell";
+import {
+  categoriaPorId,
+  eventos,
+  getDestino,
+  getRoteiro,
+  itens,
+  type CategoriaId,
+  type Destino,
+  type Roteiro,
+} from "@/data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Descubra Maranhão — destinos, experiências e roteiros" },
+      { title: "Azulejo — o Maranhão, um azulejo de cada vez" },
       {
         name: "description",
         content:
-          "Descubra o Maranhão: Lençóis Maranhenses, São Luís, Chapada das Mesas e mais. Experiências, mapas e roteiros prontos para planejar sua viagem.",
-      },
-      { property: "og:title", content: "Descubra Maranhão — destinos, experiências e roteiros" },
-      {
-        property: "og:description",
-        content: "Experiências, destinos e roteiros para você viver o Maranhão de verdade.",
+          "Roteiros, cultura e comida contados por quem conhece o Maranhão por dentro. Dos casarões de São Luís às lagoas dos Lençóis.",
       },
     ],
   }),
-  component: Index,
+  component: Home,
 });
 
-function Index() {
-  const [query, setQuery] = useState("");
+const POR_ONDE_COMECAR: { slug: string; titulo: string; texto: string }[] = [
+  {
+    slug: "barreirinhas",
+    titulo: "Lençóis Maranhenses",
+    texto:
+      "Dunas brancas e lagoas de água doce que enchem com as chuvas. A melhor época vai de junho a setembro.",
+  },
+  {
+    slug: "sao-luis",
+    titulo: "Centro Histórico de São Luís",
+    texto: "Casarões cobertos de azulejos portugueses, Patrimônio Mundial da UNESCO desde 1997.",
+  },
+  {
+    slug: "alcantara",
+    titulo: "Alcântara",
+    texto:
+      "Cidade colonial do outro lado da baía de São Marcos, com igrejas e ruínas que se visitam num dia.",
+  },
+  {
+    slug: "carolina",
+    titulo: "Chapada das Mesas",
+    texto: "Cachoeiras e morros em forma de mesa no sul do estado, perto de Carolina.",
+  },
+];
 
-  const featured = destinations.filter((d) =>
-    ["barreirinhas", "chapada-das-mesas", "sao-luis", "atins", "santo-amaro", "alcantara"].includes(d.slug),
+const CATEGORIAS_HOME: CategoriaId[] = ["lagoas-praias", "cultura", "natureza", "gastronomia"];
+
+const secao = "mx-auto max-w-7xl px-5 py-12 md:px-12 md:py-20";
+
+function Home() {
+  const comecar = POR_ONDE_COMECAR.map((c) => ({ ...c, destino: getDestino(c.slug) })).filter(
+    (c): c is typeof c & { destino: Destino } => Boolean(c.destino),
   );
-  const cityCards = destinations.filter((d) =>
-    ["sao-luis", "barreirinhas", "santo-amaro", "atins", "carolina", "alcantara"].includes(d.slug),
+  const [roteiroDestaque, ...outrosRoteiros] = [
+    "lencois-em-4-dias",
+    "3-dias-em-sao-luis",
+    "chapada-das-mesas-em-5-dias",
+    "maranhao-essencial-7-dias",
+  ]
+    .map(getRoteiro)
+    .filter((r): r is Roteiro => Boolean(r));
+
+  return (
+    <PageShell>
+      <HeroHome />
+
+      <FaixaAzulejo azulejo={96} />
+
+      {/* Por onde começar */}
+      <section aria-labelledby="comecar" className={`${secao} flex flex-col gap-8`}>
+        <SecaoTitulo
+          id="comecar"
+          titulo="Por onde começar"
+          apoio="Quatro lugares que resumem o estado, do litoral ao sertão."
+          acao={
+            <Link to="/destinos" className={linkTexto}>
+              Ver todos os destinos
+            </Link>
+          }
+        />
+        <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+          {comecar.map((c) => (
+            <CardDestino key={c.slug} destino={c.destino} titulo={c.titulo} texto={c.texto} />
+          ))}
+        </div>
+      </section>
+
+      <ExperienciasPorCategoria />
+
+      {/* Roteiros prontos */}
+      <section aria-labelledby="roteiros" className={`${secao} flex flex-col gap-8`}>
+        <SecaoTitulo
+          id="roteiros"
+          titulo="Roteiros prontos"
+          apoio="Dias contados, paradas escolhidas e tempo de estrada. É só seguir."
+          acao={
+            <Link to="/roteiros" className={linkTexto}>
+              Ver todos os roteiros
+            </Link>
+          }
+        />
+        <div className="grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-12">
+          {roteiroDestaque && <CardRoteiro roteiro={roteiroDestaque} destaque />}
+          <div className="flex flex-col gap-6">
+            {outrosRoteiros.map((r) => (
+              <CardRoteiro key={r.slug} roteiro={r} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <MesDeBoi />
+
+      {/* Mapa: a faixa forte da página, em cobalto */}
+      <section aria-labelledby="mapa" className="bg-cobalto text-sobre-cobalto">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-12 md:px-12 md:py-22 lg:grid-cols-[1fr_1.3fr]">
+          <div className="flex flex-col gap-4">
+            <h2 id="mapa" className="text-t1">
+              O Maranhão inteiro num mapa só
+            </h2>
+            <p className="max-w-[34em]">
+              Lagoas, cachoeiras, casarões e onde comer, cada um no seu lugar. Toque num pin para
+              ver o nome e abrir o que tem por lá.
+            </p>
+            <Link
+              to="/mapa"
+              className={`${botao({ tamanho: "lg" })} self-start bg-ouro text-sobre-ouro hover:bg-ouro hover:brightness-95`}
+            >
+              Explorar o mapa
+            </Link>
+          </div>
+          <MapaPrevia />
+        </div>
+      </section>
+
+      {/* O que comer primeiro */}
+      <section aria-labelledby="comer" className={`${secao} flex flex-col gap-8`}>
+        <SecaoTitulo
+          id="comer"
+          titulo="O que comer primeiro"
+          apoio="Três pratos para provar antes de qualquer outra coisa."
+        />
+        <div className="grid gap-6 md:grid-cols-3">
+          <CardComida
+            nome="Juçara"
+            texto="Fruto de palmeira, servido puro com farinha d'água e camarão seco."
+            foto="/images/lugares/parque-da-jucara.jpg"
+            cor="jucara"
+          />
+          <CardComida
+            nome="Arroz de cuxá"
+            texto="Arroz com vinagreira, gergelim e camarão seco. O prato mais maranhense que existe."
+            foto="/images/categorias/gastronomia.jpg"
+            cor="babacu"
+          />
+          <CardComida
+            nome="Torta de camarão"
+            texto="Assada no forno, presença certa nos almoços de família e nas festas."
+            cor="ouro"
+          />
+        </div>
+      </section>
+
+      {/* Chamada para planejar */}
+      <section
+        aria-labelledby="planejar"
+        className="mx-auto max-w-7xl px-5 pb-12 md:px-12 md:pb-22"
+      >
+        <div className="flex flex-wrap items-end justify-between gap-6 rounded-md bg-areia p-6 md:p-12">
+          <div className="flex max-w-xl flex-col gap-2">
+            <h2
+              id="planejar"
+              className="font-display text-[clamp(1.75rem,1.4rem+1.2vw,2.25rem)] leading-tight font-extrabold"
+            >
+              Monte sua viagem em cinco perguntas
+            </h2>
+            <p className="text-ink-suave">
+              Dias, interesses, ritmo, orçamento e cidade de chegada. A gente sugere um roteiro, e
+              você muda o que quiser.
+            </p>
+          </div>
+          <Link to="/planejar" className={botao({ tamanho: "lg" })}>
+            Planejar viagem
+          </Link>
+        </div>
+      </section>
+    </PageShell>
+  );
+}
+
+function ExperienciasPorCategoria() {
+  const [categoria, setCategoria] = useState<CategoriaId>("lagoas-praias");
+  const lista = useMemo(
+    () =>
+      itens
+        .filter((i) => i.categoria === categoria && !i.ficticio && i.horas > 0)
+        // experiências primeiro, sem repetir o mesmo lugar
+        .sort((a, b) => (a.tipo === b.tipo ? 0 : a.tipo === "experiencia" ? -1 : 1))
+        .filter((i, idx, arr) => arr.findIndex((x) => x.foto === i.foto) === idx)
+        .slice(0, 3),
+    [categoria],
   );
 
   return (
-    <PageShell transparentHeader>
-      {/* HERO */}
-      <section className="relative flex min-h-[92vh] items-end overflow-hidden">
-        <img
-          src={img.lencois}
-          alt="Dunas e lagoas dos Lençóis Maranhenses ao entardecer"
-          width={1920}
-          height={1088}
-          className="absolute inset-0 h-full w-full object-cover"
+    <section aria-labelledby="fazer" className="bg-areia">
+      <div className={`${secao} flex flex-col gap-8`}>
+        <SecaoTitulo
+          id="fazer"
+          titulo="O que fazer por aqui"
+          apoio="Escolha um jeito de viajar e veja por onde começar."
+          acao={
+            <Link to="/explorar" search={{ categoria }} className={linkTexto}>
+              Ver tudo em {categoriaPorId[categoria].nome.toLowerCase()}
+            </Link>
+          }
         />
-        <div className="absolute inset-0 hero-scrim" />
+        <div
+          role="group"
+          aria-label="Categorias"
+          className="sem-barra -mx-5 flex gap-2 overflow-x-auto px-5 md:mx-0 md:flex-wrap md:px-0"
+        >
+          {CATEGORIAS_HOME.map((id) => (
+            <Chip key={id} ativo={categoria === id} onClick={() => setCategoria(id)}>
+              {categoriaPorId[id].nome}
+            </Chip>
+          ))}
+        </div>
+        <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          {lista.map((item) => (
+            <CardItem key={`${item.tipo}:${item.slug}`} item={item} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-        <div className="relative mx-auto w-full max-w-7xl px-5 pt-32 pb-14 lg:px-8 lg:pb-20">
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold tracking-[0.18em] text-white uppercase backdrop-blur-sm">
-            Maranhão · Brasil
-          </p>
-          <h1 className="max-w-4xl font-display text-5xl leading-[1.05] text-white text-balance-title sm:text-6xl lg:text-7xl">
-            Descubra o Maranhão.
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg text-white/85 sm:text-xl">
-            Experiências, destinos e roteiros para você viver o Maranhão de verdade.
-          </p>
+function MesDeBoi() {
+  // próximos eventos a partir do mês atual, dando a volta no ano
+  const mesAtual = new Date().getMonth() + 1;
+  const proximos = [...eventos]
+    .sort((a, b) => ((a.mes - mesAtual + 12) % 12) - ((b.mes - mesAtual + 12) % 12))
+    .slice(0, 3);
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              toast.success("Buscando ideias de viagem", {
-                description: query
-                  ? `Protótipo: interpretaríamos “${query}” e montaríamos um roteiro.`
-                  : "Protótipo: escolha uma sugestão para ver como funciona.",
-              });
-            }}
-            className="mt-9 max-w-3xl rounded-3xl border border-white/25 bg-background/95 p-2.5 shadow-lift backdrop-blur-md"
-          >
-            <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 sm:flex">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-turquoise/15 text-turquoise">
-                <Search className="h-5 w-5" />
-              </span>
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="O que você quer fazer?"
-                aria-label="O que você quer fazer?"
-                className="min-w-0 flex-1 bg-transparent py-3 text-base outline-none placeholder:text-muted-foreground"
-              />
-              <button
-                type="submit"
-                className="col-span-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] sm:col-span-1"
-              >
-                <Sparkles className="h-4 w-4" /> Planejar
-              </button>
-            </div>
-            <div className="flex gap-2 overflow-x-auto px-1 pt-2.5 pb-1">
-              {searchSuggestions.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setQuery(s)}
-                  className="shrink-0 rounded-full border border-border px-3.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-turquoise hover:text-foreground"
+  return (
+    <section aria-labelledby="boi" className="bg-areia">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-12 md:px-12 md:py-24 lg:grid-cols-2 lg:gap-16">
+        <Foto
+          src="/images/eventos/sao-joao.jpg"
+          alt="Grupo de Bumba-meu-boi se apresentando à noite, com o boi bordado e brincantes com chapéus de fita"
+          rotulo="Bumba-meu-boi no São João"
+          cor="guara"
+          sizes="(min-width: 1024px) 50vw, 100vw"
+          className="aspect-[4/5] rounded-md"
+        />
+        <div className="flex flex-col gap-5">
+          <h2 id="boi" className="text-t1">
+            Junho é mês de boi
+          </h2>
+          <p className="max-w-[34em]">
+            No São João, São Luís inteira vira arraial. Cada grupo de Bumba-meu-boi tem seu sotaque,
+            com ritmo, instrumentos e roupas próprios: matraca, zabumba, orquestra, baixada e
+            costa-de-mão.
+          </p>
+          <p className="max-w-[34em] text-ink-suave">
+            A gente conta onde assistir, o que vestir e como entender o que está acontecendo na
+            roda.
+          </p>
+          <ul className="flex flex-wrap gap-2">
+            {["Bumba-meu-boi", "Tambor de crioula", "Cacuriá", "Reggae"].map((t) => (
+              <li key={t}>
+                <Link
+                  to="/eventos"
+                  className="inline-flex min-h-11 items-center rounded-full border-2 border-cobalto px-4 text-[0.9375rem] font-bold text-cobalto transition-colors duration-150 hover:bg-cobalto hover:text-sobre-cobalto"
                 >
-                  {s}
-                </button>
+                  {t}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-4">
+            <h3 className="text-t3">Próximos eventos</h3>
+            <ul className="mt-3">
+              {proximos.map((e) => (
+                <LinhaEvento key={e.slug} evento={e} />
               ))}
-            </div>
-          </form>
-
-          <div className="mt-8 flex flex-wrap gap-6 text-sm text-white/75">
-            <span>7 destinos mapeados</span>
-            <span>+120 experiências demonstrativas</span>
-            <span>6 roteiros prontos</span>
-          </div>
-        </div>
-      </section>
-
-      {/* EXPLORE */}
-      <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-        <SectionHeading
-          eyebrow="Explore o Maranhão"
-          title="Cidades para começar a viagem"
-          description="De capital histórica a vilas de areia dentro do parque — escolha por onde entrar no estado."
-          action={
-            <Link
-              to="/destinos"
-              className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-secondary"
-            >
-              Ver todos os destinos <ArrowRight className="h-4 w-4" />
-            </Link>
-          }
-        />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {cityCards.map((d) => (
-            <DestinationCard key={d.slug} destination={d} />
-          ))}
-        </div>
-      </section>
-
-      {/* CATEGORIAS */}
-      <section className="bg-sand/60 py-20">
-        <div className="mx-auto max-w-7xl px-5 lg:px-8">
-          <SectionHeading
-            eyebrow="Por onde começar"
-            title="O que você quer viver?"
-            description="Escolha um interesse e veja tudo o que combina com ele."
-          />
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-            {categories.map((c) => (
-              <CategoryCard key={c.id} category={c} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* DESTINOS EM DESTAQUE */}
-      <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-        <SectionHeading
-          eyebrow="Seleção editorial"
-          title="Destinos que você precisa conhecer"
-          description="Os lugares que definem a paisagem maranhense, com experiências já mapeadas."
-        />
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {featured.map((d, i) => (
-            <div key={d.slug} className={i === 0 ? "md:col-span-2 lg:col-span-2" : ""}>
-              <DestinationCard destination={d} size={i === 0 ? "md" : "md"} />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* MAPA */}
-      <section className="bg-deep py-20 text-deep-foreground">
-        <div className="mx-auto max-w-7xl px-5 lg:px-8">
-          <div className="mb-8 grid gap-4 sm:flex sm:items-end sm:justify-between">
-            <div className="max-w-2xl">
-              <p className="mb-2 text-xs font-semibold tracking-[0.2em] text-turquoise uppercase">Mapa turístico</p>
-              <h2 className="font-display text-3xl text-balance-title sm:text-4xl">
-                Veja tudo no mapa antes de decidir
-              </h2>
-              <p className="mt-3 text-deep-foreground/70">
-                Atrações, praias, restaurantes e hospedagens em um mapa único — com rotas prontas.
-              </p>
-            </div>
-            <Link
-              to="/mapa"
-              className="inline-flex items-center gap-2 rounded-full bg-turquoise px-5 py-2.5 text-sm font-semibold text-turquoise-foreground"
-            >
-              <MapIcon className="h-4 w-4" /> Abrir mapa completo
+            </ul>
+            <Link to="/eventos" className={linkTexto}>
+              Ver a agenda do ano
             </Link>
           </div>
-          <div className="rounded-3xl bg-background p-4 text-foreground shadow-lift lg:p-6">
-            <MapExplorer compact />
-          </div>
         </div>
-      </section>
-
-      {/* EXPERIÊNCIAS */}
-      <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-        <SectionHeading
-          eyebrow="Experiências"
-          title="Para viver assim que chegar"
-          action={
-            <Link
-              to="/experiencias"
-              className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-secondary"
-            >
-              Ver todas <ArrowRight className="h-4 w-4" />
-            </Link>
-          }
-        />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {experiences.slice(0, 4).map((e) => (
-            <ExperienceCard key={e.id} experience={e} />
-          ))}
-        </div>
-      </section>
-
-      {/* ROTEIROS */}
-      <section className="bg-sand/60 py-20">
-        <div className="mx-auto max-w-7xl px-5 lg:px-8">
-          <SectionHeading
-            eyebrow="Roteiros"
-            title="Viagens prontas para seguir"
-            description="Dia a dia com deslocamentos, tempo estimado e onde comer."
-            action={
-              <Link
-                to="/roteiros"
-                className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-card"
-              >
-                Todos os roteiros <ArrowRight className="h-4 w-4" />
-              </Link>
-            }
-          />
-          <div className="grid gap-5 lg:grid-cols-2">
-            {itineraries.slice(0, 2).map((i) => (
-              <RouteCard key={i.slug} itinerary={i} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* PLANEJADOR CTA */}
-      <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl">
-          <img src={img.porDoSol} alt="Pôr do sol nas dunas" loading="lazy" className="h-full w-full object-cover" />
-          <div className="absolute inset-0 hero-scrim" />
-          <div className="absolute inset-0 flex items-center">
-            <div className="max-w-xl px-6 py-10 sm:px-12">
-              <h2 className="font-display text-3xl text-white text-balance-title sm:text-4xl">
-                Conte como você quer viajar. A gente monta o caminho.
-              </h2>
-              <p className="mt-3 text-white/80">
-                Cinco perguntas rápidas e um roteiro completo com mapa, experiências e estimativa de custo.
-              </p>
-              <Link
-                to="/planejar"
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-turquoise px-6 py-3.5 text-sm font-semibold text-turquoise-foreground transition-transform hover:scale-[1.03]"
-              >
-                <Sparkles className="h-4 w-4" /> Monte minha viagem
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* EMPRESAS */}
-      <section className="mx-auto max-w-7xl px-5 pb-4 lg:px-8">
-        <SectionHeading
-          eyebrow="Local"
-          title="Encontre quem faz acontecer"
-          description="Pousadas, restaurantes, guias e agências que operam nos destinos."
-          action={
-            <Link
-              to="/empresas"
-              className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-secondary"
-            >
-              Ver empresas <ArrowRight className="h-4 w-4" />
-            </Link>
-          }
-        />
-        <div className="grid gap-4 md:grid-cols-2">
-          {businesses.slice(0, 4).map((b) => (
-            <BusinessCard key={b.id} business={b} />
-          ))}
-        </div>
-        <p className="mt-6 inline-flex items-center gap-2 text-xs text-muted-foreground">
-          <Star className="h-3.5 w-3.5 fill-gold text-gold" /> Empresas, avaliações e preços são dados
-          demonstrativos deste protótipo.
-        </p>
-      </section>
-    </PageShell>
+      </div>
+    </section>
   );
 }

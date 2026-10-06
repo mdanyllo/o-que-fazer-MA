@@ -7,22 +7,17 @@ import { SiteHeader } from "./SiteHeader";
 
 /**
  * Estrutura de toda página: link de pular, header, conteúdo, rodapé e bottom nav (celular).
- * - `sobreFoto`: a página começa com uma foto grande; o header fica transparente por cima.
  * - `semRodape`: telas de app em tela cheia (mapa).
  */
 export function PageShell({
   children,
-  sobreFoto = false,
-  transparentHeader = false,
   semRodape = false,
 }: {
   children: ReactNode;
-  sobreFoto?: boolean;
-  /** @deprecated nome antigo de `sobreFoto`, usado pelas telas que serão refeitas */
-  transparentHeader?: boolean;
   semRodape?: boolean;
+  /** @deprecated o header não fica mais sobre a foto; ignorado */
+  transparentHeader?: boolean;
 }) {
-  const foto = sobreFoto || transparentHeader;
   return (
     <div className="flex min-h-svh flex-col bg-louca">
       <a
@@ -31,15 +26,11 @@ export function PageShell({
       >
         Pular para o conteúdo
       </a>
-      <SiteHeader sobreFoto={foto} />
+      <SiteHeader />
       <main
         id="conteudo"
         tabIndex={-1}
-        className={cn(
-          "flex-1 outline-none",
-          !foto && "pt-16 md:pt-18",
-          semRodape && "pb-16 md:pb-0",
-        )}
+        className={cn("flex-1 pt-16 outline-none md:pt-20", semRodape && "pb-16 md:pb-0")}
       >
         {children}
       </main>
@@ -49,7 +40,7 @@ export function PageShell({
   );
 }
 
-/** Capa de página com foto que sangra até a borda e título sobre véu escuro. */
+/** Capa de página legada (telas antigas, refeitas na etapa d). */
 export function PageHero({
   image,
   eyebrow,
@@ -66,15 +57,38 @@ export function PageHero({
   tall?: boolean;
 }) {
   return (
-    <section className={cn("relative flex items-end", tall ? "min-h-[78svh]" : "min-h-[56svh]")}>
+    <section className={cn("relative flex items-end", tall ? "min-h-[70svh]" : "min-h-[48svh]")}>
       <Foto src={image} alt={title} rotulo={title} prioridade className="absolute inset-0" />
       <div className="absolute inset-0 veu-foto" />
-      <div className="relative mx-auto w-full max-w-7xl px-4 pt-32 pb-12 text-sobre-foto md:px-8 md:pb-16">
+      <div className="relative mx-auto w-full max-w-7xl px-5 pt-24 pb-12 text-sobre-foto md:px-12 md:pb-16">
         {eyebrow && <p className="mb-3 text-rotulo">{eyebrow}</p>}
-        <h1 className="max-w-4xl text-t1 md:text-display">{title}</h1>
+        <h1 className="max-w-4xl text-t1">{title}</h1>
         {subtitle && <p className="mt-4 medida text-lg">{subtitle}</p>}
         {children}
       </div>
+    </section>
+  );
+}
+
+/** Abertura padrão das páginas internas: título grande + apoio, sem etiqueta acima. */
+export function CabecalhoPagina({
+  titulo,
+  apoio,
+  children,
+  className,
+}: {
+  titulo: ReactNode;
+  apoio?: ReactNode;
+  children?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section
+      className={cn("mx-auto max-w-7xl px-5 pt-10 pb-10 md:px-12 md:pt-16 md:pb-14", className)}
+    >
+      <h1 className="max-w-4xl text-display text-cobalto">{titulo}</h1>
+      {apoio && <p className="mt-6 medida text-[1.1875rem] text-ink-suave">{apoio}</p>}
+      {children}
     </section>
   );
 }

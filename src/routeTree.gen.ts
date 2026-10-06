@@ -12,13 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as EventosRouteImport } from './routes/eventos'
-import { Route as ExperienciasRouteImport } from './routes/experiencias'
 import { Route as ExplorarRouteImport } from './routes/explorar'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as MinhaViagemRouteImport } from './routes/minha-viagem'
 import { Route as PlanejarRouteImport } from './routes/planejar'
 import { Route as DestinosIndexRouteImport } from './routes/destinos.index'
 import { Route as DestinosSlugRouteImport } from './routes/destinos.$slug'
+import { Route as ExperienciasIndexRouteImport } from './routes/experiencias.index'
+import { Route as ExperienciasSlugRouteImport } from './routes/experiencias.$slug'
+import { Route as LugaresSlugRouteImport } from './routes/lugares.$slug'
 import { Route as RoteirosIndexRouteImport } from './routes/roteiros.index'
 import { Route as RoteirosSlugRouteImport } from './routes/roteiros.$slug'
 
@@ -35,11 +37,6 @@ const EmpresasRoute = EmpresasRouteImport.update({
 const EventosRoute = EventosRouteImport.update({
   id: '/eventos',
   path: '/eventos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExperienciasRoute = ExperienciasRouteImport.update({
-  id: '/experiencias',
-  path: '/experiencias',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExplorarRoute = ExplorarRouteImport.update({
@@ -72,6 +69,21 @@ const DestinosSlugRoute = DestinosSlugRouteImport.update({
   path: '/destinos/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExperienciasIndexRoute = ExperienciasIndexRouteImport.update({
+  id: '/experiencias/',
+  path: '/experiencias/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperienciasSlugRoute = ExperienciasSlugRouteImport.update({
+  id: '/experiencias/$slug',
+  path: '/experiencias/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LugaresSlugRoute = LugaresSlugRouteImport.update({
+  id: '/lugares/$slug',
+  path: '/lugares/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RoteirosIndexRoute = RoteirosIndexRouteImport.update({
   id: '/roteiros/',
   path: '/roteiros/',
@@ -87,28 +99,32 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRoute
-  '/experiencias': typeof ExperienciasRoute
   '/explorar': typeof ExplorarRoute
   '/mapa': typeof MapaRoute
   '/minha-viagem': typeof MinhaViagemRoute
   '/planejar': typeof PlanejarRoute
   '/destinos/$slug': typeof DestinosSlugRoute
+  '/experiencias/$slug': typeof ExperienciasSlugRoute
+  '/lugares/$slug': typeof LugaresSlugRoute
   '/roteiros/$slug': typeof RoteirosSlugRoute
   '/destinos/': typeof DestinosIndexRoute
+  '/experiencias/': typeof ExperienciasIndexRoute
   '/roteiros/': typeof RoteirosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRoute
-  '/experiencias': typeof ExperienciasRoute
   '/explorar': typeof ExplorarRoute
   '/mapa': typeof MapaRoute
   '/minha-viagem': typeof MinhaViagemRoute
   '/planejar': typeof PlanejarRoute
   '/destinos/$slug': typeof DestinosSlugRoute
+  '/experiencias/$slug': typeof ExperienciasSlugRoute
+  '/lugares/$slug': typeof LugaresSlugRoute
   '/roteiros/$slug': typeof RoteirosSlugRoute
   '/destinos': typeof DestinosIndexRoute
+  '/experiencias': typeof ExperienciasIndexRoute
   '/roteiros': typeof RoteirosIndexRoute
 }
 export interface FileRoutesById {
@@ -116,14 +132,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRoute
-  '/experiencias': typeof ExperienciasRoute
   '/explorar': typeof ExplorarRoute
   '/mapa': typeof MapaRoute
   '/minha-viagem': typeof MinhaViagemRoute
   '/planejar': typeof PlanejarRoute
   '/destinos/$slug': typeof DestinosSlugRoute
+  '/experiencias/$slug': typeof ExperienciasSlugRoute
+  '/lugares/$slug': typeof LugaresSlugRoute
   '/roteiros/$slug': typeof RoteirosSlugRoute
   '/destinos/': typeof DestinosIndexRoute
+  '/experiencias/': typeof ExperienciasIndexRoute
   '/roteiros/': typeof RoteirosIndexRoute
 }
 export interface FileRouteTypes {
@@ -132,42 +150,48 @@ export interface FileRouteTypes {
     | '/'
     | '/empresas'
     | '/eventos'
-    | '/experiencias'
     | '/explorar'
     | '/mapa'
     | '/minha-viagem'
     | '/planejar'
     | '/destinos/$slug'
+    | '/experiencias/$slug'
+    | '/lugares/$slug'
     | '/roteiros/$slug'
     | '/destinos/'
+    | '/experiencias/'
     | '/roteiros/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/empresas'
     | '/eventos'
-    | '/experiencias'
     | '/explorar'
     | '/mapa'
     | '/minha-viagem'
     | '/planejar'
     | '/destinos/$slug'
+    | '/experiencias/$slug'
+    | '/lugares/$slug'
     | '/roteiros/$slug'
     | '/destinos'
+    | '/experiencias'
     | '/roteiros'
   id:
     | '__root__'
     | '/'
     | '/empresas'
     | '/eventos'
-    | '/experiencias'
     | '/explorar'
     | '/mapa'
     | '/minha-viagem'
     | '/planejar'
     | '/destinos/$slug'
+    | '/experiencias/$slug'
+    | '/lugares/$slug'
     | '/roteiros/$slug'
     | '/destinos/'
+    | '/experiencias/'
     | '/roteiros/'
   fileRoutesById: FileRoutesById
 }
@@ -175,14 +199,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EmpresasRoute: typeof EmpresasRoute
   EventosRoute: typeof EventosRoute
-  ExperienciasRoute: typeof ExperienciasRoute
   ExplorarRoute: typeof ExplorarRoute
   MapaRoute: typeof MapaRoute
   MinhaViagemRoute: typeof MinhaViagemRoute
   PlanejarRoute: typeof PlanejarRoute
   DestinosSlugRoute: typeof DestinosSlugRoute
+  ExperienciasSlugRoute: typeof ExperienciasSlugRoute
+  LugaresSlugRoute: typeof LugaresSlugRoute
   RoteirosSlugRoute: typeof RoteirosSlugRoute
   DestinosIndexRoute: typeof DestinosIndexRoute
+  ExperienciasIndexRoute: typeof ExperienciasIndexRoute
   RoteirosIndexRoute: typeof RoteirosIndexRoute
 }
 
@@ -207,13 +233,6 @@ declare module '@tanstack/react-router' {
       path: '/eventos'
       fullPath: '/eventos'
       preLoaderRoute: typeof EventosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/experiencias': {
-      id: '/experiencias'
-      path: '/experiencias'
-      fullPath: '/experiencias'
-      preLoaderRoute: typeof ExperienciasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explorar': {
@@ -258,6 +277,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DestinosSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/experiencias/': {
+      id: '/experiencias/'
+      path: '/experiencias'
+      fullPath: '/experiencias/'
+      preLoaderRoute: typeof ExperienciasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiencias/$slug': {
+      id: '/experiencias/$slug'
+      path: '/experiencias/$slug'
+      fullPath: '/experiencias/$slug'
+      preLoaderRoute: typeof ExperienciasSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lugares/$slug': {
+      id: '/lugares/$slug'
+      path: '/lugares/$slug'
+      fullPath: '/lugares/$slug'
+      preLoaderRoute: typeof LugaresSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/roteiros/': {
       id: '/roteiros/'
       path: '/roteiros'
@@ -279,14 +319,16 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EmpresasRoute: EmpresasRoute,
   EventosRoute: EventosRoute,
-  ExperienciasRoute: ExperienciasRoute,
   ExplorarRoute: ExplorarRoute,
   MapaRoute: MapaRoute,
   MinhaViagemRoute: MinhaViagemRoute,
   PlanejarRoute: PlanejarRoute,
   DestinosSlugRoute: DestinosSlugRoute,
+  ExperienciasSlugRoute: ExperienciasSlugRoute,
+  LugaresSlugRoute: LugaresSlugRoute,
   RoteirosSlugRoute: RoteirosSlugRoute,
   DestinosIndexRoute: DestinosIndexRoute,
+  ExperienciasIndexRoute: ExperienciasIndexRoute,
   RoteirosIndexRoute: RoteirosIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -72,7 +72,11 @@ export function MapExplorer({ compact = false }: { compact?: boolean }) {
             <MapBackdrop />
 
             {showRoute && (
-              <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+              <svg
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                className="absolute inset-0 h-full w-full"
+              >
                 <polyline
                   points={routeStops.map((s) => `${s.x},${s.y}`).join(" ")}
                   fill="none"
@@ -164,7 +168,11 @@ export function MapExplorer({ compact = false }: { compact?: boolean }) {
         {selected ? (
           <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft animate-rise">
             <div className="relative aspect-16/10">
-              <img src={selected.image} alt={selected.name} className="h-full w-full object-cover" />
+              <img
+                src={selected.image}
+                alt={selected.name}
+                className="h-full w-full object-cover"
+              />
               <button
                 aria-label="Fechar"
                 onClick={() => setSelected(null)}
@@ -174,7 +182,12 @@ export function MapExplorer({ compact = false }: { compact?: boolean }) {
               </button>
             </div>
             <div className="p-5">
-              <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold", typeColor[selected.type])}>
+              <span
+                className={cn(
+                  "rounded-full px-2.5 py-1 text-[11px] font-semibold",
+                  typeColor[selected.type],
+                )}
+              >
                 {typeLabel[selected.type]}
               </span>
               <h3 className="mt-3 font-display text-2xl">{selected.name}</h3>
@@ -224,7 +237,11 @@ export function MapExplorer({ compact = false }: { compact?: boolean }) {
 
 function MapBackdrop() {
   return (
-    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+    <svg
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      className="absolute inset-0 h-full w-full"
+    >
       <rect width="100" height="100" fill="oklch(0.9 0.045 205)" />
       <path
         d="M0,38 C12,30 22,44 34,40 C48,35 60,44 74,38 C84,33 92,40 100,36 L100,100 L0,100 Z"
@@ -236,7 +253,11 @@ function MapBackdrop() {
         opacity="0.75"
       />
       <path d="M30,14 C44,8 62,14 74,26 C60,32 44,30 32,24 Z" fill="oklch(0.97 0.02 95)" />
-      <path d="M20,66 C34,58 50,64 62,74 C48,86 30,84 22,76 Z" fill="oklch(0.88 0.06 140)" opacity="0.7" />
+      <path
+        d="M20,66 C34,58 50,64 62,74 C48,86 30,84 22,76 Z"
+        fill="oklch(0.88 0.06 140)"
+        opacity="0.7"
+      />
       <path
         d="M58,32 C64,28 70,30 76,34 C80,37 86,36 92,34"
         stroke="oklch(0.72 0.09 220)"
