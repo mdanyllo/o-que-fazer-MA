@@ -1,85 +1,98 @@
 import { Link } from "@tanstack/react-router";
-import { Compass, Instagram, Youtube, Mail } from "lucide-react";
+import { Logo } from "@/components/azulejo/Logo";
+import { FaixaAzulejo } from "@/components/azulejo/PadraoAzulejo";
+
+type LinkRodape =
+  | {
+      to:
+        | "/explorar"
+        | "/destinos"
+        | "/mapa"
+        | "/eventos"
+        | "/planejar"
+        | "/roteiros"
+        | "/minha-viagem";
+      rotulo: string;
+    }
+  | { destino: string; rotulo: string };
+
+const COLUNAS: { titulo: string; links: LinkRodape[] }[] = [
+  {
+    titulo: "Descobrir",
+    links: [
+      { to: "/explorar", rotulo: "O que fazer" },
+      { to: "/destinos", rotulo: "Destinos" },
+      { to: "/mapa", rotulo: "Mapa" },
+      { to: "/eventos", rotulo: "Eventos" },
+    ],
+  },
+  {
+    titulo: "Planejar",
+    links: [
+      { to: "/planejar", rotulo: "Planejar viagem" },
+      { to: "/roteiros", rotulo: "Roteiros prontos" },
+      { to: "/minha-viagem", rotulo: "Minha viagem" },
+    ],
+  },
+  {
+    titulo: "Destinos",
+    links: [
+      { destino: "sao-luis", rotulo: "São Luís" },
+      { destino: "barreirinhas", rotulo: "Barreirinhas" },
+      { destino: "alcantara", rotulo: "Alcântara" },
+      { destino: "carolina", rotulo: "Chapada das Mesas" },
+    ],
+  },
+];
+
+const classeLink = "inline-flex min-h-11 items-center underline-offset-4 hover:underline";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-24 border-t border-border bg-primary text-primary-foreground">
-      <div className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <footer className="bg-faixa text-sobre-faixa">
+      <FaixaAzulejo azulejo={32} />
+      <div className="mx-auto max-w-7xl px-4 pt-16 pb-28 md:px-8 md:pb-12">
+        <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div>
-            <div className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-turquoise text-turquoise-foreground">
-                <Compass className="h-5 w-5" />
-              </span>
-              <span className="font-display text-lg font-semibold">Descubra Maranhão</span>
-            </div>
-            <p className="mt-4 max-w-sm text-sm text-primary-foreground/70">
-              Destinos, experiências e roteiros reunidos em um só lugar. Protótipo demonstrativo com
-              conteúdo fictício para avaliação do produto.
+            <Logo sobre="foto" className="h-10" />
+            <p className="mt-6 max-w-sm font-display text-t3">
+              O que fazer no Maranhão, sem precisar procurar em dezenas de lugares diferentes.
             </p>
-            <div className="mt-5 flex gap-2">
-              {[Instagram, Youtube, Mail].map((Icon, i) => (
-                <span
-                  key={i}
-                  className="grid h-9 w-9 place-items-center rounded-full bg-primary-foreground/10"
-                >
-                  <Icon className="h-4 w-4" />
-                </span>
-              ))}
-            </div>
           </div>
-
-          <FooterCol
-            title="Explorar"
-            links={[
-              { to: "/destinos", label: "Destinos" },
-              { to: "/experiencias", label: "Experiências" },
-              { to: "/mapa", label: "Mapa turístico" },
-            ]}
-          />
-          <FooterCol
-            title="Planejar"
-            links={[
-              { to: "/roteiros", label: "Roteiros" },
-              { to: "/planejar", label: "Monte minha viagem" },
-              { to: "/eventos", label: "Eventos" },
-            ]}
-          />
-          <FooterCol
-            title="Local"
-            links={[
-              { to: "/empresas", label: "Empresas locais" },
-              { to: "/destinos/sao-luis", label: "São Luís" },
-              { to: "/destinos/chapada-das-mesas", label: "Chapada das Mesas" },
-            ]}
-          />
+          {COLUNAS.map((col) => (
+            <div key={col.titulo}>
+              <h2 className="text-rotulo opacity-80">{col.titulo}</h2>
+              <ul className="mt-4 space-y-1">
+                {col.links.map((l) => (
+                  <li key={l.rotulo}>
+                    {"destino" in l ? (
+                      <Link
+                        to="/destinos/$slug"
+                        params={{ slug: l.destino }}
+                        className={classeLink}
+                      >
+                        {l.rotulo}
+                      </Link>
+                    ) : (
+                      <Link to={l.to} className={classeLink}>
+                        {l.rotulo}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        <p className="mt-12 border-t border-primary-foreground/15 pt-6 text-xs text-primary-foreground/60">
-          © {new Date().getFullYear()} Descubra Maranhão · Preços, avaliações e empresas são dados
-          demonstrativos.
-        </p>
+        <div className="mt-14 flex flex-col gap-2 border-t border-sobre-faixa/25 pt-6 text-legenda opacity-85 md:flex-row md:justify-between">
+          <p>© {new Date().getFullYear()} Azulejo. Protótipo navegável.</p>
+          <p>
+            Preços, horários, avaliações e empresas são dados de exemplo. Confira sempre as
+            informações oficiais antes de viajar.
+          </p>
+        </div>
       </div>
     </footer>
-  );
-}
-
-function FooterCol({ title, links }: { title: string; links: { to: string; label: string }[] }) {
-  return (
-    <div>
-      <h3 className="font-display text-sm tracking-wide text-primary-foreground/90">{title}</h3>
-      <ul className="mt-4 space-y-2.5">
-        {links.map((l) => (
-          <li key={l.to + l.label}>
-            <Link
-              to={l.to}
-              className="text-sm text-primary-foreground/70 transition-colors hover:text-primary-foreground"
-            >
-              {l.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }

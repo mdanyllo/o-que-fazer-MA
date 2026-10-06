@@ -1,143 +1,162 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, X, Compass } from "lucide-react";
+import { Heart, Menu, Sparkles } from "lucide-react";
+import { Logo } from "@/components/azulejo/Logo";
+import { botao } from "@/components/azulejo/botao";
+import { PontoGuara } from "@/components/azulejo/etiquetas";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useMinhaViagem } from "@/lib/minha-viagem";
 import { cn } from "@/lib/utils";
+import { BotaoTema } from "./BotaoTema";
+import { NAV_EXTRA, NAV_INFERIOR, NAV_PRINCIPAL } from "./nav";
 
-const nav = [
-  { to: "/", label: "Descobrir" },
-  { to: "/destinos", label: "Destinos" },
-  { to: "/experiencias", label: "Experiências" },
-  { to: "/roteiros", label: "Roteiros" },
-  { to: "/mapa", label: "Mapa" },
-  { to: "/eventos", label: "Eventos" },
-] as const;
-
-export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
-  const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+/**
+ * Header fixo. Com `sobreFoto`, começa transparente sobre o hero e fica sólido ao rolar.
+ * Sem sombra: separa do conteúdo com a linha.
+ */
+export function SiteHeader({ sobreFoto = false }: { sobreFoto?: boolean }) {
+  const [rolou, setRolou] = useState(false);
+  const { favoritos, roteiros } = useMinhaViagem();
+  const salvos = favoritos.length + roteiros.length;
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    if (!sobreFoto) return;
+    const aoRolar = () => setRolou(window.scrollY > 24);
+    aoRolar();
+    window.addEventListener("scroll", aoRolar, { passive: true });
+    return () => window.removeEventListener("scroll", aoRolar);
+  }, [sobreFoto]);
 
-  const solid = !transparent || scrolled || open;
+  const transparente = sobreFoto && !rolou;
 
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
-        solid ? "border-b border-border bg-background/90 backdrop-blur-md" : "bg-transparent",
+        "fixed inset-x-0 top-0 z-50 transition-colors duration-300 ease-saida",
+        transparente
+          ? "bg-transparent text-sobre-foto"
+          : "border-b border-linha bg-louca/95 text-ink backdrop-blur-sm",
       )}
     >
-      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-3.5 lg:px-8">
-        <Link to="/" className="flex min-w-0 items-center gap-2.5">
-          <span
-            className={cn(
-              "grid h-9 w-9 shrink-0 place-items-center rounded-xl transition-colors",
-              solid ? "bg-primary text-primary-foreground" : "bg-background/20 text-white backdrop-blur-sm",
-            )}
-          >
-            <Compass className="h-5 w-5" />
-          </span>
-          <span className="min-w-0">
-            <span
-              className={cn(
-                "block truncate font-display text-lg leading-none font-semibold",
-                solid ? "text-foreground" : "text-white",
-              )}
-            >
-              Descubra Maranhão
-            </span>
-            <span
-              className={cn(
-                "block text-[11px] tracking-[0.18em] uppercase",
-                solid ? "text-muted-foreground" : "text-white/70",
-              )}
-            >
-              Guia de viagem
-            </span>
-          </span>
+      {transparente && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-28 bg-gradient-to-b from-[rgb(var(--veu-foto)/0.55)] to-transparent"
+        />
+      )}
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 md:h-18 md:px-8">
+        <Link
+          to="/"
+          className="flex h-9 items-center rounded-md md:h-10"
+          aria-label="Azulejo, início"
+        >
+          <Logo sobre={transparente ? "foto" : "superficie"} className="h-full" />
         </Link>
 
-        <div className="flex items-center gap-1">
-          <nav className="hidden items-center gap-1 lg:flex">
-            {nav.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                activeOptions={{ exact: item.to === "/" }}
-                className={cn(
-                  "rounded-full px-3.5 py-2 text-sm font-medium transition-colors",
-                  solid
-                    ? "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    : "text-white/80 hover:bg-white/15 hover:text-white",
-                )}
-                activeProps={{
-                  className: solid ? "bg-secondary text-foreground" : "bg-white/20 text-white",
-                }}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+        <nav aria-label="Principal" className="ml-6 hidden flex-1 items-center gap-1 lg:flex">
+          {NAV_PRINCIPAL.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={cn(
+                "group relative flex min-h-11 items-center rounded-md px-3 font-bold text-[0.9375rem] transition-colors duration-150",
+                transparente ? "hover:bg-sobre-foto/15" : "hover:text-cobalto",
+                !transparente && "data-[status=active]:text-cobalto",
+              )}
+            >
+              {item.rotulo}
+              <PontoGuara className="absolute bottom-0.5 left-1/2 -translate-x-1/2 scale-0 transition-transform duration-300 ease-saida group-data-[status=active]:scale-100" />
+            </Link>
+          ))}
+        </nav>
 
-          <Link
-            to="/planejar"
-            className="ml-2 hidden rounded-full bg-turquoise px-5 py-2.5 text-sm font-semibold text-turquoise-foreground shadow-soft transition-transform hover:scale-[1.03] sm:inline-flex"
-          >
-            Monte minha viagem
-          </Link>
-
-          <button
-            type="button"
-            aria-label="Abrir menu"
-            onClick={() => setOpen((v) => !v)}
+        <div className="ml-auto flex items-center gap-1">
+          <BotaoTema
             className={cn(
-              "grid h-10 w-10 place-items-center rounded-xl lg:hidden",
-              solid ? "text-foreground hover:bg-secondary" : "text-white hover:bg-white/15",
+              "hidden sm:grid",
+              transparente ? "hover:bg-sobre-foto/15" : "hover:bg-areia",
+            )}
+          />
+          <Link
+            to="/minha-viagem"
+            aria-label={`Minha viagem${salvos ? `, ${salvos} salvos` : ""}`}
+            className={cn(
+              "relative hidden size-11 place-items-center rounded-md transition-colors duration-150 md:grid",
+              transparente
+                ? "hover:bg-sobre-foto/15"
+                : "hover:bg-areia data-[status=active]:text-cobalto",
             )}
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
-      </div>
-
-      {open && (
-        <nav className="border-t border-border bg-background px-5 pb-5 lg:hidden">
-          <ul className="flex flex-col py-2">
-            {nav.map((item) => (
-              <li key={item.to}>
-                <Link
-                  to={item.to}
-                  onClick={() => setOpen(false)}
-                  className="block rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-secondary"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-            <li>
-              <Link
-                to="/empresas"
-                onClick={() => setOpen(false)}
-                className="block rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-secondary"
-              >
-                Empresas locais
-              </Link>
-            </li>
-          </ul>
+            <Heart className="size-5" />
+            {salvos > 0 && (
+              <span className="absolute top-1 right-1 grid min-w-5 place-items-center rounded-full bg-guara px-1 text-[11px] leading-5 font-bold text-louca">
+                {salvos}
+              </span>
+            )}
+          </Link>
           <Link
             to="/planejar"
-            onClick={() => setOpen(false)}
-            className="block rounded-full bg-turquoise px-5 py-3 text-center text-sm font-semibold text-turquoise-foreground"
+            className={cn(
+              botao({ variante: transparente ? "sobre-foto" : "principal" }),
+              "ml-1 px-3 sm:px-5",
+            )}
           >
-            Monte minha viagem
+            <Sparkles />
+            <span className="sm:hidden">Planejar</span>
+            <span className="hidden sm:inline">Planejar viagem</span>
           </Link>
-        </nav>
-      )}
+          <MenuCelular transparente={transparente} />
+        </div>
+      </div>
     </header>
+  );
+}
+
+function MenuCelular({ transparente }: { transparente: boolean }) {
+  const [aberto, setAberto] = useState(false);
+  const fechar = () => setAberto(false);
+  const linkClasses =
+    "flex min-h-12 items-center gap-3 rounded-md px-3 font-bold hover:bg-areia data-[status=active]:text-cobalto";
+
+  return (
+    <Sheet open={aberto} onOpenChange={setAberto}>
+      <SheetTrigger
+        aria-label="Abrir menu"
+        className={cn(
+          "grid size-11 place-items-center rounded-md lg:hidden",
+          transparente ? "hover:bg-sobre-foto/15" : "hover:bg-areia",
+        )}
+      >
+        <Menu className="size-6" />
+      </SheetTrigger>
+      <SheetContent side="right" className="w-[86vw] max-w-sm border-linha bg-louca p-0 text-ink">
+        <SheetTitle className="sr-only">Menu</SheetTitle>
+        <div className="flex h-16 items-center border-b border-linha px-4">
+          <Logo className="h-9" />
+        </div>
+        <nav aria-label="Menu" className="flex flex-col gap-1 p-3">
+          {[...NAV_INFERIOR, ...NAV_EXTRA].map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              onClick={fechar}
+              activeOptions={{ exact: item.to === "/" }}
+              className={linkClasses}
+            >
+              <item.icone className="size-5" /> {item.rotulo}
+            </Link>
+          ))}
+        </nav>
+        <div className="mx-3 flex min-h-12 items-center justify-between border-t border-linha px-3 pt-2 font-bold sm:hidden">
+          Tema
+          <BotaoTema className="hover:bg-areia" />
+        </div>
+        <div className="mt-auto border-t border-linha p-4">
+          <Link to="/planejar" onClick={fechar} className={cn(botao({ tamanho: "lg" }), "w-full")}>
+            <Sparkles /> Planejar viagem
+          </Link>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }

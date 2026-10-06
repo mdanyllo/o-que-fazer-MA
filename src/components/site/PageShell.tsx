@@ -1,31 +1,55 @@
 import type { ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
-import { Sparkles } from "lucide-react";
-import { SiteHeader } from "./SiteHeader";
+import { Foto } from "@/components/azulejo/Foto";
+import { cn } from "@/lib/utils";
+import { BottomNav } from "./BottomNav";
 import { SiteFooter } from "./SiteFooter";
+import { SiteHeader } from "./SiteHeader";
 
+/**
+ * Estrutura de toda página: link de pular, header, conteúdo, rodapé e bottom nav (celular).
+ * - `sobreFoto`: a página começa com uma foto grande; o header fica transparente por cima.
+ * - `semRodape`: telas de app em tela cheia (mapa).
+ */
 export function PageShell({
   children,
+  sobreFoto = false,
   transparentHeader = false,
+  semRodape = false,
 }: {
   children: ReactNode;
+  sobreFoto?: boolean;
+  /** @deprecated nome antigo de `sobreFoto`, usado pelas telas que serão refeitas */
   transparentHeader?: boolean;
+  semRodape?: boolean;
 }) {
+  const foto = sobreFoto || transparentHeader;
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader transparent={transparentHeader} />
-      <main>{children}</main>
-      <SiteFooter />
-      <Link
-        to="/planejar"
-        className="fixed right-4 bottom-4 z-40 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-lift transition-transform hover:scale-105 sm:hidden"
+    <div className="flex min-h-svh flex-col bg-louca">
+      <a
+        href="#conteudo"
+        className="fixed top-2 left-2 z-[60] -translate-y-20 rounded-md bg-cobalto px-4 py-3 font-bold text-sobre-cobalto focus:translate-y-0"
       >
-        <Sparkles className="h-4 w-4" /> Monte minha viagem
-      </Link>
+        Pular para o conteúdo
+      </a>
+      <SiteHeader sobreFoto={foto} />
+      <main
+        id="conteudo"
+        tabIndex={-1}
+        className={cn(
+          "flex-1 outline-none",
+          !foto && "pt-16 md:pt-18",
+          semRodape && "pb-16 md:pb-0",
+        )}
+      >
+        {children}
+      </main>
+      {!semRodape && <SiteFooter />}
+      <BottomNav />
     </div>
   );
 }
 
+/** Capa de página com foto que sangra até a borda e título sobre véu escuro. */
 export function PageHero({
   image,
   eyebrow,
@@ -42,17 +66,13 @@ export function PageHero({
   tall?: boolean;
 }) {
   return (
-    <section className={`relative ${tall ? "min-h-[78vh]" : "min-h-[52vh]"} flex items-end overflow-hidden`}>
-      <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-0 hero-scrim" />
-      <div className="relative mx-auto w-full max-w-7xl px-5 pt-32 pb-12 lg:px-8 lg:pb-16">
-        {eyebrow && (
-          <p className="mb-3 text-xs font-semibold tracking-[0.22em] text-white/80 uppercase">{eyebrow}</p>
-        )}
-        <h1 className="max-w-3xl font-display text-4xl text-white text-balance-title sm:text-5xl lg:text-6xl">
-          {title}
-        </h1>
-        {subtitle && <p className="mt-4 max-w-2xl text-lg text-white/85">{subtitle}</p>}
+    <section className={cn("relative flex items-end", tall ? "min-h-[78svh]" : "min-h-[56svh]")}>
+      <Foto src={image} alt={title} rotulo={title} prioridade className="absolute inset-0" />
+      <div className="absolute inset-0 veu-foto" />
+      <div className="relative mx-auto w-full max-w-7xl px-4 pt-32 pb-12 text-sobre-foto md:px-8 md:pb-16">
+        {eyebrow && <p className="mb-3 text-rotulo">{eyebrow}</p>}
+        <h1 className="max-w-4xl text-t1 md:text-display">{title}</h1>
+        {subtitle && <p className="mt-4 medida text-lg">{subtitle}</p>}
         {children}
       </div>
     </section>

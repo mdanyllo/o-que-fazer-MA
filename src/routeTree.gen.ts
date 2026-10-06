@@ -13,7 +13,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
+import { Route as ExplorarRouteImport } from './routes/explorar'
 import { Route as MapaRouteImport } from './routes/mapa'
+import { Route as MinhaViagemRouteImport } from './routes/minha-viagem'
 import { Route as PlanejarRouteImport } from './routes/planejar'
 import { Route as DestinosIndexRouteImport } from './routes/destinos.index'
 import { Route as DestinosSlugRouteImport } from './routes/destinos.$slug'
@@ -40,9 +42,19 @@ const ExperienciasRoute = ExperienciasRouteImport.update({
   path: '/experiencias',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExplorarRoute = ExplorarRouteImport.update({
+  id: '/explorar',
+  path: '/explorar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MapaRoute = MapaRouteImport.update({
   id: '/mapa',
   path: '/mapa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MinhaViagemRoute = MinhaViagemRouteImport.update({
+  id: '/minha-viagem',
+  path: '/minha-viagem',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlanejarRoute = PlanejarRouteImport.update({
@@ -76,7 +88,9 @@ export interface FileRoutesByFullPath {
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRoute
   '/experiencias': typeof ExperienciasRoute
+  '/explorar': typeof ExplorarRoute
   '/mapa': typeof MapaRoute
+  '/minha-viagem': typeof MinhaViagemRoute
   '/planejar': typeof PlanejarRoute
   '/destinos/$slug': typeof DestinosSlugRoute
   '/roteiros/$slug': typeof RoteirosSlugRoute
@@ -88,7 +102,9 @@ export interface FileRoutesByTo {
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRoute
   '/experiencias': typeof ExperienciasRoute
+  '/explorar': typeof ExplorarRoute
   '/mapa': typeof MapaRoute
+  '/minha-viagem': typeof MinhaViagemRoute
   '/planejar': typeof PlanejarRoute
   '/destinos/$slug': typeof DestinosSlugRoute
   '/roteiros/$slug': typeof RoteirosSlugRoute
@@ -101,7 +117,9 @@ export interface FileRoutesById {
   '/empresas': typeof EmpresasRoute
   '/eventos': typeof EventosRoute
   '/experiencias': typeof ExperienciasRoute
+  '/explorar': typeof ExplorarRoute
   '/mapa': typeof MapaRoute
+  '/minha-viagem': typeof MinhaViagemRoute
   '/planejar': typeof PlanejarRoute
   '/destinos/$slug': typeof DestinosSlugRoute
   '/roteiros/$slug': typeof RoteirosSlugRoute
@@ -115,7 +133,9 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/eventos'
     | '/experiencias'
+    | '/explorar'
     | '/mapa'
+    | '/minha-viagem'
     | '/planejar'
     | '/destinos/$slug'
     | '/roteiros/$slug'
@@ -127,7 +147,9 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/eventos'
     | '/experiencias'
+    | '/explorar'
     | '/mapa'
+    | '/minha-viagem'
     | '/planejar'
     | '/destinos/$slug'
     | '/roteiros/$slug'
@@ -139,7 +161,9 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/eventos'
     | '/experiencias'
+    | '/explorar'
     | '/mapa'
+    | '/minha-viagem'
     | '/planejar'
     | '/destinos/$slug'
     | '/roteiros/$slug'
@@ -152,7 +176,9 @@ export interface RootRouteChildren {
   EmpresasRoute: typeof EmpresasRoute
   EventosRoute: typeof EventosRoute
   ExperienciasRoute: typeof ExperienciasRoute
+  ExplorarRoute: typeof ExplorarRoute
   MapaRoute: typeof MapaRoute
+  MinhaViagemRoute: typeof MinhaViagemRoute
   PlanejarRoute: typeof PlanejarRoute
   DestinosSlugRoute: typeof DestinosSlugRoute
   RoteirosSlugRoute: typeof RoteirosSlugRoute
@@ -190,11 +216,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExperienciasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/explorar': {
+      id: '/explorar'
+      path: '/explorar'
+      fullPath: '/explorar'
+      preLoaderRoute: typeof ExplorarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mapa': {
       id: '/mapa'
       path: '/mapa'
       fullPath: '/mapa'
       preLoaderRoute: typeof MapaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/minha-viagem': {
+      id: '/minha-viagem'
+      path: '/minha-viagem'
+      fullPath: '/minha-viagem'
+      preLoaderRoute: typeof MinhaViagemRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/planejar': {
@@ -240,7 +280,9 @@ const rootRouteChildren: RootRouteChildren = {
   EmpresasRoute: EmpresasRoute,
   EventosRoute: EventosRoute,
   ExperienciasRoute: ExperienciasRoute,
+  ExplorarRoute: ExplorarRoute,
   MapaRoute: MapaRoute,
+  MinhaViagemRoute: MinhaViagemRoute,
   PlanejarRoute: PlanejarRoute,
   DestinosSlugRoute: DestinosSlugRoute,
   RoteirosSlugRoute: RoteirosSlugRoute,

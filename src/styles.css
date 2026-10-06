@@ -30,6 +30,9 @@
   --babacu: #3e6b3a; /* sucesso, confirmações */
   --jucara: #4a1e3d; /* rodapé, faixas escuras, citações */
 
+  /* faixa escura (rodapé, citações): juçara escura nos dois temas, com texto claro */
+  --faixa: #4a1e3d;
+  --sobre-faixa: #ffffff;
   /* ícones sobre as cores maranhenses: --ouro pede sempre --ink (fixo nos dois temas) */
   --sobre-ouro: #1a1a22;
   /* fotos: texto sobre foto é sempre claro, com véu escuro garantindo contraste */
@@ -59,6 +62,7 @@
   --lagoa: #3fc0cc;
   --babacu: #7fc07a;
   --jucara: #c99bbb;
+  --faixa: #2a1224;
 
   color-scheme: dark;
 }
@@ -80,6 +84,8 @@
   --color-jucara: var(--jucara);
   --color-sobre-foto: var(--sobre-foto);
   --color-sobre-ouro: var(--sobre-ouro);
+  --color-faixa: var(--faixa);
+  --color-sobre-faixa: var(--sobre-faixa);
 
   /* nomes do shadcn/ui apontando para os tokens Azulejo */
   --color-background: var(--louca);
