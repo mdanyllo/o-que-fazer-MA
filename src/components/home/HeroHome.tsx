@@ -12,7 +12,7 @@ type Modo = "cheguei" | "viajar";
 const normalizar = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 
 const chip =
-  "inline-flex min-h-11 shrink-0 items-center rounded-full border-2 border-cobalto px-4 text-[0.9375rem] font-bold text-cobalto transition-colors duration-150 hover:bg-cobalto hover:text-sobre-cobalto";
+  "inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full border-2 border-cobalto px-4 text-[0.9375rem] font-bold text-cobalto transition-colors duration-150 hover:bg-cobalto hover:text-sobre-cobalto";
 
 export function HeroHome() {
   const [modo, setModo] = useState<Modo>("viajar");
@@ -101,7 +101,7 @@ export function HeroHome() {
               <Search className="size-5" />
             </button>
           </div>
-          <ul className="sem-barra -mx-5 flex gap-2 overflow-x-auto px-5 md:mx-0 md:flex-wrap md:px-0">
+          <ul className="sem-barra -mx-5 flex gap-2 overflow-x-auto [&>li]:shrink-0 px-5 md:mx-0 md:flex-wrap md:px-0">
             {modo === "cheguei" ? <SugestoesCheguei /> : <SugestoesViajar />}
           </ul>
         </form>
