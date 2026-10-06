@@ -13,7 +13,7 @@ import { Chip } from "@/components/azulejo/etiquetas";
 import { Foto } from "@/components/azulejo/Foto";
 import { FaixaMovimento } from "@/components/movimento/FaixaMovimento";
 import { GradeRevelar, Revelar } from "@/components/movimento/Revelar";
-import { FaixaAzulejo, PadraoAzulejo } from "@/components/azulejo/PadraoAzulejo";
+import { PadraoAzulejo } from "@/components/azulejo/PadraoAzulejo";
 import { linkTexto, SecaoTitulo } from "@/components/azulejo/SecaoTitulo";
 import { HeroHome } from "@/components/home/HeroHome";
 import { MapaPrevia } from "@/components/home/MapaPrevia";
@@ -89,7 +89,7 @@ function Home() {
     <PageShell>
       <HeroHome />
 
-      <FaixaAzulejo azulejo={96} />
+      <PadraoAzulejo azulejo={24} style={{ height: 72 }} />
 
       {/* Por onde começar */}
       <section aria-labelledby="comecar" className={`${secao} flex flex-col gap-8`}>

@@ -8,8 +8,9 @@ type Props = {
    * - "superficie": fundo louça/areia (positivo de dia, negativo à noite)
    * - "faixa": faixa cobalto/juçara (negativo de dia; à noite as faixas clareiam, então positivo)
    * - "foto": sempre negativo
+   * - "jucara": rodapé juçara, sempre o logo todo branco
    */
-  sobre?: "superficie" | "faixa" | "foto";
+  sobre?: "superficie" | "faixa" | "foto" | "jucara";
   className?: string;
 };
 
@@ -17,12 +18,14 @@ const ARQUIVOS = {
   completo: {
     pos: "/brand/azulejo-logo.svg",
     neg: "/brand/azulejo-logo-negativo.svg",
+    branco: "/brand/azulejo-logo-branco.svg",
     w: 433,
     h: 104,
   },
   simbolo: {
     pos: "/brand/azulejo-simbolo.svg",
     neg: "/brand/azulejo-simbolo-negativo.svg",
+    branco: "/brand/azulejo-simbolo-branco.svg",
     w: 100,
     h: 100,
   },
@@ -45,6 +48,7 @@ export function Logo({ variante = "completo", sobre = "superficie", className }:
   return (
     <span className={cn("inline-flex shrink-0", className)}>
       {sobre === "foto" && img(a.neg)}
+      {sobre === "jucara" && img(a.branco)}
       {sobre === "superficie" && (
         <>
           {img(a.pos, "so-dia")}

@@ -36,8 +36,9 @@ O nome Azulejo vem dos azulejos portugueses que cobrem os casarões do Centro Hi
 Os arquivos estão na pasta `azulejo-brand/` (mova para a pasta pública do projeto, por exemplo `public/brand/`):
 
 - `azulejo-logo.svg`: símbolo + nome, versão principal, sobre fundos claros
-- `azulejo-logo-negativo.svg`: para fundos escuros (cobalto, cobalto-forte). Nunca sobre juçara
-- `azulejo-simbolo.svg` e `azulejo-simbolo-negativo.svg`: só o símbolo (favicon, ícone de app, avatar, loading)
+- `azulejo-logo-negativo.svg`: para fundos azuis escuros (cobalto, cobalto-forte)
+- `azulejo-logo-branco.svg`: versão toda em branco, só os traços do azulejo. Use no rodapé roxo (juçara) e sobre fotos escuras
+- `azulejo-simbolo.svg`, `azulejo-simbolo-negativo.svg` e `azulejo-simbolo-branco.svg`: só o símbolo (favicon, ícone de app, avatar, loading)
 - `azulejo-padrao.svg`: padrão de azulejos repetidos
 
 O símbolo é um azulejo: quatro pétalas em cobalto, quartos de círculo nos cantos e um ponto vermelho no centro (o guará). Quando os azulejos se repetem, os quartos de círculo formam círculos inteiros. Não redesenhe, não recolora e não distorça o logo. Espaço livre mínimo ao redor: metade da largura do símbolo. Use o símbolo também como favicon.
@@ -64,7 +65,7 @@ Crie estes tokens como variáveis CSS (e no tema do Tailwind, se o projeto usar 
   --ouro: #E8A33D;           /* selos, badges, destaques. Sempre com texto --ink */
   --lagoa: #1E9AA8;          /* ilustrações, mapas, gráficos. Não é cor de texto */
   --babacu: #3E6B3A;         /* sucesso, confirmações */
-  --jucara: #4A1E3D;         /* citações e detalhes pequenos. Nunca como fundo do logo */
+  --jucara: #4A1E3D;         /* rodapé (com o logo branco) e citações */
 }
 
 [data-theme="noite"] {
@@ -76,7 +77,7 @@ Crie estes tokens como variáveis CSS (e no tema do Tailwind, se o projeto usar 
 ```
 
 Regras:
-- Fundo padrão `--louca`; seções alternadas em `--areia`; uma faixa forte por página em `--cobalto`, no máximo. Rodapé em `--cobalto-forte` com o logo negativo.
+- Fundo padrão `--louca`; seções alternadas em `--areia`; uma faixa forte por página em `--cobalto`, no máximo. Rodapé em `--jucara` com o logo branco.
 - Botão principal: fundo `--cobalto`, texto `--sobre-cobalto`. Botão secundário: borda 2px `--cobalto`, texto `--cobalto`.
 - Numa mesma tela, no máximo duas cores maranhenses além do cobalto.
 - Texto pequeno só em `--ink`, `--ink-suave`, `--cobalto`, `--guara` ou `--babacu`. Contraste mínimo 4.5:1.
@@ -118,6 +119,17 @@ O Azulejo fala como alguém daqui apresentando a própria terra para um amigo: d
 - Evitar: "Descubra experiências mágicas e inesquecíveis!" / "Transforme sua viagem."
 
 Use "juçara" (não "açaí maranhense"), "Lençóis" (não "paraíso"). Todo texto em português do Brasil.
+
+### 2.8 Hero da Home (aprovado)
+
+O hero da Home segue o arquivo `referencia-hero.html`. Composição:
+- Header numa faixa própria sobre `--louca`, nunca por cima da foto.
+- Esquerda: selo "Guia do Maranhão" em `--ouro`, título "O Maranhão, um azulejo de cada vez." em `--cobalto` com o ponto final em `--guara`, subtítulo em `--ink-suave`, cartão branco com o seletor "Já estou no Maranhão / Vou viajar" e a busca, e a linha "Mais procurados" com links.
+- Direita: um painel `--cobalto` que vai até a borda direita da tela, começando a cerca de 24% da largura da coluna, com cantos arredondados só do lado esquerdo e o padrão de azulejos por cima com opacidade 0.12.
+- A foto principal fica inteira, num retângulo com raio de 10px, centralizada verticalmente e avançando sobre o fundo claro à esquerda do painel (ela fica metade sobre o claro, metade sobre o azul). Sem recortes em onda.
+- Legenda do lugar abaixo da foto, alinhada à direita, em `--louca` sobre o azul. Símbolo do azulejo (48px) no canto superior direito do painel.
+- Abaixo do hero, a faixa do padrão de azulejos.
+- No celular: o texto vem primeiro; o painel azul vira um bloco atrás da foto, ocupando a largura toda.
 
 ## 3. Direção de arte: moderno, não "cara de IA"
 

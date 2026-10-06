@@ -29,11 +29,13 @@
   --ouro: #e8a33d; /* selos, badges, destaques. Sempre com texto --ink */
   --lagoa: #1e9aa8; /* ilustrações, mapas, gráficos. Não é cor de texto */
   --babacu: #3e6b3a; /* sucesso, confirmações */
-  --jucara: #4a1e3d; /* citações e detalhes pequenos. Nunca como fundo do logo */
+  --jucara: #4a1e3d; /* rodapé (com o logo branco) e citações */
 
-  /* rodapé: cobalto-forte com logo negativo; continua escuro no tema noite */
-  --faixa: #163a6a;
+  /* rodapé: juçara com o logo branco; continua escuro no tema noite */
+  --faixa: #4a1e3d;
   --sobre-faixa: #ffffff;
+  /* painel do hero: cobalto de dia, cobalto profundo à noite (texto sempre branco) */
+  --painel: #1f4e8c;
   /* ícones sobre as cores maranhenses: --ouro pede sempre --ink (fixo nos dois temas) */
   --sobre-ouro: #1a1a22;
   /* fotos: texto sobre foto é sempre claro, com véu escuro garantindo contraste */
@@ -63,7 +65,8 @@
   --lagoa: #3fc0cc;
   --babacu: #7fc07a;
   --jucara: #c99bbb;
-  --faixa: #0f2848;
+  --faixa: #2a1224;
+  --painel: #1b3a66;
 
   color-scheme: dark;
 }
@@ -87,6 +90,7 @@
   --color-sobre-ouro: var(--sobre-ouro);
   --color-faixa: var(--faixa);
   --color-sobre-faixa: var(--sobre-faixa);
+  --color-painel: var(--painel);
 
   /* nomes do shadcn/ui apontando para os tokens Azulejo */
   --color-background: var(--louca);
@@ -481,6 +485,16 @@
     transform: none;
   }
 }
+@keyframes painel-desliza {
+  from {
+    opacity: 0;
+    transform: translateX(32%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 @keyframes passa-faixa {
   to {
     transform: translateX(-50%);
@@ -516,6 +530,11 @@ html.js .entra-foto {
 html.js .entra-foto img {
   animation: foto-assenta 1600ms var(--ease-saida) both;
   animation-delay: var(--atraso, 0ms);
+}
+
+/* painel cobalto do hero desliza da direita */
+html.js .entra-painel {
+  animation: painel-desliza var(--dur-hero) var(--ease-saida) 200ms both;
 }
 
 /* revelação no scroll (uma vez); fallback: aparece sozinho depois de 4s */
@@ -600,6 +619,7 @@ html.js [data-revelar]:not([data-visivel]) .trilho {
 @media (prefers-reduced-motion: reduce) {
   html.js .palavra-mascara > span,
   html.js .entra,
+  html.js .entra-painel,
   html.js .entra-foto,
   .card-sobe,
   .card-sobe.folha {
