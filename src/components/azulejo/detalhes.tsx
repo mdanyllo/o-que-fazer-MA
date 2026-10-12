@@ -13,8 +13,22 @@ import { nomeDestino } from "@/data";
 import { botao } from "./botao";
 import { PontoGuara, Tag } from "./etiquetas";
 
-/** Ficha de informações práticas (horário, preço, duração) + dicas. */
-export function InfoPraticas({ info, extra }: { info: InfoPratica; extra?: ReactNode }) {
+/**
+ * Ficha de informações práticas (horário, preço, duração) + dicas. Linhas sem valor somem.
+ * `exemplo`: dados ilustrativos (atrativos e negócios de exemplo) ou de um negócio real.
+ */
+export function InfoPraticas({
+  info,
+  extra,
+  acao,
+  exemplo = true,
+}: {
+  info: InfoPratica;
+  extra?: ReactNode;
+  /** botão no fim da ficha (ex.: Falar no WhatsApp) */
+  acao?: ReactNode;
+  exemplo?: boolean;
+}) {
   const linhas: [ReactNode, string, string][] = [
     [<Clock key="h" className="size-5" />, "Horário", info.horario],
     [<Wallet key="p" className="size-5" />, "Preço", info.preco],
@@ -53,10 +67,52 @@ export function InfoPraticas({ info, extra }: { info: InfoPratica; extra?: React
           </ul>
         </div>
       )}
+      {acao && <div className="mt-5">{acao}</div>}
       <p className="mt-4 text-legenda text-ink-suave">
-        Horários e preços são de exemplo. Confirme com quem oferece antes de ir.
+        {exemplo
+          ? "Horários e preços são de exemplo. Confirme com quem oferece antes de ir."
+          : "Confirme horários e valores com o estabelecimento antes de ir."}
       </p>
     </div>
+  );
+}
+
+/** Linha extra da ficha de informações práticas. */
+export function LinhaInfo({
+  icone,
+  rotulo,
+  children,
+}: {
+  icone: ReactNode;
+  rotulo: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="flex gap-3 py-3">
+      <span className="mt-0.5 text-cobalto [&_svg]:size-5" aria-hidden>
+        {icone}
+      </span>
+      <div>
+        <dt className="text-rotulo">{rotulo}</dt>
+        <dd className="text-base">{children}</dd>
+      </div>
+    </div>
+  );
+}
+
+/** Link para o WhatsApp do negócio, com a mensagem pronta. */
+export function FalarNoWhatsapp({ numero, nome }: { numero: string; nome: string }) {
+  const texto = `Olá! Vi ${nome} no Azulejo e gostaria de mais informações.`;
+  return (
+    <a
+      href={`https://wa.me/${numero.replace(/\D/g, "")}?text=${encodeURIComponent(texto)}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`${botao({ tamanho: "lg" })} w-full`}
+    >
+      <MessageCircle aria-hidden /> Falar no WhatsApp
+      <span className="sr-only"> (abre em outra aba)</span>
+    </a>
   );
 }
 

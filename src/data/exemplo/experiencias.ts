@@ -1,9 +1,10 @@
-import type { Experiencia } from "./tipos";
+import type { Experiencia } from "../tipos";
 
 /**
- * DADOS DE EXEMPLO.
+ * PASSEIOS DE EXEMPLO — fonte do seed dos negócios (tipo 'passeio').
  * Os passeios existem de verdade na região; preços, horários e as empresas que os
  * oferecem são ilustrativos.
+ * O site não importa este arquivo: lê os passeios do banco (ver lugares-negocios.ts).
  */
 export const experiencias: Experiencia[] = [
   {

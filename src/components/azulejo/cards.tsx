@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, CalendarDays, Clock, MapPin, Route as RouteIcon } from "lucide-react";
+import { ArrowRight, CalendarDays, Clock, MapPin, Route as RouteIcon, Star } from "lucide-react";
 import {
   FAIXAS,
   categoriaPorId,
@@ -8,11 +8,13 @@ import {
   nomeMes,
   type Destino,
   type Evento,
+  type Hospedagem,
   type Item,
   type Roteiro,
 } from "@/data";
+import { useMarcarExemplo } from "@/lib/aviso-exemplo";
 import { cn } from "@/lib/utils";
-import { corDaCategoria } from "./cores";
+import { corDaCategoria, type CorMaranhense } from "./cores";
 import { MarcaCategoria, Tag } from "./etiquetas";
 import { Favoritar } from "./Favoritar";
 import { Foto } from "./Foto";
@@ -29,17 +31,23 @@ export function CardDestino({
   destino,
   titulo,
   texto,
+  foto,
+  tempo,
   className,
 }: {
   destino: Destino;
   titulo?: string;
   texto?: string;
+  /** troca a foto do destino (ex.: dunas no card dos Lençóis) */
+  foto?: string;
+  /** troca o texto do tempo a partir de São Luís */
+  tempo?: string;
   className?: string;
 }) {
   return (
     <article className={cn("group relative flex min-w-0 flex-col gap-3", className)}>
       <Foto
-        src={destino.foto}
+        src={foto ?? destino.foto}
         alt={`${destino.nome}, ${destino.regiao}`}
         rotulo={destino.nome}
         cor="cobalto"
@@ -65,7 +73,7 @@ export function CardDestino({
       </h3>
       <p className="text-base text-ink-suave">{texto ?? destino.chamada}</p>
       <p className="mt-auto flex items-center gap-1.5 text-legenda text-ink-suave">
-        <Clock className="size-4" aria-hidden /> {destino.tempoDeSaoLuis}
+        <Clock className="size-4" aria-hidden /> {tempo ?? destino.tempoDeSaoLuis}
       </p>
       <span
         aria-hidden
@@ -88,6 +96,7 @@ export function CardItem({
   className?: string;
 }) {
   const categoria = categoriaPorId[item.categoria];
+  useMarcarExemplo(item.exemplo);
   return (
     <article className={cn("group relative flex min-w-0 flex-col gap-3", className)}>
       <Foto
@@ -255,31 +264,103 @@ export function CardComida({
   cor: "jucara" | "babacu" | "ouro";
 }) {
   return (
-    <article className="group relative flex min-w-0 items-center gap-4 rounded-md bg-areia p-4">
+    <article className="group relative flex min-w-0 flex-col gap-3">
       <Foto
         {...(foto ? { src: foto } : {})}
         alt={nome}
         rotulo={nome}
         cor={cor}
-        sizes="104px"
-        className="size-26 shrink-0 rounded-sm"
+        sizes="(min-width: 768px) 33vw, 100vw"
+        className="aspect-[4/3] rounded-md"
+        imgClassName="transition-transform duration-600 ease-saida group-hover:scale-[1.04]"
       />
-      <div className="flex min-w-0 flex-col gap-1">
-        <h3 className="font-display text-[1.375rem] leading-tight font-semibold">
-          <Link
-            to="/explorar"
-            search={{ categoria: "gastronomia" }}
-            className={cn(linkEsticado, "hover:text-cobalto")}
-          >
-            {nome}
+      <h3 className="text-t3">
+        <Link
+          to="/explorar"
+          search={{ categoria: "gastronomia" }}
+          className={cn(linkEsticado, "hover:text-cobalto")}
+        >
+          {nome}
+        </Link>
+      </h3>
+      <p className="text-base text-ink-suave">{texto}</p>
+    </article>
+  );
+}
+
+/** cores do placeholder temporário das hospedagens sem foto, na ordem dos cards */
+const CORES_PLACEHOLDER: CorMaranhense[] = ["lagoa", "jucara", "cobalto"];
+
+const nota = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const reais = new Intl.NumberFormat("pt-BR");
+
+/** Hospedagem: foto, cidade, nome, nota e preço por noite (sem reserva de verdade). */
+export function CardHospedagem({
+  hospedagem: h,
+  posicao = 0,
+  className,
+}: {
+  hospedagem: Hospedagem;
+  /** posição do card na grade, para alternar a cor do placeholder */
+  posicao?: number;
+  className?: string;
+}) {
+  const classeLink = cn(linkEsticado, "hover:text-cobalto");
+  useMarcarExemplo(h.exemplo);
+  return (
+    <article className={cn("group relative flex min-w-0 flex-col gap-2", className)}>
+      <Foto
+        src={h.foto}
+        alt={`${h.nome}, ${nomeDestino(h.destino)}`}
+        rotulo={h.nome}
+        cor="jucara"
+        placeholderCor={CORES_PLACEHOLDER[posicao % CORES_PLACEHOLDER.length] ?? "cobalto"}
+        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+        className="mb-1 aspect-[4/3] rounded-md"
+        imgClassName="transition-transform duration-600 ease-saida group-hover:scale-[1.04]"
+      >
+        <Favoritar
+          tipo="hospedagem"
+          slug={h.slug}
+          nome={h.nome}
+          className="absolute top-3 right-3 z-10"
+        />
+      </Foto>
+      <p className="text-legenda text-ink-suave">{nomeDestino(h.destino)}</p>
+      {/* nome numa linha só; nota e preço presos na base, alinhados entre os cards */}
+      <h3 className="truncate text-t3">
+        {/* com página própria vai para o lugar; senão, para a página da cidade */}
+        {h.lugar ? (
+          <Link to="/lugares/$slug" params={{ slug: h.lugar }} className={classeLink}>
+            {h.nome}
           </Link>
-        </h3>
-        <p className="text-[0.9375rem] leading-normal text-ink-suave">{texto}</p>
+        ) : (
+          <Link to="/destinos/$slug" params={{ slug: h.destino }} className={classeLink}>
+            {h.nome}
+          </Link>
+        )}
+      </h3>
+      <div className="mt-auto flex flex-col gap-2">
+        {h.avaliacao != null && h.avaliacoes != null && (
+          <p className="flex items-center gap-1 text-legenda">
+            <Star className="size-4 fill-ouro text-ouro" aria-hidden />
+            <span className="font-bold">
+              <span className="sr-only">Nota </span>
+              {nota.format(h.avaliacao)}
+            </span>
+            <span className="text-ink-suave">
+              ({reais.format(h.avaliacoes)}
+              <span className="sr-only"> avaliações</span>)
+            </span>
+          </p>
+        )}
+        {h.precoNoite != null && (
+          <p className="pt-1">
+            <span className="font-bold">R$ {reais.format(h.precoNoite)}</span>
+            <span className="text-ink-suave"> / noite</span>
+          </p>
+        )}
       </div>
-      <ArrowRight
-        aria-hidden
-        className="ml-auto size-5 shrink-0 text-cobalto transition-transform duration-150 group-hover:translate-x-1"
-      />
     </article>
   );
 }

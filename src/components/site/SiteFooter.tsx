@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/azulejo/Logo";
+import { useHaExemplo } from "@/lib/aviso-exemplo";
 import { NAV_PRINCIPAL } from "./nav";
 
 const classeLink =
@@ -7,6 +8,8 @@ const classeLink =
 
 /** Rodapé em juçara com o logo branco. */
 export function SiteFooter() {
+  // só quando há na tela algum negócio de exemplo (exemplo = true no banco)
+  const haExemplo = useHaExemplo();
   return (
     <footer className="bg-faixa text-sobre-faixa">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 pt-12 pb-28 md:px-12 md:pb-12">
@@ -26,13 +29,18 @@ export function SiteFooter() {
             <Link to="/minha-viagem" className={classeLink}>
               Minha viagem
             </Link>
+            <Link to="/cadastrar" className={classeLink}>
+              Cadastre seu negócio
+            </Link>
           </nav>
           <p className="text-legenda opacity-85">Feito em São Luís, Maranhão.</p>
         </div>
-        <p className="border-t border-sobre-faixa/20 pt-6 text-legenda opacity-85">
-          Preços, horários, avaliações e empresas são dados de exemplo. Confira sempre as
-          informações oficiais antes de viajar.
-        </p>
+        {haExemplo && (
+          <p className="border-t border-sobre-faixa/20 pt-6 text-legenda opacity-85">
+            Preços, horários, avaliações e empresas são dados de exemplo. Confira sempre as
+            informações oficiais antes de viajar.
+          </p>
+        )}
       </div>
     </footer>
   );

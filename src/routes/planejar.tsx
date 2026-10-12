@@ -7,15 +7,9 @@ import { botao } from "@/components/azulejo/botao";
 import { MarcaCategoria } from "@/components/azulejo/etiquetas";
 import { MapaInterativo } from "@/components/mapa/MapaInterativo";
 import { EditorRoteiro } from "@/components/paginas/EditorRoteiro";
+import { AvisoNegocios } from "@/components/site/AvisoNegocios";
 import { CabecalhoPagina, PageShell } from "@/components/site/PageShell";
-import {
-  categoriaPorId,
-  FAIXAS,
-  pontosDoRoteiro,
-  type CategoriaId,
-  type DiaRoteiro,
-  type Mes,
-} from "@/data";
+import { categoriaPorId, FAIXAS, type CategoriaId, type DiaRoteiro, type Mes } from "@/data";
 import { salvarRoteiro } from "@/lib/minha-viagem";
 import {
   CHEGADAS,
@@ -25,6 +19,7 @@ import {
   type Respostas,
   type Ritmo,
 } from "@/lib/planejador";
+import { useCatalogo } from "@/lib/use-catalogo";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/planejar")({
@@ -66,12 +61,13 @@ function Planejar() {
     dias: DiaRoteiro[];
   } | null>(null);
   const navigate = useNavigate();
+  const catalogo = useCatalogo();
 
   const podeSeguir = passo !== 0 || (r.dias !== null && r.dias > 0);
 
   function gerar() {
     if (!r.dias) return;
-    setResultado(gerarRoteiro({ ...r, dias: r.dias }));
+    setResultado(gerarRoteiro({ ...r, dias: r.dias }, catalogo));
     window.scrollTo({ top: 0 });
   }
 
@@ -424,7 +420,8 @@ function Resultado({
   recomecar: () => void;
   salvar: () => void;
 }) {
-  const pontos = useMemo(() => pontosDoRoteiro(resultado.dias), [resultado.dias]);
+  const { negociosOk, pontosDoRoteiro } = useCatalogo();
+  const pontos = useMemo(() => pontosDoRoteiro(resultado.dias), [pontosDoRoteiro, resultado.dias]);
   return (
     <PageShell>
       <CabecalhoPagina
@@ -446,6 +443,7 @@ function Resultado({
       </CabecalhoPagina>
       <div className="mx-auto grid max-w-7xl gap-12 px-5 pb-16 md:px-12 md:pb-24 lg:grid-cols-[1.25fr_1fr]">
         <section aria-label="Dia a dia" className="min-w-0">
+          {!negociosOk && <AvisoNegocios className="mb-8" />}
           <EditorRoteiro dias={resultado.dias} aoMudar={aoMudar} />
         </section>
         <aside aria-label="Mapa da rota" className="lg:sticky lg:top-28 lg:self-start">

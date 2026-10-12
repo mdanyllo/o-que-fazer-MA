@@ -7,6 +7,7 @@ import { CardItem } from "@/components/azulejo/cards";
 import { Chip } from "@/components/azulejo/etiquetas";
 import { PadraoAzulejo } from "@/components/azulejo/PadraoAzulejo";
 import { MapaInterativo } from "@/components/mapa/MapaInterativo";
+import { AvisoNegocios } from "@/components/site/AvisoNegocios";
 import { CabecalhoPagina, PageShell } from "@/components/site/PageShell";
 import {
   Drawer,
@@ -22,13 +23,13 @@ import {
   distanciaKm,
   FAIXAS,
   formatarDistancia,
-  itens,
   MESES,
   nomeDestino,
   type FaixaPreco,
   type Item,
 } from "@/data";
 import { validarBuscaExplorar, type BuscaExplorar } from "@/lib/busca";
+import { useCatalogo } from "@/lib/use-catalogo";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/explorar")({
@@ -61,7 +62,7 @@ const DURACOES = [
   { valor: "dia", rotulo: "Dia inteiro" },
 ] as const;
 
-function filtrar(busca: BuscaExplorar) {
+function filtrar(busca: BuscaExplorar, itens: Item[]) {
   const q = busca.q ? normalizar(busca.q) : "";
   let lista: (Item & { km?: number })[] = itens.filter((i) => {
     if (busca.categoria && i.categoria !== busca.categoria) return false;
@@ -93,7 +94,8 @@ function filtrar(busca: BuscaExplorar) {
 function Explorar() {
   const busca = Route.useSearch();
   const navigate = useNavigate({ from: "/explorar" });
-  const resultado = useMemo(() => filtrar(busca), [busca]);
+  const { itens, negociosOk } = useCatalogo();
+  const resultado = useMemo(() => filtrar(busca, itens), [busca, itens]);
   const ver = busca.ver ?? "lista";
 
   const atualizar = (mudanca: Mudanca) =>
@@ -206,6 +208,7 @@ function Explorar() {
         </aside>
 
         <section aria-label="Resultados" className="min-w-0">
+          {!negociosOk && <AvisoNegocios className="mb-6" />}
           <p aria-live="polite" className="mb-6 text-ink-suave">
             <strong className="text-ink">{resultado.length}</strong>{" "}
             {resultado.length === 1 ? "lugar ou experiência" : "lugares e experiências"}

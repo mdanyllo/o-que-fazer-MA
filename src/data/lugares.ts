@@ -1,10 +1,10 @@
 import type { Lugar, Mes } from "./tipos";
 
 /**
- * DADOS DE EXEMPLO.
- * Atrativos são lugares reais, com informação geral. Horários e preços são ilustrativos,
- * não oficiais. Restaurantes e pousadas marcados com `ficticio: true` foram inventados.
- * Coordenadas aproximadas.
+ * ATRATIVOS — lugares reais, com informação geral. Horários e preços são ilustrativos,
+ * não oficiais. Coordenadas aproximadas.
+ * Restaurantes, hospedagens e passeios vêm do banco (tabela negocios); os de exemplo
+ * estão em ./exemplo, que é só a fonte do seed.
  */
 
 const anoTodo: Mes[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -209,54 +209,6 @@ export const lugares: Lugar[] = [
     lat: -2.583,
     lng: -44.236,
   },
-  {
-    slug: "cozinha-do-cuxa",
-    nome: "Cozinha do Cuxá",
-    destino: "sao-luis",
-    categoria: "gastronomia",
-    tipo: "restaurante",
-    ficticio: true,
-    resumo: "Arroz de cuxá, peixe-pedra frito e torta de camarão num sobrado da Praia Grande.",
-    descricao:
-      "Restaurante fictício criado para o MVP. Serve a cozinha maranhense do dia a dia: arroz de cuxá feito com vinagreira, gergelim e camarão seco, peixe-pedra frito e torta de camarão.",
-    info: {
-      horario: "Almoço todos os dias (exemplo)",
-      preco: "Prato a partir de R$ 50 (exemplo)",
-      duracao: "1 hora e meia",
-      dicas: ["Peça o cuxá como acompanhamento do peixe."],
-    },
-    faixaPreco: 2,
-    horas: 1.5,
-    mesesBons: anoTodo,
-    foto: "/images/lugares/cozinha-do-cuxa.jpg",
-    tags: ["Arroz de cuxá", "Peixe-pedra"],
-    lat: -2.5294,
-    lng: -44.3045,
-  },
-  {
-    slug: "pousada-sobrado-azul",
-    nome: "Pousada Sobrado Azul",
-    destino: "sao-luis",
-    categoria: "hospedagem",
-    tipo: "hospedagem",
-    ficticio: true,
-    resumo: "Quartos num casarão restaurado, a duas quadras da Rua Portugal.",
-    descricao:
-      "Pousada fictícia criada para o MVP. Fica num casarão do Centro Histórico, com pé-direito alto e café da manhã com frutas da região.",
-    info: {
-      horario: "Check-in a partir das 14h (exemplo)",
-      preco: "Diária a partir de R$ 280 (exemplo)",
-      duracao: "—",
-      dicas: ["Bom para quem quer fazer tudo a pé no Centro."],
-    },
-    faixaPreco: 2,
-    horas: 0,
-    mesesBons: anoTodo,
-    foto: "/images/lugares/pousada-sobrado-azul.jpg",
-    tags: ["Casarão", "Centro Histórico"],
-    lat: -2.5302,
-    lng: -44.3048,
-  },
 
   // ——— Barreirinhas e Lençóis ———
   {
@@ -378,54 +330,6 @@ export const lugares: Lugar[] = [
     lat: -2.583,
     lng: -42.69,
   },
-  {
-    slug: "peixaria-beira-rio",
-    nome: "Peixaria Beira-Rio",
-    destino: "barreirinhas",
-    categoria: "gastronomia",
-    tipo: "restaurante",
-    ficticio: true,
-    resumo: "Peixe na brasa e camarão na orla do Preguiças.",
-    descricao:
-      "Restaurante fictício criado para o MVP, na orla de Barreirinhas, com mesas de frente para o rio.",
-    info: {
-      horario: "Almoço e jantar (exemplo)",
-      preco: "Prato a partir de R$ 60 (exemplo)",
-      duracao: "1 hora e meia",
-      dicas: ["Bom para o jantar depois do passeio da Lagoa Bonita."],
-    },
-    faixaPreco: 2,
-    horas: 1.5,
-    mesesBons: anoTodo,
-    foto: "/images/lugares/peixaria-beira-rio.jpg",
-    tags: ["Peixe", "Beira-rio"],
-    lat: -2.7455,
-    lng: -42.8255,
-  },
-  {
-    slug: "pousada-preguicas",
-    nome: "Pousada Margem do Preguiças",
-    destino: "barreirinhas",
-    categoria: "hospedagem",
-    tipo: "hospedagem",
-    ficticio: true,
-    resumo: "Chalés com redário e deque sobre o rio.",
-    descricao:
-      "Pousada fictícia criada para o MVP. Chalés de madeira, redário e deque para banho de rio.",
-    info: {
-      horario: "Check-in a partir das 14h (exemplo)",
-      preco: "Diária a partir de R$ 350 (exemplo)",
-      duracao: "—",
-      dicas: ["As agências buscam os hóspedes na pousada para os passeios."],
-    },
-    faixaPreco: 2,
-    horas: 0,
-    mesesBons: anoTodo,
-    foto: "/images/categorias/hospedagem.jpg",
-    tags: ["Beira-rio", "Redário"],
-    lat: -2.7495,
-    lng: -42.8205,
-  },
 
   // ——— Atins ———
   {
@@ -473,30 +377,6 @@ export const lugares: Lugar[] = [
     tags: ["Camarão", "4x4"],
     lat: -2.585,
     lng: -42.775,
-  },
-  {
-    slug: "pousada-vento-leste",
-    nome: "Pousada Vento Leste",
-    destino: "atins",
-    categoria: "hospedagem",
-    tipo: "hospedagem",
-    ficticio: true,
-    resumo: "Bangalôs no pé da duna, a 10 minutos a pé da praia.",
-    descricao:
-      "Pousada fictícia criada para o MVP, com bangalôs de palha e café da manhã com tapioca e juçara.",
-    info: {
-      horario: "Check-in a partir das 13h (exemplo)",
-      preco: "Diária a partir de R$ 420 (exemplo)",
-      duracao: "—",
-      dicas: ["Leve lanterna: as ruas de areia são escuras à noite."],
-    },
-    faixaPreco: 3,
-    horas: 0,
-    mesesBons: anoTodo,
-    foto: "/images/lugares/pousada-vento-leste.jpg",
-    tags: ["Bangalô", "Pé na areia"],
-    lat: -2.5715,
-    lng: -42.7405,
   },
 
   // ——— Santo Amaro ———
@@ -713,54 +593,6 @@ export const lugares: Lugar[] = [
     tags: ["Parque nacional", "Dia inteiro"],
     lat: -7.15,
     lng: -47.06,
-  },
-  {
-    slug: "pousada-mesa-alta",
-    nome: "Pousada Mesa Alta",
-    destino: "carolina",
-    categoria: "hospedagem",
-    tipo: "hospedagem",
-    ficticio: true,
-    resumo: "Quartos simples e piscina, no centro de Carolina.",
-    descricao:
-      "Pousada fictícia criada para o MVP, com café da manhã regional e saída das agências na porta.",
-    info: {
-      horario: "Check-in a partir das 14h (exemplo)",
-      preco: "Diária a partir de R$ 220 (exemplo)",
-      duracao: "—",
-      dicas: ["Boa base para os passeios de Carolina e Riachão."],
-    },
-    faixaPreco: 1,
-    horas: 0,
-    mesesBons: anoTodo,
-    foto: "/images/lugares/pousada-mesa-alta.jpg",
-    tags: ["Piscina", "Centro"],
-    lat: -7.334,
-    lng: -47.465,
-  },
-  {
-    slug: "mesa-da-chapada",
-    nome: "Mesa da Chapada",
-    destino: "carolina",
-    categoria: "gastronomia",
-    tipo: "restaurante",
-    ficticio: true,
-    resumo: "Comida caseira do sertão maranhense: carne de sol, paçoca e baião.",
-    descricao:
-      "Restaurante fictício criado para o MVP, com comida caseira servida no fogão a lenha.",
-    info: {
-      horario: "Almoço e jantar (exemplo)",
-      preco: "Prato a partir de R$ 45 (exemplo)",
-      duracao: "1 hora",
-      dicas: ["Peça a paçoca de carne de sol."],
-    },
-    faixaPreco: 1,
-    horas: 1,
-    mesesBons: anoTodo,
-    foto: "/images/lugares/mesa-da-chapada.jpg",
-    tags: ["Comida caseira"],
-    lat: -7.331,
-    lng: -47.471,
   },
 
   // ——— Tutóia ———

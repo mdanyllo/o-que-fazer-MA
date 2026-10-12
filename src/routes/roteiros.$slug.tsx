@@ -14,7 +14,9 @@ import { MapaInterativo } from "@/components/mapa/MapaInterativo";
 import { LinhaDoTempo } from "@/components/paginas/LinhaDoTempo";
 import { Pagina404 } from "@/components/site/Pagina404";
 import { PageShell } from "@/components/site/PageShell";
-import { getRoteiro, nomeDestino, pontosDoRoteiro, roteiros } from "@/data";
+import { AvisoNegocios } from "@/components/site/AvisoNegocios";
+import { getRoteiro, nomeDestino, roteiros } from "@/data";
+import { useCatalogo } from "@/lib/use-catalogo";
 import { salvarRoteiro } from "@/lib/minha-viagem";
 
 export const Route = createFileRoute("/roteiros/$slug")({
@@ -47,6 +49,7 @@ export const Route = createFileRoute("/roteiros/$slug")({
 function PaginaRoteiro() {
   const { roteiro } = Route.useLoaderData();
   const navigate = useNavigate();
+  const { negociosOk, pontosDoRoteiro } = useCatalogo();
   const pontos = pontosDoRoteiro(roteiro.dias);
   const outros = roteiros.filter((r) => r.slug !== roteiro.slug).slice(0, 2);
 
@@ -147,6 +150,7 @@ function PaginaRoteiro() {
           <h2 id="dia-a-dia" className="mb-8 text-t1">
             Dia a dia
           </h2>
+          {!negociosOk && <AvisoNegocios className="mb-8" />}
           <LinhaDoTempo dias={roteiro.dias} />
           <button type="button" onClick={usar} className={`${botao({ tamanho: "lg" })} mt-10`}>
             Usar este roteiro

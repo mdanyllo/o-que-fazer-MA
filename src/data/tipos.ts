@@ -8,6 +8,9 @@
 export type CategoriaId =
   "lagoas-praias" | "cultura" | "natureza" | "gastronomia" | "festas" | "hospedagem";
 
+/** Negócios que vêm do banco (tabela negocios). */
+export type TipoNegocio = "restaurante" | "hospedagem" | "passeio";
+
 /** 1 = barato/gratuito, 2 = médio, 3 = mais caro. Faixas de exemplo. */
 export type FaixaPreco = 1 | 2 | 3;
 
@@ -36,6 +39,22 @@ export type Destino = Coordenada & {
   tags: string[];
 };
 
+/** O que só os negócios do banco têm (a página usa para a galeria, o contato e a ficha). */
+export type DetalhesNegocio = {
+  tipo: TipoNegocio;
+  exemplo: boolean;
+  /** fotos do próprio negócio, na ordem do dono (a primeira é a capa) */
+  fotos: string[];
+  /** só dígitos, com 55 */
+  whatsapp?: string;
+  /** "Pousada", "Chalé"… (hospedagem) */
+  subtipo?: string;
+  cidade?: string;
+  /** os meses bons e a dificuldade foram informados (senão a ficha não mostra) */
+  melhorEpoca: boolean;
+  dificuldade: boolean;
+};
+
 export type InfoPratica = {
   horario: string;
   preco: string;
@@ -58,8 +77,12 @@ export type Lugar = Coordenada & {
   mesesBons: Mes[];
   foto: string;
   tags: string[];
-  /** true para restaurantes e pousadas inventados para o MVP */
+  /** true para restaurantes e pousadas inventados para o MVP (mostra a etiqueta "Exemplo") */
   ficticio?: boolean;
+  /** negócio de exemplo vindo do banco (exemplo = true): liga o aviso do rodapé */
+  exemplo?: boolean;
+  /** só nos restaurantes e hospedagens do banco */
+  negocio?: DetalhesNegocio;
 };
 
 export type Experiencia = Coordenada & {
@@ -80,6 +103,10 @@ export type Experiencia = Coordenada & {
   empresas: string[];
   foto: string;
   tags: string[];
+  /** passeio de exemplo vindo do banco (exemplo = true): liga o aviso do rodapé */
+  exemplo?: boolean;
+  /** só nos passeios do banco */
+  negocio?: DetalhesNegocio;
 };
 
 export type Empresa = {
@@ -95,6 +122,27 @@ export type Empresa = {
   whatsapp: string;
   /** preço de exemplo mostrado no botão de reservar */
   aPartirDe?: number;
+};
+
+export type TipoHospedagem = "Pousada" | "Hotel" | "Chalé" | "Hostel" | "Casa de temporada";
+
+/** Card de hospedagem da seção "Onde ficar" (sem reserva de verdade). */
+export type Hospedagem = {
+  slug: string;
+  nome: string;
+  tipo: TipoHospedagem;
+  /** slug do destino (cidade) */
+  destino: string;
+  /** nota de exemplo, de 0 a 5 (sem nota, o card não mostra a linha da estrela) */
+  avaliacao?: number;
+  avaliacoes?: number;
+  /** preço por noite, em reais (sem preço, o card não mostra a linha) */
+  precoNoite?: number;
+  foto: string;
+  /** slug do lugar com página própria, quando a hospedagem tem página */
+  lugar?: string;
+  /** negócio de exemplo (exemplo = true): liga o aviso do rodapé */
+  exemplo?: boolean;
 };
 
 export type Parada = {

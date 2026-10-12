@@ -1016,3 +1016,67 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Contas e negócios (Supabase)
+
+Restaurantes, hospedagens e passeios vêm do banco (Supabase). Destinos, atrativos, roteiros e eventos continuam nos arquivos de `src/data`. Só quem cadastra um negócio tem conta; o turista usa o site sem login.
+
+### 1. Criar o projeto
+
+1. Crie uma conta em [supabase.com](https://supabase.com) e um projeto novo (região sugerida: São Paulo, `sa-east-1`). Guarde a senha do banco.
+2. Em **Project Settings → API**, copie a **Project URL** e a chave **anon public**.
+
+### 2. Variáveis
+
+1. Copie `.env.example` para `.env.local` (que não vai para o git).
+2. Preencha:
+
+   ```sh
+   VITE_SUPABASE_URL=https://SEU-PROJETO.supabase.co
+   VITE_SUPABASE_ANON_KEY=eyJ...   # a chave "anon public"
+   ```
+
+3. Reinicie o `npm run dev`. Em produção (Lovable/Cloudflare), cadastre as mesmas duas variáveis no ambiente de build.
+
+Nunca use a chave `service_role` no site: ela ignora todas as regras de segurança.
+
+### 3. Criar as tabelas
+
+No painel do Supabase, abra o **SQL Editor** e rode, nesta ordem, o conteúdo de:
+
+1. `supabase/migrations/20261008120000_perfis.sql`
+2. `supabase/migrations/20261008120100_negocios.sql`
+3. `supabase/migrations/20261008120200_storage_fotos.sql` (cria o bucket `fotos-negocios`)
+4. `supabase/migrations/20261009120000_revisao_e_slug.sql`
+5. `supabase/migrations/20261010120000_cadastro_dono.sql`
+6. `supabase/migrations/20261011120000_admin.sql`
+7. `supabase/seed.sql` (os 24 negócios de exemplo, publicados e marcados como exemplo)
+
+Com a [Supabase CLI](https://supabase.com/docs/guides/cli), o mesmo é `supabase link` + `supabase db push` e, para o seed, rodar `supabase/seed.sql` no SQL Editor.
+
+As regras do banco têm testes: `npm run test:banco` (não precisa de Supabase nem Docker).
+
+Para testar o fluxo do dono no Supabase de verdade: `npm run test:real -- --criar-contas` cria duas contas de teste (guardadas no `.env.local`); confirme os e-mails (ou rode `update auth.users set email_confirmed_at = now() where email like 'seu-email+azulejo%';` no SQL Editor) e rode `npm run test:real`. O teste apaga tudo o que cria. Para o fluxo do admin: `npm run test:real -- --criar-admin` cria uma terceira conta; confirme e dê o papel admin a ela (comando da seção 5) e rode `npm run test:admin-real` (com `-- --manter` para deixar exemplos no site e `-- --limpar` para apagar).
+
+Mudou os dados de exemplo em `src/data/exemplo`? Rode `npm run seed:gerar` e aplique o `supabase/seed.sql` de novo (ele atualiza pelo slug, sem duplicar).
+
+### 4. Login por e-mail
+
+Em **Authentication → URL Configuration**:
+
+- **Site URL**: o endereço do site (em desenvolvimento, `http://localhost:8080` ou a porta que o Vite mostrar).
+- **Redirect URLs**: acrescente `http://localhost:*/entrar`, `http://localhost:*/redefinir-senha` e os mesmos caminhos no domínio de produção.
+
+Em **Authentication → Sign In / Providers → Email**, deixe **Confirm email** ligado. Os textos dos e-mails podem ser traduzidos em **Authentication → Emails**. O envio padrão do Supabase tem limite baixo de e-mails por hora; para produção, configure um SMTP próprio em **Authentication → SMTP Settings**.
+
+### 5. Primeiro admin
+
+Ninguém vira admin pelo site. Crie a conta normalmente em `/cadastrar`, confirme o e-mail e rode no SQL Editor:
+
+```sql
+update public.perfis
+set papel = 'admin'
+where id = (select id from auth.users where email = 'seu-email@exemplo.com');
+```
+
+Para tirar o acesso, rode o mesmo comando com `'dono'`. A pessoa precisa sair e entrar de novo para o menu mudar.

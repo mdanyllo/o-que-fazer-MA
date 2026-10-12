@@ -1,9 +1,11 @@
 /// <reference types="leaflet.markercluster" />
 import "leaflet/dist/leaflet.css";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
+import type { FeatureCollection } from "geojson";
 import L from "leaflet";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import {
+  GeoJSON,
   MapContainer,
   Marker,
   Polyline,
@@ -15,6 +17,8 @@ import {
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { corDaCategoria } from "@/components/azulejo/cores";
 import type { Coordenada, Item } from "@/data";
+// contorno do estado (IBGE, malha de qualidade mínima), salvo no projeto
+import contornoMaranhao from "@/data/geo/maranhao.json";
 import { cn } from "@/lib/utils";
 
 /** Enquadramento inicial do Maranhão. */
@@ -36,18 +40,38 @@ export type MapaProps = {
   /** "pontos" enquadra os pontos; "maranhao" mostra o estado todo */
   enquadrar?: "pontos" | "maranhao";
   rolagemZoom?: boolean;
+  /**
+   * prévia da Home: sem tiles, só o contorno do Maranhão sobre um fundo cobalto bem claro,
+   * enquadrado no estado inteiro, sem nomes de cidades e com todos os pins em cobalto
+   */
+  previa?: boolean;
+  /** canto dos botões de zoom; em mapas pequenos, em cima, para não cobrir nomes e atribuição */
+  zoomNoTopo?: boolean;
   className?: string;
   children?: ReactNode;
 };
 
+/**
+ * Mapa base claro e dessaturado (Esri Light Gray Canvas, sem chave de API), para não brigar
+ * com as cores da marca. Os nomes vêm numa camada separada, que a prévia da Home não usa.
+ */
+const ATRIBUICAO =
+  'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright">colaboradores do OpenStreetMap</a>';
+const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas";
+const TILES_BASE = `${ESRI}/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}`;
+const TILES_NOMES = `${ESRI}/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}`;
+
+const CONTORNO = contornoMaranhao as FeatureCollection;
+const LIMITES_CONTORNO = L.geoJSON(CONTORNO).getBounds();
+
 /** `entra`: primeira vez que o pin aparece, cai em sequência (índice `i`). */
-function iconePin(item: Item, ativo: boolean, entra: boolean, i: number) {
+function iconePin(item: Item, ativo: boolean, entra: boolean, i: number, cobalto: boolean) {
   const classes = ["pin-azulejo", ativo && "is-ativo", entra && "pin-entra"]
     .filter(Boolean)
     .join(" ");
   return L.divIcon({
     className: "pin-azulejo-wrap",
-    html: `<span class="${classes}" style="--i:${i}" data-cor="${corDaCategoria(item.categoria)}"><span class="pin-azulejo-ponto"></span></span>`,
+    html: `<span class="${classes}" style="--i:${i}" data-cor="${cobalto ? "cobalto" : corDaCategoria(item.categoria)}"><span class="pin-azulejo-ponto"></span></span>`,
     iconSize: [32, 32],
     iconAnchor: [16, 16],
     tooltipAnchor: [0, -18],
@@ -99,7 +123,8 @@ function Controle({
   pontos,
   selecionado,
   enquadrar,
-}: Pick<MapaProps, "pontos" | "selecionado" | "enquadrar">) {
+  previa,
+}: Pick<MapaProps, "pontos" | "selecionado" | "enquadrar" | "previa">) {
   const map = useMap();
   const reduzido =
     typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -107,6 +132,10 @@ function Controle({
   // enquadramento inicial e quando a lista muda (filtros)
   const assinatura = pontos.map(chaveItem).join("|");
   useEffect(() => {
+    if (previa) {
+      map.fitBounds(LIMITES_CONTORNO, { padding: [32, 32], animate: false });
+      return;
+    }
     if (enquadrar === "maranhao" || pontos.length === 0) {
       map.fitBounds(LIMITES_MARANHAO, { animate: false });
       return;
@@ -137,6 +166,8 @@ export default function MapaLeaflet({
   agrupar = true,
   enquadrar = "pontos",
   rolagemZoom = false,
+  previa = false,
+  zoomNoTopo = false,
   className,
   children,
 }: MapaProps) {
@@ -155,7 +186,7 @@ export default function MapaLeaflet({
           <Marker
             key={chave}
             position={[p.lat, p.lng]}
-            icon={iconePin(p, ativo, !jaVistos.current.has(chave), i)}
+            icon={iconePin(p, ativo, !jaVistos.current.has(chave), i, previa)}
             zIndexOffset={ativo ? 1000 : 0}
             keyboard
             eventHandlers={{
@@ -179,7 +210,7 @@ export default function MapaLeaflet({
           </Marker>
         );
       }),
-    [pontos, selecionado, aoSelecionar],
+    [pontos, selecionado, aoSelecionar, previa],
   );
 
   return (
@@ -188,13 +219,25 @@ export default function MapaLeaflet({
         bounds={LIMITES_MARANHAO}
         scrollWheelZoom={rolagemZoom}
         zoomControl={false}
+        zoomSnap={previa ? 0 : 1}
+        // sem tiles na prévia, o agrupamento de pins precisa do zoom máximo explícito
+        maxZoom={18}
         attributionControl
-        className="mapa-azulejo h-full w-full"
+        className={cn("mapa-azulejo h-full w-full", previa && "mapa-previa")}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">colaboradores do OpenStreetMap</a>'
-          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        {previa ? (
+          <GeoJSON
+            data={CONTORNO}
+            interactive={false}
+            style={{ className: "contorno-maranhao" }}
+            attribution='Contorno: <a href="https://www.ibge.gov.br/">IBGE</a>'
+          />
+        ) : (
+          <>
+            <TileLayer attribution={ATRIBUICAO} url={TILES_BASE} maxNativeZoom={16} />
+            <TileLayer url={TILES_NOMES} maxNativeZoom={16} />
+          </>
+        )}
         {rota && rota.length > 1 && (
           <Polyline
             positions={rota.map((c) => [c.lat, c.lng] as [number, number])}
@@ -219,8 +262,12 @@ export default function MapaLeaflet({
         ) : (
           marcadores
         )}
-        <ZoomControl position="bottomright" zoomInTitle="Aproximar" zoomOutTitle="Afastar" />
-        <Controle pontos={pontos} selecionado={selecionado} enquadrar={enquadrar} />
+        <ZoomControl
+          position={zoomNoTopo ? "topright" : "bottomright"}
+          zoomInTitle="Aproximar"
+          zoomOutTitle="Afastar"
+        />
+        <Controle pontos={pontos} selecionado={selecionado} enquadrar={enquadrar} previa={previa} />
       </MapContainer>
       {children}
     </div>

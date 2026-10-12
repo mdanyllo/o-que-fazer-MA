@@ -4,17 +4,21 @@ import { cn } from "@/lib/utils";
 import { COR, type CorMaranhense } from "./cores";
 import { Parallax } from "@/components/movimento/Parallax";
 import { Revelar } from "@/components/movimento/Revelar";
-import { PadraoAzulejo } from "./PadraoAzulejo";
 
 type Props = {
   /** caminho lógico da foto (ex.: /images/destinos/barreirinhas.jpg), ver src/lib/imagens.ts */
   src?: string;
   /** texto alternativo descritivo (obrigatório) */
   alt: string;
-  /** o que vai na foto, para a etiqueta do fallback ("Foto: Lagoa Bonita") */
+  /** o que vai na foto; marcado em data-foto-falta enquanto o arquivo não existir */
   rotulo: string;
-  /** cor da categoria no fallback */
+  /** cor da categoria enquanto a foto carrega */
   cor?: CorMaranhense;
+  /**
+   * placeholder temporário colorido quando a foto não existe: fundo sólido nesta cor e o
+   * símbolo branco; sem ele, o fallback é o neutro (areia com o símbolo apagado)
+   */
+  placeholderCor?: CorMaranhense;
   /** classes do contêiner: defina o tamanho/proporção aqui */
   className?: string;
   imgClassName?: string;
@@ -32,8 +36,8 @@ type Props = {
 };
 
 /**
- * Imagem com fallback da marca: enquanto a foto não existir (ou falhar), mostra o padrão
- * de azulejos sobre a cor da categoria, com uma etiqueta discreta do que vai ali.
+ * Imagem com fallback neutro: enquanto a foto não existir (ou falhar), mostra o fundo areia
+ * com o símbolo do azulejo pequeno no centro, sem texto.
  */
 export function Foto({
   src,
@@ -47,6 +51,7 @@ export function Foto({
   parallax = false,
   entrada = false,
   cortina = false,
+  placeholderCor,
   children,
 }: Props) {
   const url = urlFoto(src);
@@ -60,19 +65,33 @@ export function Foto({
     if (img && img.complete && img.naturalWidth === 0) setFalhou(true);
   }, [url]);
 
+  // sem foto o fundo é areia até na borda arredondada (a cor da categoria vazaria nos cantos),
+  // com um fio de linha para o card não sumir sobre seções em areia
+  const fundo = !falhou
+    ? COR[cor].bg
+    : placeholderCor
+      ? COR[placeholderCor].bg
+      : "bg-areia shadow-[inset_0_0_0_1px_var(--linha)]";
   const conteudo = (
     <>
-      {/* fallback de azulejos só quando a foto não existe ou falhou;
+      {/* sem a foto: fundo areia com o símbolo pequeno e apagado, sem texto;
           enquanto carrega, a cor da categoria serve de placeholder */}
       {falhou && (
-        <div className="absolute inset-0" role="img" aria-label={alt}>
-          <PadraoAzulejo
-            azulejo={56}
-            className="absolute -top-6 -right-10 h-[70%] w-[60%] opacity-90"
+        <div
+          className="absolute inset-0 grid place-items-center"
+          role="img"
+          aria-label={alt}
+          data-foto-falta={rotulo}
+        >
+          <img
+            src={
+              placeholderCor ? "/brand/azulejo-simbolo-branco.svg" : "/brand/azulejo-simbolo.svg"
+            }
+            alt=""
+            width={100}
+            height={100}
+            className={cn("w-[clamp(28px,16%,56px)]", placeholderCor ? "opacity-35" : "opacity-15")}
           />
-          <span className="absolute bottom-3 left-3 max-w-[80%] truncate rounded-sm bg-louca/90 px-2 py-1 text-rotulo text-ink">
-            Foto: {rotulo}
-          </span>
         </div>
       )}
       {url &&
@@ -102,10 +121,10 @@ export function Foto({
     </>
   );
   return cortina ? (
-    <Revelar variante="cortina" className={cn("relative overflow-hidden", COR[cor].bg, className)}>
+    <Revelar variante="cortina" className={cn("relative overflow-hidden", fundo, className)}>
       {conteudo}
     </Revelar>
   ) : (
-    <div className={cn("relative overflow-hidden", COR[cor].bg, className)}>{conteudo}</div>
+    <div className={cn("relative overflow-hidden", fundo, className)}>{conteudo}</div>
   );
 }

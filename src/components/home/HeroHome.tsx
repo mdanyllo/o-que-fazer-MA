@@ -57,12 +57,12 @@ export function HeroHome() {
   return (
     <section
       ref={camadas.ref}
-      className="@container relative overflow-hidden lg:grid lg:min-h-[720px] lg:grid-cols-[max(520px,calc(max(48px,(100%-1280px)/2+48px)+min(620px,49%)))_minmax(0,1fr)]"
+      className="relative overflow-hidden lg:grid lg:min-h-[720px] lg:grid-cols-[calc(520px+(100%-1080px)/2.3)_minmax(0,1fr)]"
     >
       {/* esquerda: texto, cartão de busca e "Mais procurados" */}
       <motion.div
         style={camadas.estilo("texto")}
-        className="relative z-10 flex min-w-0 flex-col justify-center gap-6 px-5 pt-8 pb-12 md:px-12 md:pt-12 lg:pt-12 lg:pr-10 lg:pb-18 lg:pl-[max(48px,calc((100cqw-1280px)/2+48px))]"
+        className="relative z-10 flex min-w-0 flex-col justify-center gap-6 px-[clamp(20px,5vw,80px)] pt-8 pb-12 md:pt-12 lg:pt-[52px] lg:pr-[clamp(20px,3vw,40px)] lg:pb-[72px]"
       >
         <Selo className="entra self-start rounded-[4px] px-3 py-1.5 text-[0.8125rem] font-bold">
           Guia do Maranhão
@@ -71,7 +71,8 @@ export function HeroHome() {
           texto={"O Maranhão,\num azulejo de\ncada vez"}
           final={<span className="text-guara">.</span>}
           atraso={150}
-          className="text-[clamp(48px,5.4vw,96px)] leading-[0.92] font-extrabold tracking-[-0.03em] text-cobalto"
+          linhasFixas
+          className="max-w-[9.5em] text-[clamp(48px,6.4vw,104px)] leading-[0.92] font-extrabold tracking-[-0.03em] text-cobalto"
         />
         <p className="entra max-w-[30em] text-[1.1875rem] text-ink-suave" style={seq(650)}>
           Roteiros, cultura e comida contados por quem conhece o estado por dentro. Dos casarões de
@@ -163,7 +164,7 @@ export function HeroHome() {
       <div className="relative flex min-w-0 items-center px-5 pt-20 pb-6 md:px-12 lg:py-[clamp(48px,5vw,80px)] lg:pr-[clamp(40px,6vw,96px)] lg:pl-0">
         <div
           aria-hidden
-          className="entra-painel absolute inset-0 overflow-hidden bg-painel lg:left-[24%] lg:rounded-l-[10px]"
+          className="entra-painel absolute inset-0 overflow-hidden bg-painel lg:left-[24%] lg:rounded-l-[24px]"
         >
           <motion.div
             style={camadas.estilo("padrao")}

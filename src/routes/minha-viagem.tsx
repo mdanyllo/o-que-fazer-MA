@@ -5,20 +5,29 @@ import { ChevronDown, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { botao } from "@/components/azulejo/botao";
-import { CardDestino, CardItem, CardRoteiro } from "@/components/azulejo/cards";
+import { CardDestino, CardHospedagem, CardItem, CardRoteiro } from "@/components/azulejo/cards";
 import { Tag } from "@/components/azulejo/etiquetas";
 import { PadraoAzulejo } from "@/components/azulejo/PadraoAzulejo";
 import { SecaoTitulo } from "@/components/azulejo/SecaoTitulo";
 import { EditorRoteiro } from "@/components/paginas/EditorRoteiro";
 import { LinhaDoTempo } from "@/components/paginas/LinhaDoTempo";
+import { AvisoNegocios } from "@/components/site/AvisoNegocios";
 import { CabecalhoPagina, PageShell } from "@/components/site/PageShell";
-import { getDestino, getItem, getRoteiro, type Destino, type Item, type Roteiro } from "@/data";
+import {
+  getDestino,
+  getRoteiro,
+  type Destino,
+  type Hospedagem,
+  type Item,
+  type Roteiro,
+} from "@/data";
 import {
   removerRoteiro,
   salvarRoteiro,
   useMinhaViagem,
   type RoteiroSalvo,
 } from "@/lib/minha-viagem";
+import { useCatalogo } from "@/lib/use-catalogo";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/minha-viagem")({
@@ -28,6 +37,7 @@ export const Route = createFileRoute("/minha-viagem")({
 
 function MinhaViagem() {
   const { favoritos, roteiros } = useMinhaViagem();
+  const { getHospedagem, getItem, negociosOk } = useCatalogo();
   const destinos = favoritos
     .filter((f) => f.tipo === "destino")
     .map((f) => getDestino(f.slug))
@@ -40,6 +50,10 @@ function MinhaViagem() {
     .filter((f) => f.tipo === "roteiro")
     .map((f) => getRoteiro(f.slug))
     .filter((r): r is Roteiro => Boolean(r));
+  const hospedagens = favoritos
+    .filter((f) => f.tipo === "hospedagem")
+    .map((f) => getHospedagem(f.slug))
+    .filter((h): h is Hospedagem => Boolean(h));
   const vazio = favoritos.length === 0 && roteiros.length === 0;
 
   return (
@@ -50,6 +64,8 @@ function MinhaViagem() {
       />
       <div className="mx-auto flex max-w-7xl flex-col gap-16 px-5 pb-16 md:px-12 md:pb-24">
         {vazio && <Vazio />}
+        {/* sem o banco, favoritos de restaurantes, hospedagens e passeios não aparecem */}
+        {!vazio && !negociosOk && <AvisoNegocios />}
 
         {roteiros.length > 0 && (
           <section aria-labelledby="meus-roteiros" className="flex flex-col gap-6">
@@ -89,6 +105,20 @@ function MinhaViagem() {
             >
               {destinos.map((d) => (
                 <CardDestino key={d.slug} destino={d} />
+              ))}
+            </GradeRevelar>
+          </section>
+        )}
+
+        {hospedagens.length > 0 && (
+          <section aria-labelledby="hospedagens" className="flex flex-col gap-6">
+            <SecaoTitulo id="hospedagens" titulo="Onde ficar" />
+            <GradeRevelar
+              colunas={4}
+              className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"
+            >
+              {hospedagens.map((h, i) => (
+                <CardHospedagem key={h.slug} hospedagem={h} posicao={i} />
               ))}
             </GradeRevelar>
           </section>

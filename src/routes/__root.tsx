@@ -10,6 +10,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { AuthProvider } from "../lib/auth";
+import { buscarNegociosPublicados } from "../lib/negocios";
 import { themeBootScript } from "../lib/tema";
 import { Logo } from "../components/azulejo/Logo";
 import { botao } from "../components/azulejo/botao";
@@ -63,6 +65,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  // Negócios publicados (restaurantes, hospedagens, passeios), lidos uma vez no servidor e
+  // renovados a cada 5 minutos de navegação. null = o banco não respondeu (as telas avisam).
+  loader: async () => ({ negocios: await buscarNegociosPublicados() }),
+  staleTime: 5 * 60_000,
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -125,14 +131,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* respeita prefers-reduced-motion em todas as animações do Motion */}
-      <MotionConfig reducedMotion="user">
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <TransicaoAzulejo />
-        <RolagemSuave />
-      </MotionConfig>
-      <Toaster position="top-center" />
+      <AuthProvider>
+        {/* respeita prefers-reduced-motion em todas as animações do Motion */}
+        <MotionConfig reducedMotion="user">
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <TransicaoAzulejo />
+          <RolagemSuave />
+        </MotionConfig>
+        <Toaster position="top-center" />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

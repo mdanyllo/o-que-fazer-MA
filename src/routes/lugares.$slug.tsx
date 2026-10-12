@@ -1,16 +1,21 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PaginaItem } from "@/components/paginas/PaginaItem";
+import { PaginaNegocioIndisponivel } from "@/components/site/AvisoNegocios";
 import { Pagina404 } from "@/components/site/Pagina404";
-import { getLugar } from "@/data";
+import { criarCatalogo } from "@/data/catalogo";
+import { buscarNegociosPublicados } from "@/lib/negocios";
 
 export const Route = createFileRoute("/lugares/$slug")({
-  loader: ({ params }) => {
-    const dados = getLugar(params.slug);
-    if (!dados) throw notFound();
-    return { dados };
+  loader: async ({ params }) => {
+    const catalogo = criarCatalogo(await buscarNegociosPublicados());
+    const dados = catalogo.getLugar(params.slug);
+    if (dados) return { dados };
+    // banco fora do ar: pode ser um negócio que existe; mostra o erro, não o 404
+    if (!catalogo.negociosOk) return { dados: null };
+    throw notFound();
   },
   head: ({ loaderData }) => {
-    if (!loaderData) return { meta: [{ title: "Lugar não encontrado | Azulejo" }] };
+    if (!loaderData?.dados) return { meta: [{ title: "Lugar não encontrado | Azulejo" }] };
     const { dados } = loaderData;
     return {
       meta: [
@@ -32,5 +37,6 @@ export const Route = createFileRoute("/lugares/$slug")({
 
 function Pagina() {
   const { dados } = Route.useLoaderData();
+  if (!dados) return <PaginaNegocioIndisponivel />;
   return <PaginaItem tipo="lugar" dados={dados} />;
 }

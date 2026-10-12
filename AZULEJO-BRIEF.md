@@ -23,7 +23,7 @@ O produto precisa responder a duas situações:
 
 Não pode parecer um diretório de empresas, nem uma landing page de SaaS. Deve parecer um produto turístico real e premium: muito visual, com fotos grandes, mapas, cards, rotas e recomendações. As empresas locais aparecem dentro do contexto (no lugar, no roteiro), nunca como uma lista de anúncios.
 
-**Fora do escopo do MVP:** login, painel administrativo, pagamentos reais.
+**Fora do escopo do MVP:** pagamentos reais e conta para o turista. Login, cadastro e painel existem só para negócios e para a equipe (seção 10).
 
 **Tudo navegável:** use dados mockados realistas. Nenhum botão importante fica sem ação. O que não tem backend funciona de forma simulada (salvar favoritos, montar roteiro, filtrar, reservar mostra uma confirmação etc.), guardando estado no navegador quando fizer sentido.
 
@@ -105,7 +105,7 @@ Escala sugerida: display 64–96px (line-height 0.95, letter-spacing -0.02em, um
 
 ### 2.5 O padrão de azulejos
 
-O `azulejo-padrao.svg` é a assinatura visual. Use em faixas divisórias, no loading, na página 404, em fundos de capa e como fallback de foto. Nunca atrás de texto corrido. Prefira mostrar só um trecho cortado pela borda.
+O `azulejo-padrao.svg` é a assinatura visual. Use no loading, na página 404 e em fundos de capa. Nunca atrás de texto corrido. Prefira mostrar só um trecho cortado pela borda.
 
 ### 2.6 Ícones
 
@@ -128,7 +128,8 @@ O hero da Home segue o arquivo `referencia-hero.html`. Composição:
 - Direita: um painel `--cobalto` que vai até a borda direita da tela, começando a cerca de 24% da largura da coluna, com cantos arredondados só do lado esquerdo e o padrão de azulejos por cima com opacidade 0.12.
 - A foto principal fica inteira, num retângulo com raio de 10px, centralizada verticalmente e avançando sobre o fundo claro à esquerda do painel (ela fica metade sobre o claro, metade sobre o azul). Sem recortes em onda.
 - Legenda do lugar abaixo da foto, alinhada à direita, em `--louca` sobre o azul. Símbolo do azulejo (48px) no canto superior direito do painel.
-- Abaixo do hero, a faixa do padrão de azulejos.
+- O hero termina onde termina o painel azul (cantos de 24px no lado esquerdo, retos à direita, colados na borda da tela). Depois dele vem só um respiro de `clamp(72px, 9vw, 128px)` sobre `--louca` antes da próxima seção, sem divisor (o mesmo respiro vertical de todas as seções da Home).
+- O padrão de azulejos só aparece dentro do painel azul do hero (opacity 0.12) e no rodapé, nunca como faixa solta entre seções.
 - No celular: o texto vem primeiro; o painel azul vira um bloco atrás da foto, ocupando a largura toda.
 
 ## 3. Direção de arte: moderno, não "cara de IA"
@@ -184,7 +185,7 @@ Animações devem dar sensação de produto premium e conduzir o olhar, nunca at
 
 Adapte aos arquivos e rotas que já existem. Mínimo:
 
-1. **Home**: hero com foto grande e o seletor "Cheguei ao Maranhão / Vou viajar"; busca ("Para onde você vai?"); destinos em destaque em grade editorial; experiências por categoria; roteiros prontos; próximos eventos; chamada para o mapa; chamada para planejar a viagem.
+1. **Home**: hero com foto grande e o seletor "Cheguei ao Maranhão / Vou viajar"; busca ("Para onde você vai?"); destinos em destaque em grade editorial; experiências por categoria; roteiros prontos; onde ficar (ver 5.1); próximos eventos; chamada para o mapa; chamada para planejar a viagem.
 2. **Explorar**: tudo o que fazer, com filtros (categoria, cidade, época do ano, duração, preço, "perto de mim" simulado) e alternância lista / mapa.
 3. **Destino (cidade)**: ex. São Luís, Barreirinhas, Alcântara, Carolina. Capa grande, resumo, melhor época, como chegar, o que fazer, onde comer, onde ficar, roteiros que passam por ali, mapa.
 4. **Lugar / experiência**: galeria, descrição, informações práticas (horário, preço, duração, dicas), mapa com localização, empresas locais que oferecem o passeio (com botão de reservar que abre uma confirmação simulada), lugares próximos.
@@ -195,11 +196,21 @@ Adapte aos arquivos e rotas que já existem. Mínimo:
 9. **Minha viagem**: favoritos e roteiros salvos (guardados no navegador).
 10. **404** com o padrão de azulejos e um link de volta.
 
+### 5.1 Home: "Onde ficar"
+
+Seção entre "Roteiros prontos" e "Junho é mês de boi", no fundo `--louca`. Tudo mockado, sem reserva de verdade.
+- Cabeçalho: título "Onde ficar", subtítulo "Pousadas e hospedagens para dormir bem em cada parada." e, à direita, o link "Ver todas as hospedagens →" (vai para o Explorar filtrado em hospedagem), alinhado à base do título.
+- Chips: Todas, Pousada, Hotel, Chalé, Hostel. "Todas" vem ativo por padrão; o ativo fica em `--cobalto` com texto branco, os outros só com borda. Filtra no front; tocar num tipo desativa "Todas", e tocar no chip ativo de novo volta para "Todas". "Casa de temporada" não tem chip: essas hospedagens continuam nos dados e aparecem em "Todas".
+- Grade de 4 cards no desktop, 2 no tablet, 1 no celular. Card no mesmo estilo dos outros: foto 4:3 com raio de 10px e coração no canto, cidade, nome, nota com estrela pequena em `--ouro` e o número de avaliações entre parênteses, e o preço "**R$ 280** / noite". Sem sombra pesada, sem gradiente, sem ícone de brilho.
+- O nome ocupa uma linha só (com reticências por segurança). Os nomes mostrados nos cards têm no máximo 22 caracteres (ex.: "Margem do Preguiças", "Sobrado das Pedras"); a página do lugar mantém o nome completo. Nota e preço ficam presos na base do card, alinhados entre todos os cards da linha.
+- Placeholder temporário, só nestes cards: enquanto a foto não existir, fundo sólido alternando `--lagoa`, `--jucara` e `--cobalto` pela posição do card (na Home e em "Minha viagem"), com o símbolo do azulejo branco centralizado em opacity 0.35, sem texto. Quando a foto existe, ela substitui tudo. Os outros cards do site continuam com o placeholder neutro (seção 7).
+- O card leva para a página do lugar quando a hospedagem já existe em `lugares.ts`; senão, para a página da cidade. O coração salva em "Minha viagem", na seção "Onde ficar".
+
 Navegação: header com logo, Explorar, Destinos, Roteiros, Mapa, Eventos e o botão "Planejar viagem"; no celular, bottom navigation com Início, Explorar, Mapa, Roteiros e Minha viagem.
 
 ## 6. Dados mockados
 
-Crie arquivos de dados separados (destinos, lugares, experiências, roteiros, eventos, empresas). Use lugares reais do Maranhão e informações gerais corretas. Exemplos de base:
+Crie arquivos de dados separados (destinos, lugares, experiências, roteiros, eventos, empresas, hospedagens). Use lugares reais do Maranhão e informações gerais corretas. Exemplos de base:
 
 - **São Luís**: Centro Histórico (Patrimônio Mundial da UNESCO desde 1997), Praia Grande, Casa das Tulhas, Praia do Calhau, Palácio dos Leões
 - **Barreirinhas e Lençóis Maranhenses**: Lagoa Azul, Lagoa Bonita, passeio pelo Rio Preguiças, Vassouras, Caburé, Atins
@@ -216,10 +227,26 @@ Regras para os dados:
 - Empresas, avaliações e nomes de guias são fictícios e devem estar marcados como exemplo no código.
 - Distâncias e tempos de deslocamento: use valores aproximados e arredondados.
 
+Formato das hospedagens (`src/data/hospedagens.ts`, tipo `Hospedagem` em `tipos.ts`), todas fictícias:
+
+```ts
+{
+  slug: "chales-rio-e-duna",
+  nome: "Chalés Rio e Duna",                 // nome inventado
+  tipo: "Chalé",                             // "Pousada" | "Hotel" | "Chalé" | "Hostel" | "Casa de temporada"
+  destino: "barreirinhas",                   // slug do destino (cidade)
+  avaliacao: 4.8,                            // nota de exemplo, 0 a 5 (mostrada como "4,8")
+  avaliacoes: 96,                            // número de avaliações de exemplo
+  precoNoite: 450,                           // reais por noite, entre R$ 120 e R$ 650
+  foto: "/images/hospedagens/chales-rio-e-duna.jpg",
+  lugar: "pousada-preguicas",                // opcional: slug do lugar com página própria
+}
+```
+
 ## 7. Fotos
 
 O produto depende de fotos grandes. Faça assim:
-- Crie um componente de imagem com fallback: enquanto a foto não existir, mostra o padrão de azulejos sobre a cor da categoria com uma etiqueta discreta do que vai ali (ex. "Foto: Lagoa Bonita").
+- Crie um componente de imagem com fallback: enquanto a foto não existir, mostra um fundo `--areia` com o símbolo do azulejo pequeno e centralizado, em opacity 0.15, sem nenhum texto.
 - Organize as imagens em uma pasta por tipo (ex. `public/images/destinos/barreirinhas.jpg`) e gere um arquivo `IMAGENS.md` listando cada arquivo esperado, o que deve aparecer nele e o tamanho ideal, para eu substituir por fotos reais.
 - Não use imagens aleatórias da internet nem links externos sem licença.
 - Use carregamento otimizado (lazy loading, tamanhos responsivos, `next/image` se for Next.js) e `alt` descritivo em todas.
@@ -234,3 +261,90 @@ Use Leaflet ou MapLibre com tiles do OpenStreetMap (gratuito, com a atribuição
 - Acessível: HTML semântico, `<button>` e `<a>` de verdade, foco visível em `--cobalto`, labels nos campos, contraste 4.5:1, navegação por teclado.
 - Performance: imagens otimizadas, fontes com `display=swap`, bibliotecas de animação carregadas só onde forem usadas.
 - Zero erros no console e no build.
+
+## 10. Contas, negócios e banco (Supabase)
+
+Restaurantes, hospedagens e passeios saíram dos arquivos mockados e vêm do Supabase (Auth, Postgres e Storage). Destinos, atrativos, roteiros, eventos e as empresas fictícias continuam em `src/data`. Como configurar: README, seção "Contas e negócios (Supabase)".
+
+### 10.1 Modelo de dados (`supabase/migrations`)
+
+- **perfis**: `id` (= `auth.users.id`), `nome`, `papel` (`dono` | `admin`, padrão `dono`), `criado_em`. Criado por gatilho quando a conta nasce; o nome vem do cadastro.
+- **negocios**: `id`, `dono_id` (nulo quando a equipe cadastra), `tipo` (`restaurante` | `hospedagem` | `passeio`), `subtipo` (hospedagem: `pousada`, `hotel`, `chale`, `hostel`, `casa_de_temporada`; os outros: texto livre), `nome` (até 60), `nome_curto` (até 22, nos cards), `slug` (único, gerado pelo banco, ver 10.2), `cidade` (nome, ex. "São Luís"), `descricao`, `endereco`, `latitude`, `longitude`, `whatsapp`, `instagram`, `site`, `preco` (por noite na hospedagem, por pessoa no passeio), `faixa_preco` (`$` a `$$$`, só restaurante), `duracao` (só passeio), `horario`, `status` (`rascunho` | `pendente` | `publicado` | `recusado`), `motivo_recusa`, `notas_internas` (só admin), `exemplo`, `extras`, `aprovado_por`, `aprovado_em`, `alterado_desde_revisao` (o dono editou depois da última revisão), `alterado_em` (última edição do dono), `ponto_encontro` (passeios), `criado_em`, `atualizado_em`. Restaurante guarda o tipo de culinária em `subtipo`.
+- **extras** (jsonb, só a equipe edita): campos editoriais que o site usa e o dono não preenche: categoria do mapa, resumo, tags, meses bons, horas, dicas, textos de preço/duração, dificuldade, lugares visitados, empresas, nota de exemplo, ordem em "Onde ficar". Tipo `ExtrasNegocio` em `src/lib/negocios.ts`. Sem extras, o site usa padrões pelo tipo.
+- **negocio_fotos**: `id`, `negocio_id`, `caminho` (no bucket, `<negocio_id>/arquivo.jpg`; os exemplos usam `/images/...` do próprio site), `ordem` (a menor é a capa), `legenda`.
+- **Storage**: bucket `fotos-negocios`, leitura pública, só jpg/png/webp, até 5 MB.
+- Um negócio tem página própria (`/lugares/:slug` ou `/experiencias/:slug`) quando tem descrição e localização; sem isso, aparece só no card e leva para a cidade.
+
+### 10.2 Papéis e regras (RLS em todas as tabelas)
+
+| Quem | Lê | Escreve |
+| --- | --- | --- |
+| Visitante (sem login) | negócios `publicado` e as fotos deles | nada |
+| Dono | os publicados + os próprios | só os próprios, até 5 por conta. Cria sempre como `rascunho`; o único status que escolhe é `pendente` (enviar para análise, a partir de rascunho ou recusado). Nunca mexe em `exemplo`, `extras`, `aprovado_*`, `motivo_recusa`, `notas_internas`, `dono_id`, `alterado_*` ou `slug`. Exclui o próprio negócio em qualquer status. Fotos: até 8, só na pasta do próprio negócio. |
+| Admin | tudo (notas internas pela função `notas_internas(id)`; contas com e-mail por `admin_usuarios()`) | tudo, sem limite: aprova, recusa (motivo obrigatório), despublica, marca como revisado, edita notas, transfere (`dono_id`) e exclui negócio de qualquer pessoa |
+
+- **Completo para análise:** para ir ou ficar em `pendente`/`publicado`, o banco exige cidade, descrição de 50 a 600 caracteres, WhatsApp válido (`55` + DDD + 9 dígitos), endereço (hospedagem e restaurante), os campos do tipo (hospedagem: tipo e preço por noite; restaurante: culinária, faixa e horário; passeio: preço por pessoa, duração e ponto de encontro) e 1 foto. A mensagem diz o que falta.
+- **Edição pelo dono:** negócio `publicado` continua publicado (o status não muda) e ganha `alterado_desde_revisao = true` e `alterado_em`, se algo mudou de fato; negócio `recusado` editado volta para `pendente`. A marca só some quando o admin aprova (`status` → `publicado`) ou marca como revisado (`alterado_desde_revisao` → `false`); nos dois casos o banco preenche `aprovado_por` e `aprovado_em`. Mexer nas fotos de um publicado também marca. Edições do admin não marcam.
+- **Slug:** gerado no banco ao criar, a partir do nome e da cidade (`"Café & Cia." + "São Luís"` → `cafe-cia-sao-luis`), sem acentos, até 60 caracteres; se já existir (inclusive rascunho de outro dono), ganha sufixo `-2`, `-3`… O slug mandado pelo dono é ignorado; o admin pode escolher um ao criar. Depois de criado, não muda nunca, nem pelo admin e nem se o nome mudar, para não quebrar links, roteiros e favoritos.
+- `notas_internas` não tem permissão de leitura pela API: nunca use `select("*")` em `negocios`, liste as colunas. `alterado_desde_revisao` e `alterado_em` só são lidos por quem está logado.
+- **Testes:** `npm run test:admin-real` repete o fluxo do admin no Supabase real (aprovar, recusar, revisar, cadastrar pela equipe, transferir, despublicar, excluir; precisa da conta `TESTE_*_3` com papel admin). `npm run test:real` repete o fluxo do dono contra o Supabase do `.env.local`, com duas contas de teste (`-- --criar-contas` para criar), e apaga o que criou. `npm run test:banco` roda as migrações e o seed num Postgres em memória (PGlite) e confere cada regra como visitante, dono e admin (`supabase/tests/permissoes.mjs`). Rode depois de qualquer mudança nas migrações.
+- O papel `admin` só é dado à mão no SQL Editor (comando no README). O papel de perfil não pode ser alterado pela API.
+- O turista continua sem login; favoritos e roteiros ficam no navegador.
+
+### 10.3 Rotas
+
+- Públicas: `/entrar`, `/cadastrar`, `/esqueci-senha`, `/redefinir-senha` (destino do link do e-mail), `/termos` e `/privacidade` (texto provisório, marcado como rascunho para revisão jurídica).
+- `/painel` ("Meus negócios"): exige login; sem login vai para `/entrar?redirect=/painel`.
+- `/admin`, `/admin/:id`, `/admin/novo` e `/admin/usuarios`: exigem papel admin; para os outros (logados ou não) mostram "Página não encontrada".
+- Header: deslogado, um "Entrar" discreto em `--ink-suave` (no celular, dentro do menu); logado, menu com o nome, "Meus negócios", "Administração" (só admin) e "Sair". Rodapé: link "Cadastre seu negócio".
+
+### 10.4 Painel do dono
+
+- `/painel`: os negócios da pessoa (capa 4:3, nome, tipo, cidade, selo Rascunho, Em análise, Publicado ou Recusado; motivo da recusa; "Alterações em conferência" num publicado editado) e o botão "Cadastrar negócio". Com 5 negócios, o botão some e aparece o aviso do limite.
+- `/painel/novo` e `/painel/:id`: o mesmo formulário em 5 etapas (1 tipo, 2 dados básicos, 3 contato, 4 fotos, 5 revisão), com o progresso no topo (no celular, "Etapa 2 de 5" e uma barra em 5 partes). Negócio de outra pessoa ou inexistente: "Página não encontrada".
+- Ao sair da etapa 3 de um cadastro novo, o rascunho é gravado (as fotos precisam da pasta do negócio) e a página passa a ser `/painel/:id?etapa=4`.
+- Botões: rascunho tem "Salvar rascunho" e, na revisão, "Enviar para análise"; em análise e publicado, "Salvar alterações"; recusado, "Corrigir e reenviar". "Continuar" confere os campos da etapa; enviar confere tudo e leva à etapa do primeiro erro, com foco no campo.
+- Depois de enviar: "Enviado para análise. Volte aqui para ver o status." (sem prometer e-mail nem notificação).
+- Avisos: em análise, "Estamos revisando" (dá para editar; no celular, uma faixa de uma linha que abre o texto completo ao tocar); recusado, o motivo; publicado, "Suas alterações já estão no ar e serão conferidas pela equipe".
+- Campos: nome (60) e nome curto (22, com sugestão), cidade (lista de `src/data/cidades.ts`, que também dá a latitude e longitude do centro, gravadas ao criar ou trocar de cidade; o dono não edita), descrição com contador, WhatsApp com máscara `(98) 99123-4567` (gravado como `5598991234567`), Instagram (gravado sem @) e site (com https://) opcionais, endereço.
+- Fotos: de 1 a 8, por toque ou arrastando; reduzidas no navegador para 1600px no lado maior e convertidas para WebP (ou JPEG); recusadas se passarem de 5 MB depois disso; barra de progresso por arquivo; reordenar com setas (a primeira é a capa, mostrada em 4:3) e remover. Cada mudança é gravada na hora. Arquivo em `<negocio_id>/<uuid>.webp`, com cache de 1 hora.
+- Excluir (com confirmação) apaga os arquivos do Storage e depois o negócio. O `remove()` do Storage não dá erro quando a permissão bloqueia, então o código confere o que voltou.
+- O formulário nunca lê nem grava `extras`, `exemplo`, `notas_internas`, `aprovado_*` ou `status` além do envio para análise (`src/lib/meus-negocios.ts`). O slug é do banco; se colidir ao salvar, o app tenta de novo até 2 vezes.
+- Revisão: "Como vai aparecer" mostra o card (`CardHospedagem` ou `CardItem`) e a página (`ConteudoItem`, o miolo de `PaginaItem`) com os componentes do site, numa área `inert`.
+
+### 10.5 Área do administrador
+
+- Navegação própria e discreta (faixa em areia abaixo do header: Negócios, Usuários, Cadastrar negócio), dentro da casca do site.
+- **Aviso de envios novos**: selo redondo em ouro (`bg-ouro text-sobre-ouro`) com o número de negócios "Em análise" (`status = pendente`) ao lado de "Negócios" na faixa do admin e de "Administração" no menu do usuário (desktop e celular). Com zero, não aparece. A contagem (`ContadorEmAnalise`, chave `["admin-negocios", "em-analise"]`) se atualiza ao aprovar ou recusar e a cada minuto; leitores de tela ouvem "3 negócios em análise".
+- **`/admin`**: abas com contagem (Em análise, Alterados, Publicados, Recusados, Rascunhos, Todos), busca por nome e filtros por tipo e cidade, tudo na URL. "Alterados" são os publicados com `alterado_desde_revisao`, mais recentes primeiro, com a data. Cada linha: capa, nome, tipo, cidade, dono (nome e e-mail, ou "Cadastrado pela equipe") e status.
+- **`/admin/:id`**: o mesmo `FormularioNegocio` do dono em `modo="equipe"` (edita tudo, inclusive fotos, com um botão "Salvar") e, ao lado, os cartões:
+  - **Status**: Aprovar e publicar (o banco grava `aprovado_por` e `aprovado_em` e limpa o motivo antigo), Recusar (diálogo com motivo obrigatório, que o dono vê no painel), Marcar como revisado (só tira a marca de alterado, sem mudar status nem aprovação), Despublicar (volta para rascunho) e Excluir (com confirmação, apagando as fotos do Storage). Mostra o que falta antes de publicar.
+  - **Posição no mapa**: pin arrastável, clique no mapa move o pin, campos de latitude e longitude para o ajuste fino e "Salvar posição". O mapa tem 384px de altura (`h-96`) e a atribuição fica compacta no canto inferior direito (classe `mapa-posicao`: 10px, até 70% da largura, alinhada à direita), longe do pin centralizado e sem virar uma faixa sobre os nomes do mapa.
+  - **Notas internas**: lidas pela função `notas_internas(id)` e gravadas direto (o banco recusa para quem não é admin).
+  - **Histórico**: dono, criado em, última alteração, última edição do dono, aprovado quando e por quem, endereço no site.
+  - A coluna `extras` não aparece nem é editada em lugar nenhum da interface.
+- **`/admin/novo`**: o mesmo formulário, sem dono e sem o limite de 5. Na etapa 1, a equipe escolhe "Status ao terminar" (rascunho ou publicado: o "Salvar" da revisão publica) e se é "Exemplo".
+- **`/admin/usuarios`**: contas com nome, e-mail, papel, número de negócios e data (função `admin_usuarios()`, só admin). "Transferir negócio para este usuário" entrega um negócio da equipe (sem dono) a uma conta; o status não muda. O papel não muda pela interface.
+- Na Home e nas listas, negócios reais vêm antes dos de exemplo.
+
+### 10.6 Página pública do negócio
+
+Vale para restaurantes, hospedagens e passeios do banco (`/lugares/:slug`, `/experiencias/:slug`) e para a prévia do formulário. Os atrativos fixos continuam como antes.
+
+- **Cabeçalho**: negócio real (`exemplo = false`) mostra só categoria e nome; a descrição aparece uma vez, em "Sobre" (o resumo seria a primeira frase dela repetida). Negócios de exemplo e atrativos fixos mantêm o resumo como subtítulo.
+- **Galeria** (`GaleriaNegocio`): só as fotos do próprio negócio, na ordem do dono; nunca completa com fotos da cidade ou de outros lugares. 1 foto ocupa a largura toda (4:3 no celular, 21:9 no desktop); 2 ficam lado a lado; 3 ou mais mostram uma grande e duas menores (no celular, a grande em cima e as duas embaixo) com o botão "Ver as N fotos". Tocar em qualquer foto abre o lightbox (carrossel com setas, teclado e contador "2 de 5").
+- **Informações práticas**: só aparecem as linhas que o negócio preencheu; nada de "Consulte" ou "Ano todo" por padrão. Hospedagem não mostra horário: mostra o preço por noite, o tipo (Pousada, Chalé…) e a cidade. Melhor época e dificuldade só aparecem quando a equipe informou (em `extras`).
+- **Nota da ficha**: "Horários e preços são de exemplo…" só quando `exemplo = true` (e nos atrativos fixos); negócio real mostra "Confirme horários e valores com o estabelecimento antes de ir."
+- **WhatsApp**: se houver número, botão "Falar no WhatsApp" (`wa.me`, abre em outra aba) com a mensagem "Olá! Vi [nome] no Azulejo e gostaria de mais informações."
+- **Mapa**: só o pin do negócio, centralizado, zoom 13; botões de zoom no canto de cima (não cobrem a atribuição) e, embaixo do mapa, "[Cidade], Maranhão" (o pin fica sobre o nome da cidade no mapa).
+
+### 10.7 Como as telas leem os negócios
+
+- O loader da raiz (`src/routes/__root.tsx`) busca os publicados uma vez (SSR) e renova a cada 5 minutos de navegação. As telas usam `useCatalogo()` (`src/lib/use-catalogo.ts`), que junta atrativos e negócios no formato dos cards, do mapa e dos roteiros (`src/data/catalogo.ts`).
+- Se o banco não responder, as seções de negócios mostram `<AvisoNegocios />` (mensagem curta + "Tentar de novo") e o resto da página continua de pé. Páginas de negócio mostram "Essa página não carregou" em vez de 404.
+- O aviso de "dados de exemplo" do rodapé aparece só quando há na tela algum negócio com `exemplo = true` (`useMarcarExemplo` em `src/lib/aviso-exemplo.ts`).
+- Dados de exemplo: a fonte é `src/data/exemplo` (o site não importa esses arquivos). `npm run seed:gerar` gera `supabase/seed.sql`.
+
+### 10.8 Formulários
+
+Label sempre visível, campos de 48px, borda 2px `--linha` e foco em `--cobalto`, erro em `--guara` abaixo do campo (ligado por `aria-describedby`) e foco no primeiro campo com erro ao enviar. Mensagens em português, sem detalhe técnico (`mensagemDeErro` em `src/lib/auth.tsx`). Sem sombras, gradientes ou ícones de brilho; celular primeiro.

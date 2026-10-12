@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Título de seção como na referência: H2 forte, uma frase de apoio e, opcionalmente,
- * um link à direita ("Ver todos…"). Sem etiqueta em maiúsculas acima.
+ * um link à direita, na base do título ("Ver todos… →"). Sem etiqueta em maiúsculas acima.
  * Quando entra na tela, o título sobe palavra por palavra e o apoio vem logo depois.
  */
 export function SecaoTitulo({
@@ -24,13 +24,22 @@ export function SecaoTitulo({
   return (
     <Revelar
       variante="titulo"
-      className={cn("flex flex-wrap items-end justify-between gap-4", className)}
+      className={cn(
+        "grid gap-x-6 gap-y-2 md:grid-cols-[minmax(0,1fr)_auto] md:items-baseline-last",
+        className,
+      )}
     >
-      <div className="flex max-w-2xl flex-col gap-2">
-        <TituloAnimado as="h2" id={id} texto={titulo} atraso={0} rolagem className="text-t1" />
-        {apoio && <p className="depois-do-titulo text-ink-suave">{apoio}</p>}
-      </div>
-      {acao && <div className="depois-do-titulo">{acao}</div>}
+      <TituloAnimado
+        as="h2"
+        id={id}
+        texto={titulo}
+        atraso={0}
+        rolagem
+        className="max-w-2xl text-t1"
+      />
+      {/* no desktop o link fica na linha do título, alinhado à base dele */}
+      {acao && <div className="depois-do-titulo order-last md:order-none">{acao}</div>}
+      {apoio && <p className="depois-do-titulo max-w-2xl text-ink-suave md:col-start-1">{apoio}</p>}
     </Revelar>
   );
 }
