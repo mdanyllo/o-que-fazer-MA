@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, CalendarDays, Clock, MapPin, Route as RouteIcon, Star } from "lucide-react";
 import {
-  FAIXAS,
   categoriaPorId,
   formatarHoras,
   nomeDestino,
   nomeMes,
+  rotuloPreco,
   type Destino,
   type Evento,
   type Hospedagem,
@@ -143,8 +143,8 @@ export function CardItem({
           </Tag>
         )}
         <Tag>
-          <span className="sr-only">Faixa de preço: </span>
-          {FAIXAS[item.faixaPreco].simbolo}
+          <span className="sr-only">Preço: </span>
+          {rotuloPreco(item)}
         </Tag>
         {item.ficticio && <Tag>Exemplo</Tag>}
       </div>

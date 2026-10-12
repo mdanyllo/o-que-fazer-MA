@@ -33,7 +33,6 @@ export function SiteFooter() {
               Cadastre seu negócio
             </Link>
           </nav>
-          <p className="text-legenda opacity-85">Feito em São Luís, Maranhão.</p>
         </div>
         {haExemplo && (
           <p className="border-t border-sobre-faixa/20 pt-6 text-legenda opacity-85">

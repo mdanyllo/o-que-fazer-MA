@@ -2,6 +2,7 @@ import {
   BedDouble,
   Drum,
   Landmark,
+  MountainSnow,
   TreePalm,
   UtensilsCrossed,
   Waves,
@@ -10,7 +11,7 @@ import {
 import { categoriaPorId } from "@/data/categorias";
 import type { CategoriaId } from "@/data/tipos";
 
-export type CorMaranhense = "lagoa" | "cobalto" | "babacu" | "ouro" | "guara" | "jucara";
+export type CorMaranhense = "duna" | "lagoa" | "cobalto" | "babacu" | "ouro" | "guara" | "jucara";
 
 /**
  * Classes literais por cor (o Tailwind só gera o que aparece escrito no código).
@@ -20,6 +21,7 @@ export const COR: Record<
   CorMaranhense,
   { bg: string; text: string; sobre: string; borda: string }
 > = {
+  duna: { bg: "bg-duna", text: "text-duna", sobre: "text-louca", borda: "border-duna" },
   lagoa: { bg: "bg-lagoa", text: "text-lagoa", sobre: "text-louca", borda: "border-lagoa" },
   cobalto: {
     bg: "bg-cobalto",
@@ -34,6 +36,7 @@ export const COR: Record<
 };
 
 export const ICONE_CATEGORIA: Record<CategoriaId, LucideIcon> = {
+  lencois: MountainSnow,
   "lagoas-praias": Waves,
   cultura: Landmark,
   natureza: TreePalm,

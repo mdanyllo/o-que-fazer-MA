@@ -4,7 +4,7 @@ import { empresas } from "./empresas";
 import { eventos } from "./eventos";
 import { lugares as atrativos } from "./lugares";
 import { roteiros } from "./roteiros";
-import type { CategoriaId, Coordenada, FaixaPreco, Mes, TipoNegocio } from "./tipos";
+import type { CategoriaId, Coordenada, FaixaPreco, FaixaValores, Mes, TipoNegocio } from "./tipos";
 
 /*
  * Dados fixos do site: destinos, atrativos, roteiros, eventos e empresas fictícias.
@@ -52,6 +52,23 @@ export const FAIXAS: Record<FaixaPreco, { simbolo: string; texto: string }> = {
   3: { simbolo: "$$$", texto: "Acima de R$ 250" },
 };
 
+const reais = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+
+/** "R$ 100,00 – R$ 160,00" */
+export const formatarFaixa = (f: FaixaValores) =>
+  `${reais.format(f.min)} – ${reais.format(f.max)}`.replace(/\s/g, " ");
+
+/** Preço curto para cards: a faixa em reais, "Gratuito" ou o símbolo da faixa. */
+export function rotuloPreco(i: {
+  faixa?: FaixaValores | undefined;
+  preco?: string | undefined;
+  faixaPreco: FaixaPreco;
+}) {
+  if (i.faixa) return formatarFaixa(i.faixa);
+  if (i.preco?.startsWith("Gratuito")) return "Gratuito";
+  return FAIXAS[i.faixaPreco].simbolo;
+}
+
 export function formatarHoras(horas: number) {
   if (horas <= 0) return "—";
   if (horas >= 6) return "Dia inteiro";
@@ -91,6 +108,8 @@ export type Item = Coordenada & {
   destino: string;
   categoria: CategoriaId;
   faixaPreco: FaixaPreco;
+  faixa?: FaixaValores | undefined;
+  preco?: string | undefined;
   horas: number;
   mesesBons: Mes[];
   foto: string;

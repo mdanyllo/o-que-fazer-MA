@@ -37,7 +37,14 @@ export const Route = createFileRoute("/planejar")({
 });
 
 const PASSOS = ["Dias", "Interesses", "Ritmo", "Orçamento", "Chegada"] as const;
-const INTERESSES: CategoriaId[] = ["lagoas-praias", "cultura", "natureza", "gastronomia", "festas"];
+const INTERESSES: CategoriaId[] = [
+  "lencois",
+  "lagoas-praias",
+  "cultura",
+  "natureza",
+  "gastronomia",
+  "festas",
+];
 
 type Rascunho = Omit<Respostas, "dias"> & { dias: number | null };
 

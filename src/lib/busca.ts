@@ -15,6 +15,7 @@ export type BuscaExplorar = {
 };
 
 const CATEGORIAS: CategoriaId[] = [
+  "lencois",
   "lagoas-praias",
   "cultura",
   "natureza",

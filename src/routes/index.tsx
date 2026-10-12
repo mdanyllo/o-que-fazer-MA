@@ -83,7 +83,13 @@ const POR_ONDE_COMECAR: {
   },
 ];
 
-const CATEGORIAS_HOME: CategoriaId[] = ["lagoas-praias", "cultura", "natureza", "gastronomia"];
+const CATEGORIAS_HOME: CategoriaId[] = [
+  "lencois",
+  "lagoas-praias",
+  "cultura",
+  "natureza",
+  "gastronomia",
+];
 
 /** respiro vertical igual em todas as seções da Home */
 const respiro = "py-[clamp(72px,9vw,128px)]";
@@ -259,7 +265,7 @@ function Home() {
 }
 
 function ExperienciasPorCategoria() {
-  const [categoria, setCategoria] = useState<CategoriaId>("lagoas-praias");
+  const [categoria, setCategoria] = useState<CategoriaId>("lencois");
   const { itens } = useCatalogo();
   const lista = useMemo(
     () =>

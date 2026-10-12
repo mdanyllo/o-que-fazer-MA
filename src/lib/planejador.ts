@@ -48,7 +48,8 @@ function escolherDestinos(r: Respostas): string[] {
   if (r.chegada === "imperatriz") return ["carolina"];
   const lista: string[] = r.chegada === "barreirinhas" ? ["barreirinhas"] : ["sao-luis"];
   if (r.chegada === "sao-luis") {
-    if (r.dias >= 3 && (quer("lagoas-praias") || quer("natureza"))) lista.push("barreirinhas");
+    if (r.dias >= 3 && (quer("lencois") || quer("lagoas-praias") || quer("natureza")))
+      lista.push("barreirinhas");
     if (r.dias >= 4 && quer("cultura")) lista.splice(1, 0, "alcantara");
   } else {
     lista.push("sao-luis");
@@ -57,7 +58,7 @@ function escolherDestinos(r: Respostas): string[] {
     lista.splice(lista.indexOf("barreirinhas") + 1, 0, "atins");
   if (r.dias >= 6 && (quer("cultura") || quer("gastronomia")) && !lista.includes("raposa"))
     lista.push("raposa");
-  if (r.dias >= 8 && quer("lagoas-praias")) lista.push("santo-amaro");
+  if (r.dias >= 8 && (quer("lencois") || quer("lagoas-praias"))) lista.push("santo-amaro");
   if (r.dias >= 10 && quer("natureza")) lista.push("tutoia");
   return lista;
 }

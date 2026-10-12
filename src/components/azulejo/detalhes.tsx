@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Empresa, InfoPratica } from "@/data";
-import { nomeDestino } from "@/data";
+import { formatarFaixa, nomeDestino } from "@/data";
 import { botao } from "./botao";
 import { PontoGuara, Tag } from "./etiquetas";
 
@@ -31,7 +31,11 @@ export function InfoPraticas({
 }) {
   const linhas: [ReactNode, string, string][] = [
     [<Clock key="h" className="size-5" />, "Horário", info.horario],
-    [<Wallet key="p" className="size-5" />, "Preço", info.preco],
+    [
+      <Wallet key="p" className="size-5" />,
+      "Preço",
+      info.faixa ? `${formatarFaixa(info.faixa)} ${info.faixa.por}` : (info.preco ?? ""),
+    ],
     [<CalendarCheck key="d" className="size-5" />, "Duração", info.duracao],
   ];
   return (

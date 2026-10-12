@@ -15,7 +15,7 @@ import { FaixaAzulejoRolagem } from "@/components/movimento/FaixaAzulejoRolagem"
 import { Pagina404 } from "@/components/site/Pagina404";
 import { AvisoNegocios } from "@/components/site/AvisoNegocios";
 import { PageShell } from "@/components/site/PageShell";
-import { ehOndeComerOuFicar, FAIXAS, getDestino, roteirosQuePassamPor, type Item } from "@/data";
+import { ehOndeComerOuFicar, FAIXAS, getDestino, roteirosQuePassamPor, rotuloPreco, type Item } from "@/data";
 import { useMarcarExemplo } from "@/lib/aviso-exemplo";
 import { useCatalogo } from "@/lib/use-catalogo";
 
@@ -279,7 +279,7 @@ function ListaCurta({ titulo, itens, vazio }: { titulo: string; itens: Item[]; v
                 </Link>
                 <p className="text-base text-ink-suave">{i.resumo}</p>
                 <p className="mt-1 flex gap-2">
-                  <Tag>{FAIXAS[i.faixaPreco].simbolo}</Tag>
+                  <Tag>{rotuloPreco(i)}</Tag>
                   {i.ficticio && <Tag>Exemplo</Tag>}
                 </p>
               </div>
