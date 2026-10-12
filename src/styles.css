@@ -28,6 +28,7 @@
   --guara: #c73a22; /* avisos, erros, detalhe do símbolo. Usar pouco */
   --ouro: #e8a33d; /* selos, badges, destaques. Sempre com texto --ink */
   --lagoa: #1e9aa8; /* ilustrações, mapas, gráficos. Não é cor de texto */
+  --duna: #b8732e; /* Lençóis Maranhenses: areia das dunas no fim da tarde */
   --babacu: #3e6b3a; /* sucesso, confirmações */
   --jucara: #4a1e3d; /* rodapé (com o logo branco) e citações */
 
@@ -63,6 +64,7 @@
   --guara: #ff7a5c;
   --ouro: #f0b85a;
   --lagoa: #3fc0cc;
+  --duna: #e3a463;
   --babacu: #7fc07a;
   --jucara: #c99bbb;
   --faixa: #2a1224;
@@ -84,6 +86,7 @@
   --color-guara: var(--guara);
   --color-ouro: var(--ouro);
   --color-lagoa: var(--lagoa);
+  --color-duna: var(--duna);
   --color-babacu: var(--babacu);
   --color-jucara: var(--jucara);
   --color-sobre-foto: var(--sobre-foto);
@@ -346,6 +349,9 @@
   height: 8px;
   border-radius: 999px;
   background: var(--louca);
+}
+.pin-azulejo[data-cor="duna"] {
+  background: var(--duna);
 }
 .pin-azulejo[data-cor="lagoa"] {
   background: var(--lagoa);

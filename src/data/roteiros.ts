@@ -68,7 +68,7 @@ export const roteiros: Roteiro[] = [
     custoEstimado: "R$ 1.800 a R$ 3.000 por pessoa (exemplo)",
     melhorEpoca: "Junho a setembro, com as lagoas cheias",
     foto: "/images/destinos/barreirinhas.jpg",
-    categorias: ["lagoas-praias", "natureza"],
+    categorias: ["lencois", "lagoas-praias", "natureza"],
     dias: [
       {
         titulo: "São Luís → Barreirinhas e Lagoa Bonita",
@@ -106,7 +106,7 @@ export const roteiros: Roteiro[] = [
     custoEstimado: "R$ 800 a R$ 1.400 por pessoa (exemplo)",
     melhorEpoca: "Junho a setembro",
     foto: "/images/destinos/santo-amaro.jpg",
-    categorias: ["lagoas-praias", "natureza"],
+    categorias: ["lencois", "lagoas-praias", "natureza"],
     dias: [
       {
         titulo: "São Luís → Santo Amaro",

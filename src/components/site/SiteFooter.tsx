@@ -27,7 +27,6 @@ export function SiteFooter() {
               Minha viagem
             </Link>
           </nav>
-          <p className="text-legenda opacity-85">Feito em São Luís, Maranhão.</p>
         </div>
         <p className="border-t border-sobre-faixa/20 pt-6 text-legenda opacity-85">
           Preços, horários, avaliações e empresas são dados de exemplo. Confira sempre as

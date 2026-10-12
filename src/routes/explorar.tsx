@@ -390,10 +390,8 @@ function Filtros({
               key={p}
               ativo={busca.preco === p}
               onClick={() => atualizar({ preco: busca.preco === p ? undefined : p })}
-              title={FAIXAS[p].texto}
             >
-              {FAIXAS[p].simbolo}
-              <span className="sr-only">: {FAIXAS[p].texto}</span>
+              {FAIXAS[p].texto}
             </Chip>
           ))}
         </div>

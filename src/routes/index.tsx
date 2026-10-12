@@ -70,7 +70,13 @@ const POR_ONDE_COMECAR: { slug: string; titulo: string; texto: string }[] = [
   },
 ];
 
-const CATEGORIAS_HOME: CategoriaId[] = ["lagoas-praias", "cultura", "natureza", "gastronomia"];
+const CATEGORIAS_HOME: CategoriaId[] = [
+  "lencois",
+  "lagoas-praias",
+  "cultura",
+  "natureza",
+  "gastronomia",
+];
 
 const secao = "mx-auto max-w-7xl px-5 py-12 md:px-12 md:py-20";
 
@@ -248,7 +254,7 @@ function Home() {
 }
 
 function ExperienciasPorCategoria() {
-  const [categoria, setCategoria] = useState<CategoriaId>("lagoas-praias");
+  const [categoria, setCategoria] = useState<CategoriaId>("lencois");
   const lista = useMemo(
     () =>
       itens

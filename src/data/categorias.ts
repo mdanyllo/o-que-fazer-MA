@@ -5,11 +5,18 @@ export type Categoria = {
   nome: string;
   chamada: string;
   /** token de cor maranhense usado no mapa, nos filtros e nos cards */
-  cor: "lagoa" | "cobalto" | "babacu" | "ouro" | "guara" | "jucara";
+  cor: "duna" | "lagoa" | "cobalto" | "babacu" | "ouro" | "guara" | "jucara";
   foto: string;
 };
 
 export const categorias: Categoria[] = [
+  {
+    id: "lencois",
+    nome: "Lençóis Maranhenses",
+    chamada: "Dunas, lagoas de chuva, 4x4, rio e vilas de pescadores",
+    cor: "duna",
+    foto: "/images/categorias/lencois.jpg",
+  },
   {
     id: "lagoas-praias",
     nome: "Lagoas e praias",

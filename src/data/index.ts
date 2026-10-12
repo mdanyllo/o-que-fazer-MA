@@ -5,7 +5,7 @@ import { eventos } from "./eventos";
 import { experiencias } from "./experiencias";
 import { lugares } from "./lugares";
 import { roteiros } from "./roteiros";
-import type { CategoriaId, Coordenada, FaixaPreco, Mes, Parada } from "./tipos";
+import type { CategoriaId, Coordenada, FaixaPreco, FaixaValores, Mes, Parada } from "./tipos";
 
 export * from "./tipos";
 export { categorias, categoriaPorId, destinos, empresas, eventos, experiencias, lugares, roteiros };
@@ -50,6 +50,23 @@ export const FAIXAS: Record<FaixaPreco, { simbolo: string; texto: string }> = {
   3: { simbolo: "$$$", texto: "Acima de R$ 250" },
 };
 
+const reais = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+
+/** "R$ 100,00 – R$ 160,00" */
+export const formatarFaixa = (f: FaixaValores) =>
+  `${reais.format(f.min)} – ${reais.format(f.max)}`.replace(/\s/g, " ");
+
+/** Preço curto para cards: a faixa em reais, "Gratuito" ou o símbolo da faixa. */
+export function rotuloPreco(i: {
+  faixa?: FaixaValores | undefined;
+  preco?: string | undefined;
+  faixaPreco: FaixaPreco;
+}) {
+  if (i.faixa) return formatarFaixa(i.faixa);
+  if (i.preco?.startsWith("Gratuito")) return "Gratuito";
+  return FAIXAS[i.faixaPreco].simbolo;
+}
+
 export function formatarHoras(horas: number) {
   if (horas <= 0) return "—";
   if (horas >= 6) return "Dia inteiro";
@@ -89,6 +106,8 @@ export type Item = Coordenada & {
   destino: string;
   categoria: CategoriaId;
   faixaPreco: FaixaPreco;
+  faixa?: FaixaValores | undefined;
+  preco?: string | undefined;
   horas: number;
   mesesBons: Mes[];
   foto: string;
@@ -106,6 +125,8 @@ export const itens: Item[] = [
     destino: x.destino,
     categoria: x.categoria,
     faixaPreco: x.faixaPreco,
+    faixa: x.info.faixa,
+    preco: x.info.preco,
     horas: x.horas,
     mesesBons: x.mesesBons,
     foto: x.foto,
@@ -122,6 +143,8 @@ export const itens: Item[] = [
     destino: x.destino,
     categoria: x.categoria,
     faixaPreco: x.faixaPreco,
+    faixa: x.info.faixa,
+    preco: x.info.preco,
     horas: x.horas,
     mesesBons: x.mesesBons,
     foto: x.foto,

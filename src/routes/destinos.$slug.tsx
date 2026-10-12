@@ -14,7 +14,7 @@ import { MapaInterativo } from "@/components/mapa/MapaInterativo";
 import { FaixaAzulejoRolagem } from "@/components/movimento/FaixaAzulejoRolagem";
 import { Pagina404 } from "@/components/site/Pagina404";
 import { PageShell } from "@/components/site/PageShell";
-import { FAIXAS, getDestino, itensDoDestino, roteirosQuePassamPor, type Item } from "@/data";
+import { getDestino, itensDoDestino, roteirosQuePassamPor, rotuloPreco, type Item } from "@/data";
 
 export const Route = createFileRoute("/destinos/$slug")({
   loader: ({ params }) => {
@@ -268,7 +268,7 @@ function ListaCurta({ titulo, itens, vazio }: { titulo: string; itens: Item[]; v
                 </Link>
                 <p className="text-base text-ink-suave">{i.resumo}</p>
                 <p className="mt-1 flex gap-2">
-                  <Tag>{FAIXAS[i.faixaPreco].simbolo}</Tag>
+                  <Tag>{rotuloPreco(i)}</Tag>
                   {i.ficticio && <Tag>Exemplo</Tag>}
                 </p>
               </div>

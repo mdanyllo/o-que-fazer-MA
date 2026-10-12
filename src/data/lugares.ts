@@ -125,7 +125,7 @@ export const lugares: Lugar[] = [
       "Inaugurado em 1817, o teatro tem plateia em formato de ferradura e recebe espetáculos, concertos e visitas guiadas. Fica na Rua do Sol, no Centro.",
     info: {
       horario: "Visitas e espetáculos conforme a agenda do teatro",
-      preco: "Visita a partir de R$ 10 (exemplo)",
+      faixa: { min: 10, max: 20, por: "a visita" },
       duracao: "1 hora",
       dicas: ["Veja a agenda: assistir a um espetáculo vale mais que a visita."],
     },
@@ -164,6 +164,29 @@ export const lugares: Lugar[] = [
     lng: -44.2418,
   },
   {
+    slug: "praia-do-aracagi",
+    nome: "Praia do Araçagi",
+    destino: "sao-luis",
+    categoria: "lagoas-praias",
+    tipo: "atrativo",
+    resumo: "Praia mais calma da ilha, com dunas baixas e barracas de peixe frito.",
+    descricao:
+      "Fica no leste da Ilha de São Luís, mais longe do centro e com menos prédios. Na maré baixa forma uma faixa larga de areia, boa para caminhar e para um almoço demorado nas barracas.",
+    info: {
+      horario: "Aberta o tempo todo; barracas de dia",
+      preco: "Gratuito",
+      duracao: "Meio dia",
+      dicas: ["Confira a tábua de marés.", "Vá de carro ou aplicativo: é longe do centro."],
+    },
+    faixaPreco: 1,
+    horas: 4,
+    mesesBons: [7, 8, 9, 10, 11, 12],
+    foto: "/images/lugares/praia-do-aracagi.jpg",
+    tags: ["Praia", "Peixe frito", "Calma"],
+    lat: -2.457,
+    lng: -44.197,
+  },
+  {
     slug: "lagoa-da-jansen",
     nome: "Lagoa da Jansen",
     destino: "sao-luis",
@@ -197,7 +220,7 @@ export const lugares: Lugar[] = [
       "A juçara é o fruto de palmeira que o maranhense toma com farinha e camarão seco, ou com açúcar. No Maracanã, as barracas servem a juçara fresca o ano todo, e em outubro a festa da juçara enche o parque.",
     info: {
       horario: "Barracas abertas principalmente de manhã e nos fins de semana (exemplo)",
-      preco: "Tigela a partir de R$ 15 (exemplo)",
+      faixa: { min: 15, max: 30, por: "a tigela" },
       duracao: "1 hora",
       dicas: ["Peça com farinha d'água e camarão seco para provar do jeito local."],
     },
@@ -221,7 +244,7 @@ export const lugares: Lugar[] = [
       "Restaurante fictício criado para o MVP. Serve a cozinha maranhense do dia a dia: arroz de cuxá feito com vinagreira, gergelim e camarão seco, peixe-pedra frito e torta de camarão.",
     info: {
       horario: "Almoço todos os dias (exemplo)",
-      preco: "Prato a partir de R$ 50 (exemplo)",
+      faixa: { min: 50, max: 80, por: "o prato" },
       duracao: "1 hora e meia",
       dicas: ["Peça o cuxá como acompanhamento do peixe."],
     },
@@ -245,7 +268,7 @@ export const lugares: Lugar[] = [
       "Pousada fictícia criada para o MVP. Fica num casarão do Centro Histórico, com pé-direito alto e café da manhã com frutas da região.",
     info: {
       horario: "Check-in a partir das 14h (exemplo)",
-      preco: "Diária a partir de R$ 280 (exemplo)",
+      faixa: { min: 280, max: 450, por: "a diária" },
       duracao: "—",
       dicas: ["Bom para quem quer fazer tudo a pé no Centro."],
     },
@@ -263,14 +286,14 @@ export const lugares: Lugar[] = [
     slug: "lagoa-azul",
     nome: "Lagoa Azul",
     destino: "barreirinhas",
-    categoria: "lagoas-praias",
+    categoria: "lencois",
     tipo: "atrativo",
     resumo: "O circuito clássico dos Lençóis, com várias lagoas próximas umas das outras.",
     descricao:
       "O circuito da Lagoa Azul é o mais procurado saindo de Barreirinhas. A caminhonete atravessa o Rio Preguiças de balsa e segue pela areia até a entrada do parque. Dali, a caminhada entre as lagoas é curta e tranquila.",
     info: {
       horario: "Saídas de manhã e à tarde (exemplo)",
-      preco: "Passeio a partir de R$ 100 por pessoa (exemplo)",
+      faixa: { min: 100, max: 160, por: "por pessoa, no passeio" },
       duracao: "Cerca de 4 horas",
       dicas: [
         "As lagoas ficam cheias de junho a setembro.",
@@ -290,14 +313,14 @@ export const lugares: Lugar[] = [
     slug: "lagoa-bonita",
     nome: "Lagoa Bonita",
     destino: "barreirinhas",
-    categoria: "lagoas-praias",
+    categoria: "lencois",
     tipo: "atrativo",
     resumo: "Duna alta logo na entrada e vista aberta para o pôr do sol.",
     descricao:
       "O circuito da Lagoa Bonita começa com a subida de uma duna alta (há corda para ajudar). Lá de cima a vista dos Lençóis é uma das mais bonitas da região, principalmente no fim da tarde.",
     info: {
       horario: "Saídas principalmente à tarde, para o pôr do sol (exemplo)",
-      preco: "Passeio a partir de R$ 120 por pessoa (exemplo)",
+      faixa: { min: 120, max: 200, por: "por pessoa, no passeio" },
       duracao: "Cerca de 4 horas",
       dicas: ["A subida da duna é curta, mas íngreme.", "Fique até o sol se pôr."],
     },
@@ -313,7 +336,7 @@ export const lugares: Lugar[] = [
     slug: "vassouras",
     nome: "Vassouras",
     destino: "barreirinhas",
-    categoria: "natureza",
+    categoria: "lencois",
     tipo: "atrativo",
     resumo: "Pequenas dunas na beira do Preguiças e macacos-prego por perto.",
     descricao:
@@ -336,14 +359,14 @@ export const lugares: Lugar[] = [
     slug: "mandacaru",
     nome: "Mandacaru",
     destino: "barreirinhas",
-    categoria: "cultura",
+    categoria: "lencois",
     tipo: "atrativo",
     resumo: "Povoado com o Farol Preguiças e vista da foz do rio.",
     descricao:
       "Vila de pescadores perto da foz do Preguiças. Subindo o farol, dá para ver o rio encontrando o mar e as dunas ao redor. Tem barracas com artesanato de fibra de buriti.",
     info: {
       horario: "Parada do passeio pelo rio",
-      preco: "Subida do farol a partir de R$ 5 (exemplo)",
+      faixa: { min: 5, max: 10, por: "a subida do farol" },
       duracao: "40 minutos",
       dicas: ["A escada do farol é estreita."],
     },
@@ -359,7 +382,7 @@ export const lugares: Lugar[] = [
     slug: "cabure",
     nome: "Caburé",
     destino: "barreirinhas",
-    categoria: "lagoas-praias",
+    categoria: "lencois",
     tipo: "atrativo",
     resumo: "Faixa de areia entre o rio e o mar, parada para almoço no passeio do Preguiças.",
     descricao:
@@ -390,7 +413,7 @@ export const lugares: Lugar[] = [
       "Restaurante fictício criado para o MVP, na orla de Barreirinhas, com mesas de frente para o rio.",
     info: {
       horario: "Almoço e jantar (exemplo)",
-      preco: "Prato a partir de R$ 60 (exemplo)",
+      faixa: { min: 60, max: 100, por: "o prato" },
       duracao: "1 hora e meia",
       dicas: ["Bom para o jantar depois do passeio da Lagoa Bonita."],
     },
@@ -414,7 +437,7 @@ export const lugares: Lugar[] = [
       "Pousada fictícia criada para o MVP. Chalés de madeira, redário e deque para banho de rio.",
     info: {
       horario: "Check-in a partir das 14h (exemplo)",
-      preco: "Diária a partir de R$ 350 (exemplo)",
+      faixa: { min: 350, max: 560, por: "a diária" },
       duracao: "—",
       dicas: ["As agências buscam os hóspedes na pousada para os passeios."],
     },
@@ -432,7 +455,7 @@ export const lugares: Lugar[] = [
     slug: "praia-de-atins",
     nome: "Praia de Atins",
     destino: "atins",
-    categoria: "lagoas-praias",
+    categoria: "lencois",
     tipo: "atrativo",
     resumo: "Praia larga e ventosa, ponto dos praticantes de kitesurf.",
     descricao:
@@ -462,7 +485,7 @@ export const lugares: Lugar[] = [
       "Área nos limites do parque, perto das dunas, conhecida pelos almoços de camarão servidos depois de um dia nas lagoas. O acesso é de 4x4 ou quadriciclo.",
     info: {
       horario: "Almoço (exemplo)",
-      preco: "Prato a partir de R$ 70 (exemplo)",
+      faixa: { min: 70, max: 120, por: "o prato" },
       duracao: "2 horas",
       dicas: ["Combine o almoço com o passeio das lagoas da região."],
     },
@@ -486,7 +509,7 @@ export const lugares: Lugar[] = [
       "Pousada fictícia criada para o MVP, com bangalôs de palha e café da manhã com tapioca e juçara.",
     info: {
       horario: "Check-in a partir das 13h (exemplo)",
-      preco: "Diária a partir de R$ 420 (exemplo)",
+      faixa: { min: 420, max: 680, por: "a diária" },
       duracao: "—",
       dicas: ["Leve lanterna: as ruas de areia são escuras à noite."],
     },
@@ -504,14 +527,14 @@ export const lugares: Lugar[] = [
     slug: "lagoa-da-gaivota",
     nome: "Lagoa da Gaivota",
     destino: "santo-amaro",
-    categoria: "lagoas-praias",
+    categoria: "lencois",
     tipo: "atrativo",
     resumo: "Uma das maiores lagoas dos Lençóis, perto de Santo Amaro.",
     descricao:
       "Lagoa grande e funda, cercada de dunas altas. O passeio sai de Santo Amaro de 4x4 e costuma ter menos gente que os circuitos de Barreirinhas.",
     info: {
       horario: "Saídas de manhã e à tarde (exemplo)",
-      preco: "Passeio a partir de R$ 120 por pessoa (exemplo)",
+      faixa: { min: 120, max: 200, por: "por pessoa, no passeio" },
       duracao: "Cerca de 4 horas",
       dicas: ["Lagoas cheias de junho a setembro."],
     },
@@ -527,14 +550,14 @@ export const lugares: Lugar[] = [
     slug: "betania",
     nome: "Betânia e o Rio Alegre",
     destino: "santo-amaro",
-    categoria: "natureza",
+    categoria: "lencois",
     tipo: "atrativo",
     resumo: "Povoado às margens de um rio de água escura, encostado nas dunas.",
     descricao:
       "Povoado tranquilo onde o Rio Alegre corre ao lado das dunas. Bom para banho de rio e para ver como vivem as comunidades dentro do parque.",
     info: {
       horario: "Passeio de dia inteiro (exemplo)",
-      preco: "Passeio a partir de R$ 150 por pessoa (exemplo)",
+      faixa: { min: 150, max: 240, por: "por pessoa, no passeio" },
       duracao: "Dia inteiro",
       dicas: ["Leve dinheiro: não há caixa eletrônico."],
     },
@@ -607,7 +630,7 @@ export const lugares: Lugar[] = [
       "Complexo turístico ao norte de Carolina, com trilhas, tirolesa e a cachoeira do Santuário, que cai dentro de um cânion estreito. É uma das imagens mais conhecidas da Chapada.",
     info: {
       horario: "Aberto todos os dias, com trilhas em horários marcados (exemplo)",
-      preco: "Entrada a partir de R$ 80 (exemplo)",
+      faixa: { min: 80, max: 130, por: "a entrada" },
       duracao: "Dia inteiro",
       dicas: [
         "Agende as trilhas com antecedência na alta temporada.",
@@ -633,7 +656,7 @@ export const lugares: Lugar[] = [
       "Cachoeira com um poço de cor intensa, cercado por paredões e vegetação. Fica na região de Riachão, com acesso por estrada de terra.",
     info: {
       horario: "Durante o dia (exemplo)",
-      preco: "Entrada a partir de R$ 30 (exemplo)",
+      faixa: { min: 30, max: 60, por: "a entrada" },
       duracao: "Meio dia",
       dicas: ["Estrada de terra: carro alto ou passeio com agência."],
     },
@@ -656,7 +679,7 @@ export const lugares: Lugar[] = [
       "Poço natural de água muito clara, com fundo de areia e pedras visíveis. Fica na região de Riachão e costuma entrar no mesmo dia que outros atrativos próximos.",
     info: {
       horario: "Durante o dia (exemplo)",
-      preco: "Entrada a partir de R$ 30 (exemplo)",
+      faixa: { min: 30, max: 60, por: "a entrada" },
       duracao: "2 horas",
       dicas: ["A água é mais clara no meio da seca."],
     },
@@ -702,7 +725,7 @@ export const lugares: Lugar[] = [
       "Uma das grandes cachoeiras do Parque Nacional da Chapada das Mesas, com queda larga e volume que muda bastante entre a chuva e a seca.",
     info: {
       horario: "Durante o dia, com guia (exemplo)",
-      preco: "Passeio a partir de R$ 150 por pessoa (exemplo)",
+      faixa: { min: 150, max: 240, por: "por pessoa, no passeio" },
       duracao: "Dia inteiro",
       dicas: ["Acesso por estrada de terra longa: vá com agência."],
     },
@@ -726,7 +749,7 @@ export const lugares: Lugar[] = [
       "Pousada fictícia criada para o MVP, com café da manhã regional e saída das agências na porta.",
     info: {
       horario: "Check-in a partir das 14h (exemplo)",
-      preco: "Diária a partir de R$ 220 (exemplo)",
+      faixa: { min: 220, max: 360, por: "a diária" },
       duracao: "—",
       dicas: ["Boa base para os passeios de Carolina e Riachão."],
     },
@@ -750,7 +773,7 @@ export const lugares: Lugar[] = [
       "Restaurante fictício criado para o MVP, com comida caseira servida no fogão a lenha.",
     info: {
       horario: "Almoço e jantar (exemplo)",
-      preco: "Prato a partir de R$ 45 (exemplo)",
+      faixa: { min: 45, max: 90, por: "o prato" },
       duracao: "1 hora",
       dicas: ["Peça a paçoca de carne de sol."],
     },
@@ -775,7 +798,7 @@ export const lugares: Lugar[] = [
       "O Delta do Parnaíba, chamado de Delta das Américas, tem dezenas de ilhas entre o Maranhão e o Piauí. O passeio de barco passa por igarapés, dunas e, no fim da tarde, pela revoada dos guarás.",
     info: {
       horario: "Passeios de dia inteiro, conforme a maré (exemplo)",
-      preco: "Passeio a partir de R$ 180 por pessoa (exemplo)",
+      faixa: { min: 180, max: 290, por: "por pessoa, no passeio" },
       duracao: "Dia inteiro",
       dicas: ["A revoada dos guarás acontece no fim da tarde."],
     },

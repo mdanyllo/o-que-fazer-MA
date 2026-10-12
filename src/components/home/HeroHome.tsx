@@ -10,9 +10,9 @@ import {
 } from "motion/react";
 import { useEffect, useId, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { Selo } from "@/components/azulejo/etiquetas";
-import { Foto } from "@/components/azulejo/Foto";
 import { PadraoAzulejo } from "@/components/azulejo/PadraoAzulejo";
 import { TituloAnimado } from "@/components/movimento/TituloAnimado";
+import { CarrosselHero } from "./CarrosselHero";
 import { destinos } from "@/data";
 import { cn } from "@/lib/utils";
 
@@ -64,9 +64,6 @@ export function HeroHome() {
         style={camadas.estilo("texto")}
         className="relative z-10 flex min-w-0 flex-col justify-center gap-6 px-5 pt-8 pb-12 md:px-12 md:pt-12 lg:pt-12 lg:pr-10 lg:pb-18 lg:pl-[max(48px,calc((100cqw-1280px)/2+48px))]"
       >
-        <Selo className="entra self-start rounded-[4px] px-3 py-1.5 text-[0.8125rem] font-bold">
-          Guia do Maranhão
-        </Selo>
         <TituloAnimado
           texto={"O Maranhão,\num azulejo de\ncada vez"}
           final={<span className="text-guara">.</span>}
@@ -159,7 +156,7 @@ export function HeroHome() {
         </div>
       </motion.div>
 
-      {/* direita: painel cobalto até a borda, foto inteira e legenda */}
+      {/* direita: painel cobalto até a borda e carrossel de destaques */}
       <div className="relative flex min-w-0 items-center px-5 pt-20 pb-6 md:px-12 lg:py-[clamp(48px,5vw,80px)] lg:pr-[clamp(40px,6vw,96px)] lg:pl-0">
         <div
           aria-hidden
@@ -185,28 +182,9 @@ export function HeroHome() {
             style={seq(1000)}
           />
         </motion.div>
-        <motion.figure
-          style={camadas.estilo("foto")}
-          className="relative m-0 flex w-full flex-col gap-3.5"
-        >
-          <Foto
-            src="/images/home/hero.jpg"
-            alt="Dunas brancas e lagoas azuis dos Lençóis Maranhenses vistas do alto"
-            rotulo="Lençóis Maranhenses"
-            cor="lagoa"
-            prioridade
-            entrada
-            parallax
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            className="aspect-[4/3] w-full rounded-[10px] lg:aspect-auto lg:h-[clamp(400px,42vw,600px)]"
-          />
-          <figcaption
-            className="entra self-end text-[0.875rem] font-bold text-sobre-faixa"
-            style={seq(1300)}
-          >
-            Lençóis Maranhenses, Barreirinhas
-          </figcaption>
-        </motion.figure>
+        <motion.div style={camadas.estilo("foto")} className="relative w-full">
+          <CarrosselHero />
+        </motion.div>
       </div>
     </section>
   );

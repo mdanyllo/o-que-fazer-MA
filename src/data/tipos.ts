@@ -6,7 +6,7 @@
  */
 
 export type CategoriaId =
-  "lagoas-praias" | "cultura" | "natureza" | "gastronomia" | "festas" | "hospedagem";
+  "lencois" | "lagoas-praias" | "cultura" | "natureza" | "gastronomia" | "festas" | "hospedagem";
 
 /** 1 = barato/gratuito, 2 = médio, 3 = mais caro. Faixas de exemplo. */
 export type FaixaPreco = 1 | 2 | 3;
@@ -36,9 +36,15 @@ export type Destino = Coordenada & {
   tags: string[];
 };
 
+/** Faixa de preço em reais, de exemplo. `por` diz a unidade: "por pessoa", "a diária"… */
+export type FaixaValores = { min: number; max: number; por: string };
+
 export type InfoPratica = {
   horario: string;
-  preco: string;
+  /** preço numérico, mostrado como "R$ 100,00 – R$ 160,00" */
+  faixa?: FaixaValores;
+  /** texto livre quando não há faixa ("Gratuito", "Incluído no passeio"…) */
+  preco?: string;
   duracao: string;
   dicas: string[];
 };
