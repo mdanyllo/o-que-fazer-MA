@@ -20,8 +20,12 @@ const porCaminho = new Map(
   ]),
 );
 
-/** URL final da foto, ou undefined se ela ainda não existe. Aceita qualquer extensão. */
+/**
+ * URL final da foto, ou undefined se ela ainda não existe. Aceita qualquer extensão.
+ * URLs completas (fotos enviadas pelos negócios, no Storage) passam direto.
+ */
 export function urlFoto(caminho: string | undefined) {
   if (!caminho) return undefined;
+  if (/^https?:\/\//.test(caminho)) return caminho;
   return porCaminho.get(caminho.replace(EXTENSAO, ""));
 }

@@ -1,48 +1,60 @@
-import { Navigation } from "lucide-react";
-import type { Coordenada } from "@/data";
+import { Car, MapPinned, Navigation } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { botao } from "./botao";
 
 /**
- * Botões que abrem o Google Maps ou o Waze com a rota da posição atual até o ponto.
- * Quem traça a rota é o app de mapas; o site não pede a localização aqui.
+ * "Como chegar": abre o ponto no Google Maps, no Waze ou no Uber (no celular, no app;
+ * no computador, no site). Só links, sem chave de API.
  */
 export function ComoChegar({
-  destino,
+  lat,
+  lng,
   nome,
   className,
 }: {
-  destino: Coordenada;
+  lat: number;
+  lng: number;
   nome: string;
   className?: string;
 }) {
-  const ll = `${destino.lat},${destino.lng}`;
+  const ponto = `${lat},${lng}`;
+  const uber = new URLSearchParams({
+    action: "setPickup",
+    pickup: "my_location",
+    "dropoff[latitude]": String(lat),
+    "dropoff[longitude]": String(lng),
+    "dropoff[nickname]": nome,
+  });
+  const destinos = [
+    {
+      rotulo: "Google Maps",
+      icone: <MapPinned aria-hidden />,
+      href: `https://www.google.com/maps/dir/?api=1&destination=${ponto}`,
+    },
+    {
+      rotulo: "Waze",
+      icone: <Navigation aria-hidden />,
+      href: `https://waze.com/ul?ll=${ponto}&navigate=yes`,
+    },
+    { rotulo: "Uber", icone: <Car aria-hidden />, href: `https://m.uber.com/ul/?${uber}` },
+  ];
   return (
     <div className={cn("flex flex-col gap-2", className)}>
-      <div className="flex flex-wrap gap-2">
-        <a
-          href={`https://www.google.com/maps/dir/?api=1&destination=${ll}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`Como chegar a ${nome} pelo Google Maps (abre em nova aba)`}
-          className={cn(botao(), "flex-1")}
-        >
-          <Navigation /> Como chegar
-        </a>
-        <a
-          href={`https://waze.com/ul?ll=${ll}&navigate=yes`}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`Como chegar a ${nome} pelo Waze (abre em nova aba)`}
-          className={botao({ variante: "secundario" })}
-        >
-          Waze
-        </a>
+      <p className="text-rotulo">Como chegar</p>
+      <div className="grid grid-cols-3 gap-2">
+        {destinos.map((d) => (
+          <a
+            key={d.rotulo}
+            href={d.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(botao({ variante: "secundario" }), "px-2 text-legenda [&_svg]:size-4")}
+          >
+            {d.icone} {d.rotulo}
+            <span className="sr-only"> (abre em outra aba)</span>
+          </a>
+        ))}
       </div>
-      <p className="text-legenda text-ink-suave">
-        Abre a rota no app de mapas, saindo de onde você está. Em alguns lugares o último trecho é
-        de 4x4 ou barco.
-      </p>
     </div>
   );
 }

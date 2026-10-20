@@ -1,6 +1,7 @@
+import type { Catalogo } from "@/data/catalogo";
 import {
+  ehOndeComerOuFicar,
   getDestino,
-  itensDoDestino,
   nomeDestino,
   type CategoriaId,
   type DiaRoteiro,
@@ -80,7 +81,10 @@ function deslocamento(de: string, tempoDaCapital: string) {
   return `Saindo de ${nomeDestino(de)}. Combine o transfer ou o barco com antecedência`;
 }
 
-export function gerarRoteiro(r: Respostas): { titulo: string; resumo: string; dias: DiaRoteiro[] } {
+export function gerarRoteiro(
+  r: Respostas,
+  { itensDoDestino }: Catalogo,
+): { titulo: string; resumo: string; dias: DiaRoteiro[] } {
   const porDia = PARADAS_POR_DIA[r.ritmo];
   const precoMax = PRECO_MAXIMO[r.orcamento];
   const plano = distribuir(r.dias, escolherDestinos(r));
@@ -94,14 +98,10 @@ export function gerarRoteiro(r: Respostas): { titulo: string; resumo: string; di
       (i.tipo === "experiencia" ? 1 : 0) +
       (r.mes && i.mesesBons.includes(r.mes) ? 1 : 0);
     const candidatos = todos
-      .filter(
-        (i) => i.horas > 0 && i.categoria !== "hospedagem" && !(i.tipo === "lugar" && i.ficticio),
-      )
+      .filter((i) => i.horas > 0 && i.categoria !== "hospedagem" && !ehOndeComerOuFicar(i))
       .filter((i) => i.faixaPreco <= precoMax)
       .sort((a, b) => pontua(b) - pontua(a));
-    const restaurantes = todos.filter(
-      (i) => i.tipo === "lugar" && i.ficticio && i.categoria === "gastronomia",
-    );
+    const restaurantes = todos.filter((i) => i.negocio === "restaurante");
     const destinoInfo = getDestino(destino);
 
     for (let k = 0; k < n; k++) {
@@ -129,7 +129,7 @@ export function gerarRoteiro(r: Respostas): { titulo: string; resumo: string; di
           : {}),
         paradas,
         ...(restaurantes.length
-          ? { ondeComer: restaurantes.map((x) => `${x.nome} (exemplo)`) }
+          ? { ondeComer: restaurantes.map((x) => (x.exemplo ? `${x.nome} (exemplo)` : x.nome)) }
           : {}),
       });
     }

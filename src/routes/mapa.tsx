@@ -3,16 +3,10 @@ import { Route as RouteIcon, X } from "lucide-react";
 import { useId, useMemo } from "react";
 import { Chip } from "@/components/azulejo/etiquetas";
 import { MapaInterativo } from "@/components/mapa/MapaInterativo";
+import { AvisoNegocios } from "@/components/site/AvisoNegocios";
 import { PageShell } from "@/components/site/PageShell";
-import {
-  categorias,
-  getRoteiro,
-  itens,
-  nomeDestino,
-  pontosDoRoteiro,
-  roteiros,
-  type CategoriaId,
-} from "@/data";
+import { categorias, getRoteiro, nomeDestino, roteiros, type CategoriaId } from "@/data";
+import { useCatalogo } from "@/lib/use-catalogo";
 
 type BuscaMapa = { categoria?: CategoriaId; roteiro?: string };
 
@@ -44,6 +38,7 @@ function PaginaMapa() {
   const navigate = Route.useNavigate();
   const idRoteiro = useId();
   const roteiro = busca.roteiro ? getRoteiro(busca.roteiro) : undefined;
+  const { itens, negociosOk, pontosDoRoteiro } = useCatalogo();
 
   const { pontos, rota } = useMemo(() => {
     if (roteiro) {
@@ -55,7 +50,7 @@ function PaginaMapa() {
       (i) => i.tipo === "lugar" && (!busca.categoria || i.categoria === busca.categoria),
     );
     return { pontos: p, rota: undefined };
-  }, [roteiro, busca.categoria]);
+  }, [roteiro, busca.categoria, itens, pontosDoRoteiro]);
 
   const atualizar = (m: { categoria?: CategoriaId | undefined; roteiro?: string | undefined }) =>
     navigate({
@@ -137,6 +132,10 @@ function PaginaMapa() {
                   </Chip>
                 ))}
             </div>
+          )}
+
+          {!negociosOk && (
+            <AvisoNegocios className="pointer-events-auto self-start bg-louca shadow-flutua md:max-w-xl" />
           )}
 
           {roteiro && (

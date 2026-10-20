@@ -14,7 +14,9 @@ import { MapaInterativo } from "@/components/mapa/MapaInterativo";
 import { LinhaDoTempo } from "@/components/paginas/LinhaDoTempo";
 import { Pagina404 } from "@/components/site/Pagina404";
 import { PageShell } from "@/components/site/PageShell";
-import { getRoteiro, nomeDestino, pontosDoRoteiro, roteiros } from "@/data";
+import { AvisoNegocios } from "@/components/site/AvisoNegocios";
+import { getRoteiro, nomeDestino, roteiros } from "@/data";
+import { useCatalogo } from "@/lib/use-catalogo";
 import { salvarRoteiro } from "@/lib/minha-viagem";
 
 export const Route = createFileRoute("/roteiros/$slug")({
@@ -47,6 +49,7 @@ export const Route = createFileRoute("/roteiros/$slug")({
 function PaginaRoteiro() {
   const { roteiro } = Route.useLoaderData();
   const navigate = useNavigate();
+  const { negociosOk, pontosDoRoteiro } = useCatalogo();
   const pontos = pontosDoRoteiro(roteiro.dias);
   const outros = roteiros.filter((r) => r.slug !== roteiro.slug).slice(0, 2);
 
@@ -67,7 +70,7 @@ function PaginaRoteiro() {
 
   return (
     <PageShell>
-      <div className="mx-auto max-w-7xl px-5 pt-8 md:px-12 md:pt-12">
+      <div className="mx-auto max-w-site px-site pt-8 md:pt-12">
         <nav aria-label="Você está em" className="text-legenda text-ink-suave">
           <ol className="flex items-center gap-1">
             <li>
@@ -142,11 +145,12 @@ function PaginaRoteiro() {
         </dl>
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-12 px-5 py-12 md:px-12 md:py-20 lg:grid-cols-[1.25fr_1fr]">
+      <div className="mx-auto grid max-w-site gap-12 px-site py-12 md:py-20 lg:grid-cols-[1.25fr_1fr]">
         <section aria-labelledby="dia-a-dia" className="min-w-0">
           <h2 id="dia-a-dia" className="mb-8 text-t1">
             Dia a dia
           </h2>
+          {!negociosOk && <AvisoNegocios className="mb-8" />}
           <LinhaDoTempo dias={roteiro.dias} />
           <button type="button" onClick={usar} className={`${botao({ tamanho: "lg" })} mt-10`}>
             Usar este roteiro
@@ -167,7 +171,7 @@ function PaginaRoteiro() {
       </div>
 
       <section aria-labelledby="outros" className="bg-areia">
-        <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-12 md:px-12 md:py-20">
+        <div className="mx-auto flex max-w-site flex-col gap-8 px-site py-12 md:py-20">
           <SecaoTitulo id="outros" titulo="Outros roteiros" />
           <GradeRevelar colunas={2} className="grid gap-6 md:grid-cols-2">
             {outros.map((r) => (

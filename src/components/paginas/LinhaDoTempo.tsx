@@ -4,7 +4,9 @@ import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { MarcaCategoria } from "@/components/azulejo/etiquetas";
 import { Revelar } from "@/components/movimento/Revelar";
-import { formatarHoras, nomeDestino, resolverParada, type DiaRoteiro } from "@/data";
+import { formatarHoras, nomeDestino, type DiaRoteiro } from "@/data";
+import { useMarcarExemplo } from "@/lib/aviso-exemplo";
+import { useCatalogo } from "@/lib/use-catalogo";
 
 /** Linha do tempo dia a dia de um roteiro. `acoesParada` permite editar (Minha viagem/planejador). */
 export function LinhaDoTempo({
@@ -16,6 +18,9 @@ export function LinhaDoTempo({
   acoesParada?: (dia: number, parada: number) => ReactNode;
   rodapeDia?: (dia: number) => ReactNode;
 }) {
+  const { resolverParada } = useCatalogo();
+  const temExemplo = dias.some((d) => d.paradas.some((p) => resolverParada(p)?.exemplo));
+  useMarcarExemplo(temExemplo);
   return (
     <ol className="flex flex-col">
       {dias.map((dia, d) => (

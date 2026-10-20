@@ -7,6 +7,7 @@ import { CardItem } from "@/components/azulejo/cards";
 import { Chip } from "@/components/azulejo/etiquetas";
 import { PadraoAzulejo } from "@/components/azulejo/PadraoAzulejo";
 import { MapaInterativo } from "@/components/mapa/MapaInterativo";
+import { AvisoNegocios } from "@/components/site/AvisoNegocios";
 import { CabecalhoPagina, PageShell } from "@/components/site/PageShell";
 import {
   Drawer,
@@ -22,7 +23,6 @@ import {
   distanciaKm,
   FAIXAS,
   formatarDistancia,
-  itens,
   MESES,
   nomeDestino,
   type Coordenada,
@@ -31,6 +31,7 @@ import {
 } from "@/data";
 import { validarBuscaExplorar, type BuscaExplorar } from "@/lib/busca";
 import { POSICAO_RESERVA, useLocalizacao, type Localizacao } from "@/lib/localizacao";
+import { useCatalogo } from "@/lib/use-catalogo";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/explorar")({
@@ -73,7 +74,7 @@ function AvisoLocalizacao({ status }: { status: Localizacao["status"] }) {
   return <span className="text-legenda">{AVISOS[status]}</span>;
 }
 
-function filtrar(busca: BuscaExplorar, origem: Coordenada) {
+function filtrar(busca: BuscaExplorar, itens: Item[], origem: Coordenada) {
   const q = busca.q ? normalizar(busca.q) : "";
   let lista: (Item & { km?: number })[] = itens.filter((i) => {
     if (busca.categoria && i.categoria !== busca.categoria) return false;
@@ -105,8 +106,12 @@ function filtrar(busca: BuscaExplorar, origem: Coordenada) {
 function Explorar() {
   const busca = Route.useSearch();
   const navigate = useNavigate({ from: "/explorar" });
+  const { itens, negociosOk } = useCatalogo();
   const local = useLocalizacao(Boolean(busca.perto));
-  const resultado = useMemo(() => filtrar(busca, local.posicao), [busca, local.posicao]);
+  const resultado = useMemo(
+    () => filtrar(busca, itens, local.posicao),
+    [busca, itens, local.posicao],
+  );
   const ver = busca.ver ?? "lista";
 
   const atualizar = (mudanca: Mudanca) =>
@@ -134,7 +139,7 @@ function Explorar() {
       />
 
       <div className="sticky top-16 z-30 border-y border-linha bg-louca/95 backdrop-blur-sm md:top-20">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-5 py-3 md:px-12">
+        <div className="mx-auto flex max-w-site flex-wrap items-center gap-3 px-site py-3">
           <CampoBusca valor={busca.q ?? ""} aoMudar={(q) => atualizar({ q: q || undefined })} />
           <Chip
             ativo={Boolean(busca.perto)}
@@ -202,7 +207,7 @@ function Explorar() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-8 md:px-12 md:py-12 lg:grid-cols-[260px_1fr]">
+      <div className="mx-auto grid max-w-site gap-10 px-site py-8 md:py-12 lg:grid-cols-[260px_1fr]">
         <aside aria-label="Filtros" className="hidden lg:block">
           <div className="sticky top-44">
             <Filtros busca={busca} atualizar={atualizar} />
@@ -219,6 +224,7 @@ function Explorar() {
         </aside>
 
         <section aria-label="Resultados" className="min-w-0">
+          {!negociosOk && <AvisoNegocios className="mb-6" />}
           <p aria-live="polite" className="mb-6 text-ink-suave">
             <strong className="text-ink">{resultado.length}</strong>{" "}
             {resultado.length === 1 ? "lugar ou experiência" : "lugares e experiências"}

@@ -1,4 +1,15 @@
-import { CalendarCheck, Check, Clock, Lightbulb, MessageCircle, Star, Wallet } from "lucide-react";
+import {
+  CalendarCheck,
+  Check,
+  Clock,
+  Globe,
+  Instagram,
+  Lightbulb,
+  MessageCircle,
+  Star,
+  Wallet,
+} from "lucide-react";
+import { registrarEvento, useEhPrevia } from "@/lib/estatisticas";
 import { useId, useState, type FormEvent, type ReactNode } from "react";
 import { toast } from "sonner";
 import {
@@ -13,8 +24,25 @@ import { formatarFaixa, nomeDestino } from "@/data";
 import { botao } from "./botao";
 import { PontoGuara, Tag } from "./etiquetas";
 
-/** Ficha de informações práticas (horário, preço, duração) + dicas. */
-export function InfoPraticas({ info, extra }: { info: InfoPratica; extra?: ReactNode }) {
+/**
+ * Ficha de informações práticas (horário, preço, duração) + dicas. Linhas sem valor somem.
+ * `exemplo`: dados ilustrativos (atrativos e negócios de exemplo) ou de um negócio real.
+ */
+export function InfoPraticas({
+  info,
+  extra,
+  acao,
+  compartilhar,
+  exemplo = true,
+}: {
+  info: InfoPratica;
+  extra?: ReactNode;
+  /** botão no fim da ficha (ex.: Falar no WhatsApp) */
+  acao?: ReactNode;
+  /** botão ao lado do título (Compartilhar) */
+  compartilhar?: ReactNode;
+  exemplo?: boolean;
+}) {
   const linhas: [ReactNode, string, string][] = [
     [<Clock key="h" className="size-5" />, "Horário", info.horario],
     [
@@ -26,7 +54,10 @@ export function InfoPraticas({ info, extra }: { info: InfoPratica; extra?: React
   ];
   return (
     <div className="rounded-md bg-areia p-5 md:p-6">
-      <h2 className="text-t3">Informações práticas</h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-t3">Informações práticas</h2>
+        {compartilhar}
+      </div>
       <dl className="mt-4 divide-y divide-linha">
         {linhas
           .filter(([, , v]) => v && v !== "—")
@@ -57,9 +88,105 @@ export function InfoPraticas({ info, extra }: { info: InfoPratica; extra?: React
           </ul>
         </div>
       )}
+      {acao && <div className="mt-5">{acao}</div>}
       <p className="mt-4 text-legenda text-ink-suave">
-        Horários e preços são de exemplo. Confirme com quem oferece antes de ir.
+        {exemplo
+          ? "Horários e preços são de exemplo. Confirme com quem oferece antes de ir."
+          : "Confirme horários e valores com o estabelecimento antes de ir."}
       </p>
+    </div>
+  );
+}
+
+/** Linha extra da ficha de informações práticas. */
+export function LinhaInfo({
+  icone,
+  rotulo,
+  children,
+}: {
+  icone: ReactNode;
+  rotulo: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="flex gap-3 py-3">
+      <span className="mt-0.5 text-cobalto [&_svg]:size-5" aria-hidden>
+        {icone}
+      </span>
+      <div>
+        <dt className="text-rotulo">{rotulo}</dt>
+        <dd className="text-base">{children}</dd>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Contatos do negócio: WhatsApp (com a mensagem pronta), Instagram e site. Cada clique conta
+ * nas estatísticas do plano Pro (fora da prévia do painel).
+ */
+export function ContatosNegocio({
+  negocioId,
+  nome,
+  whatsapp,
+  instagram,
+  site,
+}: {
+  negocioId: string;
+  nome: string;
+  whatsapp?: string | undefined;
+  instagram?: string | undefined;
+  site?: string | undefined;
+}) {
+  const previa = useEhPrevia();
+  const contar = (evento: "whatsapp" | "instagram" | "site") => () => {
+    if (!previa) registrarEvento(negocioId, evento);
+  };
+  const texto = `Olá! Vi ${nome} no Azulejo e gostaria de mais informações.`;
+  const linkSecundario =
+    "inline-flex min-h-11 items-center gap-2 font-bold text-cobalto underline-offset-4 hover:underline [&_svg]:size-5";
+  return (
+    <div className="flex flex-col gap-2">
+      {whatsapp && (
+        <a
+          href={`https://wa.me/${whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(texto)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={contar("whatsapp")}
+          className={`${botao({ tamanho: "lg" })} w-full`}
+        >
+          <MessageCircle aria-hidden /> Falar no WhatsApp
+          <span className="sr-only"> (abre em outra aba)</span>
+        </a>
+      )}
+      {(instagram || site) && (
+        <div className="flex flex-wrap gap-x-6">
+          {instagram && (
+            <a
+              href={`https://instagram.com/${instagram}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={contar("instagram")}
+              className={linkSecundario}
+            >
+              <Instagram aria-hidden /> @{instagram}
+              <span className="sr-only"> no Instagram (abre em outra aba)</span>
+            </a>
+          )}
+          {site && (
+            <a
+              href={site}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={contar("site")}
+              className={linkSecundario}
+            >
+              <Globe aria-hidden /> Site
+              <span className="sr-only"> de {nome} (abre em outra aba)</span>
+            </a>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -2,25 +2,27 @@ import { categoriaPorId, categorias } from "./categorias";
 import { destinos } from "./destinos";
 import { empresas } from "./empresas";
 import { eventos } from "./eventos";
-import { experiencias } from "./experiencias";
-import { lugares } from "./lugares";
+import { lugares as atrativos } from "./lugares";
 import { roteiros } from "./roteiros";
-import type { CategoriaId, Coordenada, FaixaPreco, FaixaValores, Mes, Parada } from "./tipos";
+import type { CategoriaId, Coordenada, FaixaPreco, FaixaValores, Mes, TipoNegocio } from "./tipos";
+
+/*
+ * Dados fixos do site: destinos, atrativos, roteiros, eventos e empresas fictícias.
+ * Restaurantes, hospedagens e passeios vêm do banco e entram pelo catálogo
+ * (src/data/catalogo.ts, useCatalogo() nas telas).
+ */
 
 export * from "./tipos";
-export { categorias, categoriaPorId, destinos, empresas, eventos, experiencias, lugares, roteiros };
+export { atrativos, categorias, categoriaPorId, destinos, empresas, eventos, roteiros };
 
-const porSlug = <T extends { slug: string }>(lista: T[]) => new Map(lista.map((i) => [i.slug, i]));
+export const porSlug = <T extends { slug: string }>(lista: T[]) =>
+  new Map(lista.map((i) => [i.slug, i]));
 
 const mapaDestinos = porSlug(destinos);
-const mapaLugares = porSlug(lugares);
-const mapaExperiencias = porSlug(experiencias);
 const mapaRoteiros = porSlug(roteiros);
 const mapaEmpresas = porSlug(empresas);
 
 export const getDestino = (slug: string) => mapaDestinos.get(slug);
-export const getLugar = (slug: string) => mapaLugares.get(slug);
-export const getExperiencia = (slug: string) => mapaExperiencias.get(slug);
 export const getRoteiro = (slug: string) => mapaRoteiros.get(slug);
 export const getEmpresa = (slug: string) => mapaEmpresas.get(slug);
 
@@ -96,7 +98,7 @@ export function formatarDistancia(km: number) {
 
 /**
  * Item comum de Explorar, do mapa e dos roteiros: um lugar ou uma experiência,
- * com o que os cards e pins precisam.
+ * com o que os cards e pins precisam. A lista completa está no catálogo.
  */
 export type Item = Coordenada & {
   tipo: "lugar" | "experiencia";
@@ -113,87 +115,22 @@ export type Item = Coordenada & {
   foto: string;
   tags: string[];
   ficticio?: boolean;
+  /** restaurante, hospedagem ou passeio vindo do banco; ausente nos atrativos */
+  negocio?: TipoNegocio;
+  /** negócio de exemplo (exemplo = true): liga o aviso do rodapé */
+  exemplo?: boolean;
+  /** id na tabela negocios (estatísticas de aparição) */
+  negocioId?: string;
+  /** dono com plano Pro: selo de verificado */
+  verificado?: boolean;
   href: "/lugares/$slug" | "/experiencias/$slug";
 };
 
-export const itens: Item[] = [
-  ...experiencias.map((x): Item => ({
-    tipo: "experiencia",
-    slug: x.slug,
-    nome: x.nome,
-    resumo: x.resumo,
-    destino: x.destino,
-    categoria: x.categoria,
-    faixaPreco: x.faixaPreco,
-    faixa: x.info.faixa,
-    preco: x.info.preco,
-    horas: x.horas,
-    mesesBons: x.mesesBons,
-    foto: x.foto,
-    tags: x.tags,
-    lat: x.lat,
-    lng: x.lng,
-    href: "/experiencias/$slug",
-  })),
-  ...lugares.map((x): Item => ({
-    tipo: "lugar",
-    slug: x.slug,
-    nome: x.nome,
-    resumo: x.resumo,
-    destino: x.destino,
-    categoria: x.categoria,
-    faixaPreco: x.faixaPreco,
-    faixa: x.info.faixa,
-    preco: x.info.preco,
-    horas: x.horas,
-    mesesBons: x.mesesBons,
-    foto: x.foto,
-    tags: x.tags,
-    ...(x.ficticio ? { ficticio: true } : {}),
-    lat: x.lat,
-    lng: x.lng,
-    href: "/lugares/$slug",
-  })),
-];
-
-const mapaItens = new Map(itens.map((i) => [`${i.tipo}:${i.slug}`, i]));
-
-export const getItem = (tipo: Item["tipo"], slug: string) => mapaItens.get(`${tipo}:${slug}`);
-export const resolverParada = (p: Parada) => getItem(p.ref.tipo, p.ref.slug);
-
-export const itensDoDestino = (destino: string) => itens.filter((i) => i.destino === destino);
+/** Restaurante ou hospedagem (fica fora de "o que fazer" e do planejador). */
+export const ehOndeComerOuFicar = (i: Item) =>
+  i.negocio === "restaurante" || i.negocio === "hospedagem";
 
 export const roteirosQuePassamPor = (destino: string) =>
   roteiros.filter((r) => r.destinos.includes(destino));
 
-export const roteirosQueIncluem = (tipo: Item["tipo"], slug: string) =>
-  roteiros.filter((r) =>
-    r.dias.some((d) => d.paradas.some((p) => p.ref.tipo === tipo && p.ref.slug === slug)),
-  );
-
 export const empresasDoDestino = (destino: string) => empresas.filter((x) => x.destino === destino);
-
-/** Pontos do roteiro, em ordem, sem repetir. */
-export function pontosDoRoteiro(dias: { paradas: Parada[] }[]) {
-  const vistos = new Set<string>();
-  const pontos: Item[] = [];
-  for (const d of dias)
-    for (const p of d.paradas) {
-      const item = resolverParada(p);
-      if (!item) continue;
-      const chave = `${item.lat},${item.lng}`;
-      if (vistos.has(chave)) continue;
-      vistos.add(chave);
-      pontos.push(item);
-    }
-  return pontos;
-}
-
-export function proximos(alvo: Coordenada & { slug: string }, limite = 4) {
-  return itens
-    .filter((i) => i.slug !== alvo.slug && i.horas > 0)
-    .map((i) => ({ item: i, km: distanciaKm(alvo, i) }))
-    .filter((x) => x.km < 60)
-    .sort((a, b) => a.km - b.km)
-    .slice(0, limite);
-}

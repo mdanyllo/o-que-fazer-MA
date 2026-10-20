@@ -2,30 +2,37 @@ import type { CSSProperties } from "react";
 import { TituloAnimado } from "@/components/movimento/TituloAnimado";
 import { GradeRevelar } from "@/components/movimento/Revelar";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Gauge } from "lucide-react";
+import { BedDouble, ChevronRight, Gauge, MapPin } from "lucide-react";
 import { useMemo } from "react";
 import { CardItem, CardRoteiro } from "@/components/azulejo/cards";
-import { corDaCategoria } from "@/components/azulejo/cores";
 import { ComoChegar } from "@/components/azulejo/ComoChegar";
-import { CardEmpresa, InfoPraticas } from "@/components/azulejo/detalhes";
+import { Compartilhar } from "@/components/azulejo/Compartilhar";
+import { corDaCategoria } from "@/components/azulejo/cores";
+import {
+  CardEmpresa,
+  ContatosNegocio,
+  InfoPraticas,
+  LinhaInfo,
+} from "@/components/azulejo/detalhes";
 import { MarcaCategoria, Tag } from "@/components/azulejo/etiquetas";
 import { Favoritar } from "@/components/azulejo/Favoritar";
 import { Foto } from "@/components/azulejo/Foto";
 import { SecaoTitulo } from "@/components/azulejo/SecaoTitulo";
 import { MapaInterativo } from "@/components/mapa/MapaInterativo";
+import { GaleriaNegocio } from "./GaleriaNegocio";
+import { SeloVerificado } from "@/components/azulejo/SeloVerificado";
+import { AcoesDono } from "@/components/painel/AcoesDono";
+import { useContarVisita } from "@/lib/estatisticas";
 import { PageShell } from "@/components/site/PageShell";
+import { useMarcarExemplo } from "@/lib/aviso-exemplo";
 import { urlFoto } from "@/lib/imagens";
+import { useCatalogo } from "@/lib/use-catalogo";
 import {
   categoriaPorId,
   empresasDoDestino,
-  experiencias,
   getDestino,
   getEmpresa,
-  getItem,
-  getLugar,
   nomeMes,
-  proximos,
-  roteirosQueIncluem,
   type Empresa,
   type Experiencia,
   type Item,
@@ -36,11 +43,26 @@ type Props = { tipo: "lugar"; dados: Lugar } | { tipo: "experiencia"; dados: Exp
 
 /** Página de um lugar ou de uma experiência. */
 export function PaginaItem(props: Props) {
+  return (
+    <PageShell>
+      <ConteudoItem {...props} />
+    </PageShell>
+  );
+}
+
+/**
+ * O conteúdo da página, sem header e rodapé. Também é a prévia "Como vai aparecer" do painel
+ * (com `itemPrevia`, porque o negócio ainda não está no catálogo).
+ */
+export function ConteudoItem(props: Props & { itemPrevia?: Item }) {
   const { tipo, dados } = props;
+  const { experiencias, getItem, getLugar, proximos, roteirosQueIncluem } = useCatalogo();
+  useMarcarExemplo(dados.exemplo);
+  useContarVisita(dados.negocio?.id);
   const destino = getDestino(dados.destino);
   const categoria = categoriaPorId[dados.categoria];
   const cor = corDaCategoria(dados.categoria);
-  const item = getItem(tipo, dados.slug) as Item;
+  const item = props.itemPrevia ?? getItem(tipo, dados.slug);
 
   // lugares por onde a experiência passa
   const paradas =
@@ -61,7 +83,7 @@ export function PaginaItem(props: Props) {
       (e) => e.tipo === "Guia" || e.tipo === "Agência",
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dados.slug]);
+  }, [dados.slug, experiencias]);
 
   const experienciasAqui =
     props.tipo === "lugar" ? experiencias.filter((x) => x.lugares.includes(dados.slug)) : [];
@@ -70,13 +92,23 @@ export function PaginaItem(props: Props) {
   const perto = proximos(dados, 8)
     .filter((p) => p.km > 0.3 && !paradas.some((l) => l.slug === p.item.slug))
     .slice(0, 3);
-  const pontosMapa = [
-    item,
-    ...paradas.map((l) => getItem("lugar", l.slug) as Item),
-    ...perto.map((p) => p.item),
-  ].filter((p, i, arr) => arr.findIndex((x) => x.lat === p.lat && x.lng === p.lng) === i);
+  // negócio do banco: galeria, ficha e mapa só com o que é dele
+  const negocio = dados.negocio;
+  const pontosMapa = negocio
+    ? item
+      ? [item]
+      : []
+    : [item, ...paradas.map((l) => getItem("lugar", l.slug)), ...perto.map((p) => p.item)]
+        .filter((p): p is Item => Boolean(p))
+        .filter((p, i, arr) => arr.findIndex((x) => x.lat === p.lat && x.lng === p.lng) === i);
+  const mostraMelhorEpoca = !negocio || negocio.melhorEpoca;
+  const dificuldade =
+    props.tipo === "experiencia" && (!negocio || negocio.dificuldade)
+      ? props.dados.dificuldade.toLowerCase()
+      : null;
 
-  // galeria: a foto principal (ou o fallback) e até duas fotos que existem, do destino e dos vizinhos
+  // galeria dos atrativos: a foto principal (ou o fallback) e até duas fotos que existem,
+  // do destino e dos vizinhos (negócios usam só as fotos deles, em GaleriaNegocio)
   const extras = [
     ...(destino ? [{ src: destino.foto, rotulo: destino.nome }] : []),
     ...[...paradas, ...perto.map((p) => p.item)].map((x) => ({ src: x.foto, rotulo: x.nome })),
@@ -92,8 +124,8 @@ export function PaginaItem(props: Props) {
       : `${nomeMes(dados.mesesBons[0]!)} a ${nomeMes(dados.mesesBons[dados.mesesBons.length - 1]!)}`;
 
   return (
-    <PageShell>
-      <div className="mx-auto max-w-7xl px-5 pt-8 md:px-12 md:pt-12">
+    <>
+      <div className="mx-auto max-w-site px-site pt-8 md:pt-12">
         <nav aria-label="Você está em" className="text-legenda text-ink-suave">
           <ol className="flex flex-wrap items-center gap-1">
             <li>
@@ -125,21 +157,30 @@ export function PaginaItem(props: Props) {
           </ol>
         </nav>
 
-        <header className="mt-6 flex flex-wrap items-end justify-between gap-6">
+        {/* categoria e selo; à direita, as ações do dono (só ele vê, e nunca na prévia) */}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+          <p className="flex items-center gap-2 text-legenda text-ink-suave">
+            <MarcaCategoria categoria={dados.categoria} tamanho="sm" />
+            {categoria.nome}
+            {tipo === "experiencia" && <Tag>Experiência</Tag>}
+            {"ficticio" in dados && dados.ficticio && <Tag>Exemplo</Tag>}
+            {dados.negocio?.verificado && <SeloVerificado variante="etiqueta" />}
+          </p>
+          {!props.itemPrevia && <AcoesDono negocioId={dados.negocio?.id} />}
+        </div>
+
+        <header className="mt-4 flex flex-wrap items-end justify-between gap-6">
           <div className="flex max-w-4xl flex-col gap-4">
-            <p className="flex items-center gap-2 text-legenda text-ink-suave">
-              <MarcaCategoria categoria={dados.categoria} tamanho="sm" />
-              {categoria.nome}
-              {tipo === "experiencia" && <Tag>Experiência</Tag>}
-              {"ficticio" in dados && dados.ficticio && <Tag>Exemplo</Tag>}
-            </p>
             <TituloAnimado texto={dados.nome} className="text-display text-pretty text-cobalto" />
-            <p
-              className="entra medida text-[1.1875rem] text-ink-suave"
-              style={{ "--atraso": "500ms" } as CSSProperties}
-            >
-              {dados.resumo}
-            </p>
+            {/* negócio real: o resumo é a 1ª frase da descrição, que já aparece em "Sobre" */}
+            {!(negocio && !negocio.exemplo) && (
+              <p
+                className="entra medida text-[1.1875rem] text-ink-suave"
+                style={{ "--atraso": "500ms" } as CSSProperties}
+              >
+                {dados.resumo}
+              </p>
+            )}
           </div>
           <Favoritar
             tipo={tipo}
@@ -149,37 +190,43 @@ export function PaginaItem(props: Props) {
           />
         </header>
 
-        {/* galeria editorial: uma grande e duas menores */}
-        <div
-          className={
-            galeria.length > 1
-              ? "mt-10 grid gap-3 md:grid-cols-[2fr_1fr] md:grid-rows-2"
-              : "mt-10 grid"
-          }
-        >
-          {galeria.map((g, i) => (
-            <Foto
-              key={g.src + i}
-              src={g.src}
-              alt={g.rotulo}
-              rotulo={g.rotulo}
-              cor={cor}
-              prioridade={i === 0}
-              entrada={i === 0}
-              sizes={i === 0 ? "(min-width: 768px) 66vw, 100vw" : "(min-width: 768px) 33vw, 100vw"}
-              className={
-                i === 0 && galeria.length === 1
-                  ? "aspect-[4/3] rounded-md md:aspect-[21/9]"
-                  : i === 0
-                    ? "aspect-[4/3] rounded-md md:row-span-2 md:aspect-auto md:min-h-[480px]"
-                    : "hidden aspect-[4/3] rounded-md md:block md:aspect-auto"
-              }
-            />
-          ))}
-        </div>
+        {negocio ? (
+          <GaleriaNegocio fotos={negocio.fotos} nome={dados.nome} cor={cor} />
+        ) : (
+          /* galeria editorial: uma grande e duas menores */
+          <div
+            className={
+              galeria.length > 1
+                ? "mt-10 grid gap-3 md:grid-cols-[2fr_1fr] md:grid-rows-2"
+                : "mt-10 grid"
+            }
+          >
+            {galeria.map((g, i) => (
+              <Foto
+                key={g.src + i}
+                src={g.src}
+                alt={g.rotulo}
+                rotulo={g.rotulo}
+                cor={cor}
+                prioridade={i === 0}
+                entrada={i === 0}
+                sizes={
+                  i === 0 ? "(min-width: 768px) 66vw, 100vw" : "(min-width: 768px) 33vw, 100vw"
+                }
+                className={
+                  i === 0 && galeria.length === 1
+                    ? "aspect-[4/3] rounded-md md:aspect-[21/9]"
+                    : i === 0
+                      ? "aspect-[4/3] rounded-md md:row-span-2 md:aspect-auto md:min-h-[480px]"
+                      : "hidden aspect-[4/3] rounded-md md:block md:aspect-auto"
+                }
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-12 px-5 py-12 md:px-12 md:py-20 lg:grid-cols-[1.4fr_1fr]">
+      <div className="mx-auto grid max-w-site gap-12 px-site py-12 md:py-20 lg:grid-cols-[1.4fr_1fr]">
         <div className="flex min-w-0 flex-col gap-12">
           <section aria-labelledby="sobre">
             <h2 id="sobre" className="text-t2">
@@ -253,28 +300,78 @@ export function PaginaItem(props: Props) {
         <aside className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-28 lg:self-start">
           <InfoPraticas
             info={dados.info}
-            extra={
-              <div className="flex gap-3 py-3">
-                <Gauge className="mt-0.5 size-5 text-cobalto" aria-hidden />
-                <div>
-                  <dt className="text-rotulo">Melhor época</dt>
-                  <dd className="text-base">
-                    {melhorEpoca}
-                    {props.tipo === "experiencia" &&
-                      ` · dificuldade ${props.dados.dificuldade.toLowerCase()}`}
-                  </dd>
-                </div>
-              </div>
+            exemplo={negocio ? negocio.exemplo : true}
+            compartilhar={
+              <Compartilhar
+                caminho={`/${tipo === "lugar" ? "lugares" : "experiencias"}/${dados.slug}`}
+                nome={dados.nome}
+                onde={negocio?.cidade ?? destino?.nome}
+                resumo={dados.resumo}
+                foto={dados.foto}
+                negocioId={negocio?.id}
+              />
             }
+            extra={
+              <>
+                {negocio?.subtipo && (
+                  <LinhaInfo icone={<BedDouble />} rotulo="Tipo">
+                    {negocio.subtipo}
+                  </LinhaInfo>
+                )}
+                {negocio?.tipo === "hospedagem" && negocio.cidade && (
+                  <LinhaInfo icone={<MapPin />} rotulo="Cidade">
+                    {negocio.cidade}
+                  </LinhaInfo>
+                )}
+                {(mostraMelhorEpoca || dificuldade) && (
+                  <LinhaInfo
+                    icone={<Gauge />}
+                    rotulo={mostraMelhorEpoca ? "Melhor época" : "Dificuldade"}
+                  >
+                    {mostraMelhorEpoca
+                      ? `${melhorEpoca}${dificuldade ? ` · dificuldade ${dificuldade}` : ""}`
+                      : dificuldade}
+                  </LinhaInfo>
+                )}
+              </>
+            }
+            {...(negocio && (negocio.whatsapp || negocio.instagram || negocio.site)
+              ? {
+                  acao: (
+                    <ContatosNegocio
+                      negocioId={negocio.id}
+                      nome={dados.nome}
+                      whatsapp={negocio.whatsapp}
+                      instagram={negocio.instagram}
+                      site={negocio.site}
+                    />
+                  ),
+                }
+              : {})}
           />
-          <ComoChegar destino={dados} nome={dados.nome} />
-          <MapaInterativo pontos={pontosMapa} agrupar={false} className="h-72 rounded-md" />
+          <div className="flex flex-col gap-2">
+            <MapaInterativo
+              pontos={pontosMapa}
+              agrupar={false}
+              zoomNoTopo={Boolean(negocio)}
+              className="h-72 rounded-md"
+            />
+            {negocio?.cidade && (
+              <p className="flex items-center gap-1.5 text-legenda text-ink-suave">
+                <MapPin className="size-4 text-cobalto" aria-hidden />
+                {negocio.cidade}, Maranhão
+              </p>
+            )}
+            {item && (item.lat !== 0 || item.lng !== 0) && (
+              <ComoChegar lat={item.lat} lng={item.lng} nome={dados.nome} className="mt-2" />
+            )}
+          </div>
         </aside>
       </div>
 
       {roteiros.length > 0 && (
         <section aria-labelledby="roteiros-aqui" className="bg-areia">
-          <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-12 md:px-12 md:py-20">
+          <div className="mx-auto flex max-w-site flex-col gap-8 px-site py-12 md:py-20">
             <SecaoTitulo id="roteiros-aqui" titulo="Roteiros que passam aqui" />
             <GradeRevelar colunas={2} className="grid gap-6 md:grid-cols-2">
               {roteiros.slice(0, 4).map((r) => (
@@ -288,7 +385,7 @@ export function PaginaItem(props: Props) {
       {perto.length > 0 && (
         <section
           aria-labelledby="perto"
-          className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-12 md:px-12 md:py-20"
+          className="mx-auto flex max-w-site flex-col gap-8 px-site py-12 md:py-20"
         >
           <SecaoTitulo id="perto" titulo="Perto daqui" apoio="Dá para encaixar no mesmo dia." />
           <GradeRevelar colunas={3} className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
@@ -298,6 +395,6 @@ export function PaginaItem(props: Props) {
           </GradeRevelar>
         </section>
       )}
-    </PageShell>
+    </>
   );
 }

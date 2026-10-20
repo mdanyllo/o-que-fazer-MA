@@ -120,6 +120,9 @@
 
 /* tokens estáticos: emitidos como variáveis CSS (usados também fora dos utilitários) */
 @theme static {
+  /* largura máxima do conteúdo (max-w-site); com px-site, as bordas batem com as do cabeçalho */
+  --container-site: 120rem;
+
   /* tipografia */
   --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
@@ -183,6 +186,11 @@
 }
 
 /* escala tipográfica */
+/* respiro lateral das páginas, o mesmo do cabeçalho */
+@utility px-site {
+  padding-inline: clamp(20px, 5vw, 80px);
+}
+
 @utility text-display {
   font-family: var(--font-display);
   font-weight: 800;
@@ -304,6 +312,20 @@
   background: var(--areia);
   z-index: 0;
 }
+/* prévia da Home: fundo cobalto bem claro e o estado em areia com borda cobalto */
+.mapa-azulejo.mapa-previa {
+  background: color-mix(in srgb, var(--cobalto) 10%, white); /* ≈ #E9EDF4 */
+}
+[data-theme="noite"] .mapa-azulejo.mapa-previa {
+  background: color-mix(in srgb, var(--cobalto) 14%, var(--louca));
+}
+.contorno-maranhao {
+  fill: var(--areia);
+  fill-opacity: 1;
+  stroke: var(--cobalto);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+}
 .mapa-azulejo .leaflet-control-attribution {
   font-size: 11px;
   background: color-mix(in srgb, var(--louca) 85%, transparent);
@@ -311,6 +333,16 @@
 }
 .mapa-azulejo .leaflet-control-attribution a {
   color: var(--cobalto);
+}
+/* mapa do admin (cartão estreito): atribuição compacta no canto, longe do pin e dos nomes */
+.mapa-posicao .leaflet-control-attribution {
+  max-width: min(15rem, 70%);
+  margin: 0 !important;
+  padding: 2px 6px;
+  border-top-left-radius: 6px;
+  font-size: 10px;
+  line-height: 1.35;
+  text-align: right;
 }
 .mapa-azulejo .leaflet-bar {
   border: 1px solid var(--linha);

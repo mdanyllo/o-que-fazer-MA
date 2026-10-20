@@ -1,0 +1,22 @@
+Vamos reformular este projeto com a identidade visual Azulejo.
+
+Na raiz do projeto estão:
+- AZULEJO-BRIEF.md: o briefing completo (produto, identidade visual, direção de arte, animações, páginas, dados, fotos e mapa). É a fonte principal, leia por inteiro.
+- referencia-hero.html: o hero da Home já aprovado. Reproduza fielmente.
+- referencia-landing.html: referência de layout, tipografia, cores, tom dos textos e rodapé para o resto do site.
+- azulejo-brand/: logos, símbolos e o padrão de azulejos. Mova para a pasta pública do projeto (ex.: public/brand/) e use a partir de lá.
+
+Regras importantes:
+1. Mantenha todas as fotos que já estão no projeto. As imagens referencia-lencois.jpg são só recortes de referência: no site, use a foto original dos Lençóis que já existe.
+2. Mantenha as funcionalidades e páginas que já existem; o foco é o visual, a navegação e as animações.
+3. Hero da Home: siga a seção 2.8 do briefing e o referencia-hero.html. Foto inteira sobre o painel cobalto com o padrão de azulejos, sem recorte em onda, header fora da foto.
+4. Rodapé: fundo juçara (#4A1E3D) com o logo azulejo-brand/azulejo-logo-branco.svg.
+5. Remova o que deixa o site com cara de IA (seção 3 do briefing): números inventados no hero, etiquetas pequenas em maiúsculas acima dos títulos, ícones de brilho/estrelinhas nos botões, textos genéricos como "Descubra o Maranhão".
+6. No mapa da Home, os nomes dos lugares não podem se sobrepor: mostre só os pins coloridos por categoria e o nome ao passar o mouse, tocar ou selecionar.
+7. Esconda barras de rolagem visíveis em listas horizontais (mantendo a rolagem).
+8. Aplique as animações da seção 4 do briefing. No hero: o título entra palavra por palavra, a foto assenta de scale 1.08 para 1, o painel azul desliza da direita e a legenda aparece por último. Respeite prefers-reduced-motion.
+
+Como trabalhar:
+- Antes de alterar qualquer código, explore o projeto e me mostre um plano curto: a stack, o que vai mudar em cada página, as bibliotecas que vai instalar e a ordem das etapas. Espere minha aprovação.
+- Comece pela Home (tokens, fontes, header, hero, rodapé) e só depois aplique o mesmo estilo nas outras páginas.
+- Ao final de cada etapa, rode o projeto, confira se não há erros no console e no build, e me diga o que foi feito antes de seguir.

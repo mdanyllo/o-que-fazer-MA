@@ -7,7 +7,7 @@ import type { DiaRoteiro } from "@/data/tipos";
  * e se perde ao fechar.
  */
 
-export type TipoFavorito = "destino" | "lugar" | "experiencia" | "roteiro";
+export type TipoFavorito = "destino" | "lugar" | "experiencia" | "roteiro" | "hospedagem";
 export type Favorito = { tipo: TipoFavorito; slug: string };
 
 export type RoteiroSalvo = {

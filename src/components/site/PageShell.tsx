@@ -54,9 +54,7 @@ export function CabecalhoPagina({
   className?: string;
 }) {
   return (
-    <section
-      className={cn("mx-auto max-w-7xl px-5 pt-10 pb-10 md:px-12 md:pt-16 md:pb-14", className)}
-    >
+    <section className={cn("mx-auto max-w-site px-site pt-10 pb-10 md:pt-16 md:pb-14", className)}>
       <TituloAnimado texto={titulo} className="max-w-4xl text-display text-pretty text-cobalto" />
       {apoio && (
         <p

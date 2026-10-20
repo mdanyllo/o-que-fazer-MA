@@ -5,10 +5,14 @@ import { useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
 import type { CorMaranhense } from "@/components/azulejo/cores";
 import { Foto } from "@/components/azulejo/Foto";
-import { categoriaPorId, getDestino, getItem, type Item } from "@/data";
+import { categoriaPorId, getDestino, type Item } from "@/data";
+import { criarCatalogo } from "@/data/catalogo";
 import { cn } from "@/lib/utils";
 
 const INTERVALO = 5500;
+
+/** Os slides só usam passeios e lugares fixos, que existem sem o banco. */
+const { getItem } = criarCatalogo(null);
 
 type Slide = {
   chave: string;

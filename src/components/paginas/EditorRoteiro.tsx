@@ -1,7 +1,8 @@
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import { useId, useState } from "react";
 import { botao } from "@/components/azulejo/botao";
-import { destinos, itens, resolverParada, type DiaRoteiro } from "@/data";
+import { destinos, type DiaRoteiro } from "@/data";
+import { useCatalogo } from "@/lib/use-catalogo";
 import { cn } from "@/lib/utils";
 import { LinhaDoTempo } from "./LinhaDoTempo";
 
@@ -19,6 +20,7 @@ export function EditorRoteiro({
   dias: DiaRoteiro[];
   aoMudar: (dias: DiaRoteiro[]) => void;
 }) {
+  const { resolverParada } = useCatalogo();
   const copiar = () => dias.map((d) => ({ ...d, paradas: [...d.paradas] }));
 
   function mover(d: number, p: number, direcao: -1 | 1) {
@@ -126,6 +128,7 @@ function AcrescentarParada({
 }) {
   const [valor, setValor] = useState("");
   const id = useId();
+  const { itens } = useCatalogo();
   return (
     <div className="mt-3 flex flex-wrap items-center gap-2">
       <label htmlFor={id} className="sr-only">

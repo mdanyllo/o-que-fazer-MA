@@ -10,6 +10,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { AuthProvider } from "../lib/auth";
+import { buscarNegociosPublicados } from "../lib/negocios";
 import { themeBootScript } from "../lib/tema";
 import { Logo } from "../components/azulejo/Logo";
 import { botao } from "../components/azulejo/botao";
@@ -24,7 +26,7 @@ function NotFoundComponent() {
   return <Pagina404 />;
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -63,6 +65,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  // Negócios publicados (restaurantes, hospedagens, passeios), lidos uma vez no servidor e
+  // renovados a cada 5 minutos de navegação. null = o banco não respondeu (as telas avisam).
+  loader: async () => ({ negocios: await buscarNegociosPublicados() }),
+  staleTime: 5 * 60_000,
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -81,7 +87,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "pt_BR" },
+      { property: "og:image", content: "/og-image.jpg" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "/og-image.jpg" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -95,7 +103,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/brand/azulejo-simbolo.svg", type: "image/svg+xml" },
-      { rel: "apple-touch-icon", href: "/brand/azulejo-simbolo.svg" },
+      { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -125,14 +134,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* respeita prefers-reduced-motion em todas as animações do Motion */}
-      <MotionConfig reducedMotion="user">
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <TransicaoAzulejo />
-        <RolagemSuave />
-      </MotionConfig>
-      <Toaster position="top-center" />
+      <AuthProvider>
+        {/* respeita prefers-reduced-motion em todas as animações do Motion */}
+        <MotionConfig reducedMotion="user">
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <TransicaoAzulejo />
+          <RolagemSuave />
+        </MotionConfig>
+        <Toaster position="top-center" />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

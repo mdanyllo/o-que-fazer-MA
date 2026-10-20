@@ -16,7 +16,7 @@ export function Pagina404({
   return (
     <PageShell>
       <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 md:grid-cols-[1fr_1fr] md:px-8 md:py-24">
+        <div className="mx-auto grid max-w-site items-center gap-12 px-site py-16 md:grid-cols-[1fr_1fr] md:py-24">
           <div className="relative z-10">
             <p className="text-rotulo text-guara">Erro 404</p>
             <h1 className="mt-4 text-display">{titulo}</h1>

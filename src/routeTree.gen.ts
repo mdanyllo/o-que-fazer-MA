@@ -10,22 +10,55 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CadastrarRouteImport } from './routes/cadastrar'
+import { Route as EntrarRouteImport } from './routes/entrar'
+import { Route as EsqueciSenhaRouteImport } from './routes/esqueci-senha'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as ExplorarRouteImport } from './routes/explorar'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as MinhaViagemRouteImport } from './routes/minha-viagem'
 import { Route as PlanejarRouteImport } from './routes/planejar'
+import { Route as PlanosRouteImport } from './routes/planos'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
+import { Route as TermosRouteImport } from './routes/termos'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminIdRouteImport } from './routes/admin.$id'
+import { Route as AdminNovoRouteImport } from './routes/admin.novo'
+import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
+import { Route as ConviteTokenRouteImport } from './routes/convite.$token'
 import { Route as DestinosIndexRouteImport } from './routes/destinos.index'
 import { Route as DestinosSlugRouteImport } from './routes/destinos.$slug'
 import { Route as ExperienciasIndexRouteImport } from './routes/experiencias.index'
 import { Route as ExperienciasSlugRouteImport } from './routes/experiencias.$slug'
 import { Route as LugaresSlugRouteImport } from './routes/lugares.$slug'
+import { Route as PainelIndexRouteImport } from './routes/painel.index'
+import { Route as PainelIdRouteImport } from './routes/painel.$id'
+import { Route as PainelAssinaturaRouteImport } from './routes/painel.assinatura'
+import { Route as PainelNovoRouteImport } from './routes/painel.novo'
 import { Route as RoteirosIndexRouteImport } from './routes/roteiros.index'
 import { Route as RoteirosSlugRouteImport } from './routes/roteiros.$slug'
+import { Route as PainelEstatisticasIndexRouteImport } from './routes/painel.estatisticas.index'
+import { Route as PainelEstatisticasIdRouteImport } from './routes/painel.estatisticas.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastrarRoute = CadastrarRouteImport.update({
+  id: '/cadastrar',
+  path: '/cadastrar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntrarRoute = EntrarRouteImport.update({
+  id: '/entrar',
+  path: '/entrar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsqueciSenhaRoute = EsqueciSenhaRouteImport.update({
+  id: '/esqueci-senha',
+  path: '/esqueci-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventosRoute = EventosRouteImport.update({
@@ -53,6 +86,51 @@ const PlanejarRoute = PlanejarRouteImport.update({
   path: '/planejar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlanosRoute = PlanosRouteImport.update({
+  id: '/planos',
+  path: '/planos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIdRoute = AdminIdRouteImport.update({
+  id: '/admin/$id',
+  path: '/admin/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminNovoRoute = AdminNovoRouteImport.update({
+  id: '/admin/novo',
+  path: '/admin/novo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
+  id: '/admin/usuarios',
+  path: '/admin/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConviteTokenRoute = ConviteTokenRouteImport.update({
+  id: '/convite/$token',
+  path: '/convite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DestinosIndexRoute = DestinosIndexRouteImport.update({
   id: '/destinos/',
   path: '/destinos/',
@@ -78,6 +156,26 @@ const LugaresSlugRoute = LugaresSlugRouteImport.update({
   path: '/lugares/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PainelIndexRoute = PainelIndexRouteImport.update({
+  id: '/painel/',
+  path: '/painel/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelIdRoute = PainelIdRouteImport.update({
+  id: '/painel/$id',
+  path: '/painel/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelAssinaturaRoute = PainelAssinaturaRouteImport.update({
+  id: '/painel/assinatura',
+  path: '/painel/assinatura',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelNovoRoute = PainelNovoRouteImport.update({
+  id: '/painel/novo',
+  path: '/painel/novo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RoteirosIndexRoute = RoteirosIndexRouteImport.update({
   id: '/roteiros/',
   path: '/roteiros/',
@@ -88,115 +186,251 @@ const RoteirosSlugRoute = RoteirosSlugRouteImport.update({
   path: '/roteiros/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PainelEstatisticasIndexRoute = PainelEstatisticasIndexRouteImport.update({
+  id: '/painel/estatisticas/',
+  path: '/painel/estatisticas/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelEstatisticasIdRoute = PainelEstatisticasIdRouteImport.update({
+  id: '/painel/estatisticas/$id',
+  path: '/painel/estatisticas/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cadastrar': typeof CadastrarRoute
+  '/entrar': typeof EntrarRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
   '/eventos': typeof EventosRoute
   '/explorar': typeof ExplorarRoute
   '/mapa': typeof MapaRoute
   '/minha-viagem': typeof MinhaViagemRoute
   '/planejar': typeof PlanejarRoute
+  '/planos': typeof PlanosRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/termos': typeof TermosRoute
+  '/admin/$id': typeof AdminIdRoute
+  '/admin/novo': typeof AdminNovoRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
+  '/convite/$token': typeof ConviteTokenRoute
   '/destinos/$slug': typeof DestinosSlugRoute
   '/experiencias/$slug': typeof ExperienciasSlugRoute
   '/lugares/$slug': typeof LugaresSlugRoute
+  '/painel/$id': typeof PainelIdRoute
+  '/painel/assinatura': typeof PainelAssinaturaRoute
+  '/painel/novo': typeof PainelNovoRoute
   '/roteiros/$slug': typeof RoteirosSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/destinos/': typeof DestinosIndexRoute
   '/experiencias/': typeof ExperienciasIndexRoute
+  '/painel/': typeof PainelIndexRoute
   '/roteiros/': typeof RoteirosIndexRoute
+  '/painel/estatisticas/$id': typeof PainelEstatisticasIdRoute
+  '/painel/estatisticas/': typeof PainelEstatisticasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cadastrar': typeof CadastrarRoute
+  '/entrar': typeof EntrarRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
   '/eventos': typeof EventosRoute
   '/explorar': typeof ExplorarRoute
   '/mapa': typeof MapaRoute
   '/minha-viagem': typeof MinhaViagemRoute
   '/planejar': typeof PlanejarRoute
+  '/planos': typeof PlanosRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/termos': typeof TermosRoute
+  '/admin/$id': typeof AdminIdRoute
+  '/admin/novo': typeof AdminNovoRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
+  '/convite/$token': typeof ConviteTokenRoute
   '/destinos/$slug': typeof DestinosSlugRoute
   '/experiencias/$slug': typeof ExperienciasSlugRoute
   '/lugares/$slug': typeof LugaresSlugRoute
+  '/painel/$id': typeof PainelIdRoute
+  '/painel/assinatura': typeof PainelAssinaturaRoute
+  '/painel/novo': typeof PainelNovoRoute
   '/roteiros/$slug': typeof RoteirosSlugRoute
+  '/admin': typeof AdminIndexRoute
   '/destinos': typeof DestinosIndexRoute
   '/experiencias': typeof ExperienciasIndexRoute
+  '/painel': typeof PainelIndexRoute
   '/roteiros': typeof RoteirosIndexRoute
+  '/painel/estatisticas/$id': typeof PainelEstatisticasIdRoute
+  '/painel/estatisticas': typeof PainelEstatisticasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cadastrar': typeof CadastrarRoute
+  '/entrar': typeof EntrarRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
   '/eventos': typeof EventosRoute
   '/explorar': typeof ExplorarRoute
   '/mapa': typeof MapaRoute
   '/minha-viagem': typeof MinhaViagemRoute
   '/planejar': typeof PlanejarRoute
+  '/planos': typeof PlanosRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/termos': typeof TermosRoute
+  '/admin/$id': typeof AdminIdRoute
+  '/admin/novo': typeof AdminNovoRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
+  '/convite/$token': typeof ConviteTokenRoute
   '/destinos/$slug': typeof DestinosSlugRoute
   '/experiencias/$slug': typeof ExperienciasSlugRoute
   '/lugares/$slug': typeof LugaresSlugRoute
+  '/painel/$id': typeof PainelIdRoute
+  '/painel/assinatura': typeof PainelAssinaturaRoute
+  '/painel/novo': typeof PainelNovoRoute
   '/roteiros/$slug': typeof RoteirosSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/destinos/': typeof DestinosIndexRoute
   '/experiencias/': typeof ExperienciasIndexRoute
+  '/painel/': typeof PainelIndexRoute
   '/roteiros/': typeof RoteirosIndexRoute
+  '/painel/estatisticas/$id': typeof PainelEstatisticasIdRoute
+  '/painel/estatisticas/': typeof PainelEstatisticasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/cadastrar'
+    | '/entrar'
+    | '/esqueci-senha'
     | '/eventos'
     | '/explorar'
     | '/mapa'
     | '/minha-viagem'
     | '/planejar'
+    | '/planos'
+    | '/privacidade'
+    | '/redefinir-senha'
+    | '/termos'
+    | '/admin/$id'
+    | '/admin/novo'
+    | '/admin/usuarios'
+    | '/convite/$token'
     | '/destinos/$slug'
     | '/experiencias/$slug'
     | '/lugares/$slug'
+    | '/painel/$id'
+    | '/painel/assinatura'
+    | '/painel/novo'
     | '/roteiros/$slug'
+    | '/admin/'
     | '/destinos/'
     | '/experiencias/'
+    | '/painel/'
     | '/roteiros/'
+    | '/painel/estatisticas/$id'
+    | '/painel/estatisticas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cadastrar'
+    | '/entrar'
+    | '/esqueci-senha'
     | '/eventos'
     | '/explorar'
     | '/mapa'
     | '/minha-viagem'
     | '/planejar'
+    | '/planos'
+    | '/privacidade'
+    | '/redefinir-senha'
+    | '/termos'
+    | '/admin/$id'
+    | '/admin/novo'
+    | '/admin/usuarios'
+    | '/convite/$token'
     | '/destinos/$slug'
     | '/experiencias/$slug'
     | '/lugares/$slug'
+    | '/painel/$id'
+    | '/painel/assinatura'
+    | '/painel/novo'
     | '/roteiros/$slug'
+    | '/admin'
     | '/destinos'
     | '/experiencias'
+    | '/painel'
     | '/roteiros'
+    | '/painel/estatisticas/$id'
+    | '/painel/estatisticas'
   id:
     | '__root__'
     | '/'
+    | '/cadastrar'
+    | '/entrar'
+    | '/esqueci-senha'
     | '/eventos'
     | '/explorar'
     | '/mapa'
     | '/minha-viagem'
     | '/planejar'
+    | '/planos'
+    | '/privacidade'
+    | '/redefinir-senha'
+    | '/termos'
+    | '/admin/$id'
+    | '/admin/novo'
+    | '/admin/usuarios'
+    | '/convite/$token'
     | '/destinos/$slug'
     | '/experiencias/$slug'
     | '/lugares/$slug'
+    | '/painel/$id'
+    | '/painel/assinatura'
+    | '/painel/novo'
     | '/roteiros/$slug'
+    | '/admin/'
     | '/destinos/'
     | '/experiencias/'
+    | '/painel/'
     | '/roteiros/'
+    | '/painel/estatisticas/$id'
+    | '/painel/estatisticas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CadastrarRoute: typeof CadastrarRoute
+  EntrarRoute: typeof EntrarRoute
+  EsqueciSenhaRoute: typeof EsqueciSenhaRoute
   EventosRoute: typeof EventosRoute
   ExplorarRoute: typeof ExplorarRoute
   MapaRoute: typeof MapaRoute
   MinhaViagemRoute: typeof MinhaViagemRoute
   PlanejarRoute: typeof PlanejarRoute
+  PlanosRoute: typeof PlanosRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
+  RedefinirSenhaRoute: typeof RedefinirSenhaRoute
+  TermosRoute: typeof TermosRoute
+  AdminIdRoute: typeof AdminIdRoute
+  AdminNovoRoute: typeof AdminNovoRoute
+  AdminUsuariosRoute: typeof AdminUsuariosRoute
+  ConviteTokenRoute: typeof ConviteTokenRoute
   DestinosSlugRoute: typeof DestinosSlugRoute
   ExperienciasSlugRoute: typeof ExperienciasSlugRoute
   LugaresSlugRoute: typeof LugaresSlugRoute
+  PainelIdRoute: typeof PainelIdRoute
+  PainelAssinaturaRoute: typeof PainelAssinaturaRoute
+  PainelNovoRoute: typeof PainelNovoRoute
   RoteirosSlugRoute: typeof RoteirosSlugRoute
+  AdminIndexRoute: typeof AdminIndexRoute
   DestinosIndexRoute: typeof DestinosIndexRoute
   ExperienciasIndexRoute: typeof ExperienciasIndexRoute
+  PainelIndexRoute: typeof PainelIndexRoute
   RoteirosIndexRoute: typeof RoteirosIndexRoute
+  PainelEstatisticasIdRoute: typeof PainelEstatisticasIdRoute
+  PainelEstatisticasIndexRoute: typeof PainelEstatisticasIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -206,6 +440,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastrar': {
+      id: '/cadastrar'
+      path: '/cadastrar'
+      fullPath: '/cadastrar'
+      preLoaderRoute: typeof CadastrarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entrar': {
+      id: '/entrar'
+      path: '/entrar'
+      fullPath: '/entrar'
+      preLoaderRoute: typeof EntrarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/esqueci-senha': {
+      id: '/esqueci-senha'
+      path: '/esqueci-senha'
+      fullPath: '/esqueci-senha'
+      preLoaderRoute: typeof EsqueciSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/eventos': {
@@ -243,6 +498,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlanejarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/planos': {
+      id: '/planos'
+      path: '/planos'
+      fullPath: '/planos'
+      preLoaderRoute: typeof PlanosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/$id': {
+      id: '/admin/$id'
+      path: '/admin/$id'
+      fullPath: '/admin/$id'
+      preLoaderRoute: typeof AdminIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/novo': {
+      id: '/admin/novo'
+      path: '/admin/novo'
+      fullPath: '/admin/novo'
+      preLoaderRoute: typeof AdminNovoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/usuarios': {
+      id: '/admin/usuarios'
+      path: '/admin/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AdminUsuariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/convite/$token': {
+      id: '/convite/$token'
+      path: '/convite/$token'
+      fullPath: '/convite/$token'
+      preLoaderRoute: typeof ConviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/destinos/': {
       id: '/destinos/'
       path: '/destinos'
@@ -278,6 +596,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LugaresSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/painel/': {
+      id: '/painel/'
+      path: '/painel'
+      fullPath: '/painel/'
+      preLoaderRoute: typeof PainelIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel/$id': {
+      id: '/painel/$id'
+      path: '/painel/$id'
+      fullPath: '/painel/$id'
+      preLoaderRoute: typeof PainelIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel/assinatura': {
+      id: '/painel/assinatura'
+      path: '/painel/assinatura'
+      fullPath: '/painel/assinatura'
+      preLoaderRoute: typeof PainelAssinaturaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel/novo': {
+      id: '/painel/novo'
+      path: '/painel/novo'
+      fullPath: '/painel/novo'
+      preLoaderRoute: typeof PainelNovoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/roteiros/': {
       id: '/roteiros/'
       path: '/roteiros'
@@ -292,23 +638,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RoteirosSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/painel/estatisticas/': {
+      id: '/painel/estatisticas/'
+      path: '/painel/estatisticas'
+      fullPath: '/painel/estatisticas/'
+      preLoaderRoute: typeof PainelEstatisticasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel/estatisticas/$id': {
+      id: '/painel/estatisticas/$id'
+      path: '/painel/estatisticas/$id'
+      fullPath: '/painel/estatisticas/$id'
+      preLoaderRoute: typeof PainelEstatisticasIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CadastrarRoute: CadastrarRoute,
+  EntrarRoute: EntrarRoute,
+  EsqueciSenhaRoute: EsqueciSenhaRoute,
   EventosRoute: EventosRoute,
   ExplorarRoute: ExplorarRoute,
   MapaRoute: MapaRoute,
   MinhaViagemRoute: MinhaViagemRoute,
   PlanejarRoute: PlanejarRoute,
+  PlanosRoute: PlanosRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
+  RedefinirSenhaRoute: RedefinirSenhaRoute,
+  TermosRoute: TermosRoute,
+  AdminIdRoute: AdminIdRoute,
+  AdminNovoRoute: AdminNovoRoute,
+  AdminUsuariosRoute: AdminUsuariosRoute,
+  ConviteTokenRoute: ConviteTokenRoute,
   DestinosSlugRoute: DestinosSlugRoute,
   ExperienciasSlugRoute: ExperienciasSlugRoute,
   LugaresSlugRoute: LugaresSlugRoute,
+  PainelIdRoute: PainelIdRoute,
+  PainelAssinaturaRoute: PainelAssinaturaRoute,
+  PainelNovoRoute: PainelNovoRoute,
   RoteirosSlugRoute: RoteirosSlugRoute,
+  AdminIndexRoute: AdminIndexRoute,
   DestinosIndexRoute: DestinosIndexRoute,
   ExperienciasIndexRoute: ExperienciasIndexRoute,
+  PainelIndexRoute: PainelIndexRoute,
   RoteirosIndexRoute: RoteirosIndexRoute,
+  PainelEstatisticasIdRoute: PainelEstatisticasIdRoute,
+  PainelEstatisticasIndexRoute: PainelEstatisticasIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

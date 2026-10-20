@@ -1,0 +1,16 @@
+PACOTE AZULEJO — COMO USAR
+
+1. Faça uma cópia de segurança do seu projeto (ou um commit, se usar git).
+2. Copie para a RAIZ do projeto (a pasta principal, onde fica o package.json):
+   - AZULEJO-BRIEF.md
+   - referencia-hero.html
+   - referencia-landing.html
+   - a pasta azulejo-brand inteira
+   Se já existir um AZULEJO-BRIEF.md ou referencia-landing.html antigos, substitua.
+3. Abra o Claude Code na pasta do projeto.
+4. Ative o modo de planejamento (Shift+Tab até aparecer "plan mode").
+5. Abra o arquivo PROMPT-CLAUDE-CODE.txt, copie tudo e cole no Claude Code.
+6. Leia o plano que ele mostrar. Se estiver bom, aprove e deixe ele executar etapa por etapa.
+
+Dica: se algo ficar com cara genérica, aponte a seção do briefing, por exemplo:
+"A página Explorar está com cara de SaaS, revise seguindo a seção 3 do AZULEJO-BRIEF.md".

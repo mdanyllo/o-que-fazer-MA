@@ -1,35 +1,40 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
+import { ArrowRight } from "lucide-react";
 import { useMemo, useState } from "react";
 import { botao } from "@/components/azulejo/botao";
 import {
   CardComida,
   CardDestino,
+  CardHospedagem,
   CardItem,
   CardRoteiro,
   LinhaEvento,
 } from "@/components/azulejo/cards";
 import { Chip } from "@/components/azulejo/etiquetas";
 import { Foto } from "@/components/azulejo/Foto";
-import { FaixaAzulejoRolagem } from "@/components/movimento/FaixaAzulejoRolagem";
-import { FaixaMovimento } from "@/components/movimento/FaixaMovimento";
 import { TituloAnimado } from "@/components/movimento/TituloAnimado";
 import { GradeRevelar, Revelar } from "@/components/movimento/Revelar";
 import { PadraoAzulejo } from "@/components/azulejo/PadraoAzulejo";
 import { linkTexto, SecaoTitulo } from "@/components/azulejo/SecaoTitulo";
 import { HeroHome } from "@/components/home/HeroHome";
 import { MapaPrevia } from "@/components/home/MapaPrevia";
+import { AvisoNegocios } from "@/components/site/AvisoNegocios";
 import { PageShell } from "@/components/site/PageShell";
 import {
   categoriaPorId,
+  ehOndeComerOuFicar,
   eventos,
   getDestino,
   getRoteiro,
-  itens,
   type CategoriaId,
   type Destino,
   type Roteiro,
+  type TipoHospedagem,
 } from "@/data";
+import { useIrParaOsNegociosAoChegar } from "@/lib/auth";
+import { useCatalogo } from "@/lib/use-catalogo";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -45,16 +50,24 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const POR_ONDE_COMECAR: { slug: string; titulo: string; texto: string }[] = [
+const POR_ONDE_COMECAR: {
+  slug: string;
+  titulo: string;
+  texto: string;
+  foto?: string;
+  tempo?: string;
+}[] = [
   {
     slug: "barreirinhas",
     titulo: "Lençóis Maranhenses",
+    // dunas e lagoa; a foto do rio com barcos fica para a página de Barreirinhas
+    foto: "/images/destinos/santo-amaro.jpg",
     texto:
       "Dunas brancas e lagoas de água doce que enchem com as chuvas. A melhor época vai de junho a setembro.",
   },
   {
     slug: "sao-luis",
-    titulo: "Centro Histórico de São Luís",
+    titulo: "Centro de São Luís",
     texto: "Casarões cobertos de azulejos portugueses, Patrimônio Mundial da UNESCO desde 1997.",
   },
   {
@@ -67,6 +80,7 @@ const POR_ONDE_COMECAR: { slug: string; titulo: string; texto: string }[] = [
     slug: "carolina",
     titulo: "Chapada das Mesas",
     texto: "Cachoeiras e morros em forma de mesa no sul do estado, perto de Carolina.",
+    tempo: "~12h de carro ou voo até Imperatriz",
   },
 ];
 
@@ -78,9 +92,14 @@ const CATEGORIAS_HOME: CategoriaId[] = [
   "gastronomia",
 ];
 
-const secao = "mx-auto max-w-7xl px-5 py-12 md:px-12 md:py-20";
+/** respiro vertical igual em todas as seções da Home */
+const respiro = "py-[clamp(72px,9vw,128px)]";
+const secao = `mx-auto max-w-site px-site ${respiro}`;
+
+const seta = <ArrowRight className="size-4" aria-hidden />;
 
 function Home() {
+  useIrParaOsNegociosAoChegar();
   const comecar = POR_ONDE_COMECAR.map((c) => ({ ...c, destino: getDestino(c.slug) })).filter(
     (c): c is typeof c & { destino: Destino } => Boolean(c.destino),
   );
@@ -97,9 +116,7 @@ function Home() {
     <PageShell>
       <HeroHome />
 
-      <FaixaAzulejoRolagem azulejo={24} linhas={3} />
-
-      {/* Por onde começar */}
+      {/* Por onde começar: o respiro depois do hero é só espaço, sem divisor */}
       <section aria-labelledby="comecar" className={`${secao} flex flex-col gap-8`}>
         <SecaoTitulo
           id="comecar"
@@ -107,33 +124,23 @@ function Home() {
           apoio="Quatro lugares que resumem o estado, do litoral ao sertão."
           acao={
             <Link to="/destinos" className={linkTexto}>
-              Ver todos os destinos
+              Ver todos os destinos {seta}
             </Link>
           }
         />
         <GradeRevelar colunas={4} className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {comecar.map((c) => (
-            <CardDestino key={c.slug} destino={c.destino} titulo={c.titulo} texto={c.texto} />
+            <CardDestino
+              key={c.slug}
+              destino={c.destino}
+              titulo={c.titulo}
+              texto={c.texto}
+              {...(c.foto ? { foto: c.foto } : {})}
+              {...(c.tempo ? { tempo: c.tempo } : {})}
+            />
           ))}
         </GradeRevelar>
       </section>
-
-      <FaixaMovimento
-        itens={[
-          "São Luís",
-          "Lagoa Bonita",
-          "Arroz de cuxá",
-          "Alcântara",
-          "Rio Preguiças",
-          "Bumba-meu-boi",
-          "Atins",
-          "Chapada das Mesas",
-          "Juçara",
-          "Poço Azul",
-          "Raposa",
-          "Delta das Américas",
-        ]}
-      />
 
       <ExperienciasPorCategoria />
 
@@ -145,7 +152,7 @@ function Home() {
           apoio="Dias contados, paradas escolhidas e tempo de estrada. É só seguir."
           acao={
             <Link to="/roteiros" className={linkTexto}>
-              Ver todos os roteiros
+              Ver todos os roteiros {seta}
             </Link>
           }
         />
@@ -163,11 +170,15 @@ function Home() {
         </div>
       </section>
 
+      <OndeFicar />
+
       <MesDeBoi />
 
       {/* Mapa: a faixa forte da página, em cobalto */}
       <section aria-labelledby="mapa" className="bg-cobalto text-sobre-cobalto">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-12 md:px-12 md:py-22 lg:grid-cols-[1fr_1.3fr]">
+        <div
+          className={`mx-auto grid max-w-site items-center gap-10 px-site ${respiro} lg:grid-cols-[1fr_1.3fr]`}
+        >
           <Revelar variante="esquerda" className="flex flex-col gap-4">
             <h2 id="mapa" className="text-t1">
               O Maranhão inteiro num mapa só
@@ -212,25 +223,24 @@ function Home() {
           <CardComida
             nome="Torta de camarão"
             texto="Assada no forno, presença certa nos almoços de família e nas festas."
+            foto="/images/comida/torta-de-camarao.jpg"
             cor="ouro"
           />
         </GradeRevelar>
       </section>
 
-      {/* Chamada para planejar */}
+      {/* Chamada para planejar: bloco cobalto com o padrão inteiro por trás, como o painel do hero */}
       <section
         aria-labelledby="planejar"
-        className="mx-auto max-w-7xl px-5 pb-12 md:px-12 md:pb-22"
+        className="mx-auto max-w-site px-site pb-[clamp(72px,9vw,128px)]"
       >
         <Revelar
           variante="escala"
-          className="relative flex flex-wrap items-end justify-between gap-6 overflow-hidden rounded-md bg-areia p-6 md:p-12"
+          className="relative overflow-hidden rounded-[16px] bg-cobalto p-[clamp(40px,5vw,72px)] text-sobre-cobalto"
         >
-          <PadraoAzulejo
-            azulejo={48}
-            className="absolute -top-6 -right-6 hidden h-32 w-48 opacity-50 md:block"
-          />
-          <div className="relative flex max-w-xl flex-col gap-2">
+          <PadraoAzulejo azulejo={30} className="absolute inset-0 opacity-[0.12]" />
+          {/* título, texto e botão empilhados à esquerda; 12px de gap + 16px = 28px acima do botão */}
+          <div className="relative flex flex-col items-start gap-3">
             <TituloAnimado
               as="h2"
               id="planejar"
@@ -239,14 +249,17 @@ function Home() {
               rolagem
               className="font-display text-[clamp(1.75rem,1.4rem+1.2vw,2.25rem)] leading-tight font-extrabold"
             />
-            <p className="text-ink-suave">
+            <p className="max-w-[36em]">
               Dias, interesses, ritmo, orçamento e cidade de chegada. A gente sugere um roteiro, e
               você muda o que quiser.
             </p>
+            <Link
+              to="/planejar"
+              className={`${botao({ tamanho: "lg" })} mt-4 bg-ouro text-sobre-ouro hover:bg-ouro hover:brightness-95`}
+            >
+              Planejar viagem
+            </Link>
           </div>
-          <Link to="/planejar" className={`${botao({ tamanho: "lg" })} relative`}>
-            Planejar viagem
-          </Link>
         </Revelar>
       </section>
     </PageShell>
@@ -255,15 +268,16 @@ function Home() {
 
 function ExperienciasPorCategoria() {
   const [categoria, setCategoria] = useState<CategoriaId>("lencois");
+  const { itens } = useCatalogo();
   const lista = useMemo(
     () =>
       itens
-        .filter((i) => i.categoria === categoria && !i.ficticio && i.horas > 0)
+        .filter((i) => i.categoria === categoria && !ehOndeComerOuFicar(i) && i.horas > 0)
         // experiências primeiro, sem repetir o mesmo lugar
         .sort((a, b) => (a.tipo === b.tipo ? 0 : a.tipo === "experiencia" ? -1 : 1))
         .filter((i, idx, arr) => arr.findIndex((x) => x.foto === i.foto) === idx)
         .slice(0, 3),
-    [categoria],
+    [categoria, itens],
   );
 
   return (
@@ -275,7 +289,7 @@ function ExperienciasPorCategoria() {
           apoio="Escolha um jeito de viajar e veja por onde começar."
           acao={
             <Link to="/explorar" search={{ categoria }} className={linkTexto}>
-              Ver tudo em {categoriaPorId[categoria].nome.toLowerCase()}
+              Ver tudo em {categoriaPorId[categoria].nome.toLowerCase()} {seta}
             </Link>
           }
         />
@@ -309,6 +323,70 @@ function ExperienciasPorCategoria() {
   );
 }
 
+// "Casa de temporada" fica fora da fileira: aparece só em "Todas"
+const TIPOS_HOSPEDAGEM: TipoHospedagem[] = ["Pousada", "Hotel", "Chalé", "Hostel"];
+
+/** Na Home cabem duas fileiras de quatro. */
+const MAX_HOSPEDAGENS = 8;
+
+/** Onde ficar: hospedagens do banco, filtradas por tipo só no front. */
+function OndeFicar() {
+  // null = "Todas"; tocar no chip ativo de novo volta para "Todas"
+  const [tipo, setTipo] = useState<TipoHospedagem | null>(null);
+  const { hospedagens, negociosOk } = useCatalogo();
+  const lista = (tipo ? hospedagens.filter((h) => h.tipo === tipo) : hospedagens).slice(
+    0,
+    MAX_HOSPEDAGENS,
+  );
+
+  return (
+    // logo depois de "Roteiros prontos", no mesmo fundo: sem respiro em cima para não dobrar
+    <section aria-labelledby="ficar" className={cn(secao, "flex flex-col gap-8 pt-0 md:pt-0")}>
+      <SecaoTitulo
+        id="ficar"
+        titulo="Onde ficar"
+        apoio="Pousadas e hospedagens para dormir bem em cada parada."
+        acao={
+          <Link to="/explorar" search={{ categoria: "hospedagem" }} className={linkTexto}>
+            Ver todas as hospedagens {seta}
+          </Link>
+        }
+      />
+      {!negociosOk && <AvisoNegocios />}
+      {negociosOk && (
+        <div
+          role="group"
+          aria-label="Tipo de hospedagem"
+          className="sem-barra -mx-5 flex gap-2 overflow-x-auto px-5 md:mx-0 md:flex-wrap md:px-0"
+        >
+          <Chip ativo={tipo === null} onClick={() => setTipo(null)}>
+            Todas
+          </Chip>
+          {TIPOS_HOSPEDAGEM.map((t) => (
+            <Chip key={t} ativo={tipo === t} onClick={() => setTipo(tipo === t ? null : t)}>
+              {t}
+            </Chip>
+          ))}
+        </div>
+      )}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={tipo ?? "todas"}
+          className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {lista.map((h, i) => (
+            <CardHospedagem key={h.slug} hospedagem={h} posicao={i} />
+          ))}
+        </motion.div>
+      </AnimatePresence>
+    </section>
+  );
+}
+
 function MesDeBoi() {
   // próximos eventos a partir do mês atual, dando a volta no ano
   const mesAtual = new Date().getMonth() + 1;
@@ -318,7 +396,9 @@ function MesDeBoi() {
 
   return (
     <section aria-labelledby="boi" className="bg-areia">
-      <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-12 md:px-12 md:py-24 lg:grid-cols-2 lg:gap-16">
+      <div
+        className={`mx-auto grid max-w-site items-center gap-10 px-site ${respiro} lg:grid-cols-2 lg:gap-16`}
+      >
         <div>
           <Foto
             src="/images/eventos/sao-joao.jpg"
@@ -369,7 +449,7 @@ function MesDeBoi() {
               ))}
             </ul>
             <Link to="/eventos" className={linkTexto}>
-              Ver a agenda do ano
+              Ver a agenda do ano {seta}
             </Link>
           </div>
         </Revelar>

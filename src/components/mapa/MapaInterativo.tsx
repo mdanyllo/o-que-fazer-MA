@@ -20,6 +20,8 @@ export function MapaInterativo({
   agrupar = true,
   rolagemZoom = false,
   card = "compacto",
+  previa = false,
+  zoomNoTopo = false,
   className,
 }: {
   pontos: Item[];
@@ -28,6 +30,10 @@ export function MapaInterativo({
   agrupar?: boolean;
   rolagemZoom?: boolean;
   card?: "compacto" | "completo";
+  /** prévia da Home, ver MapaProps */
+  previa?: boolean;
+  /** botões de zoom no canto de cima (mapas pequenos) */
+  zoomNoTopo?: boolean;
   className?: string;
 }) {
   const [selecionado, setSelecionado] = useState<Item | null>(null);
@@ -51,6 +57,8 @@ export function MapaInterativo({
       enquadrar={enquadrar}
       agrupar={agrupar}
       rolagemZoom={rolagemZoom}
+      previa={previa}
+      zoomNoTopo={zoomNoTopo}
       className={cn("overflow-hidden", className)}
     >
       {selecionado &&
