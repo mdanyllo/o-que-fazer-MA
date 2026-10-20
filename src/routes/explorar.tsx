@@ -25,10 +25,12 @@ import {
   itens,
   MESES,
   nomeDestino,
+  type Coordenada,
   type FaixaPreco,
   type Item,
 } from "@/data";
 import { validarBuscaExplorar, type BuscaExplorar } from "@/lib/busca";
+import { POSICAO_RESERVA, useLocalizacao, type Localizacao } from "@/lib/localizacao";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/explorar")({
@@ -46,8 +48,6 @@ export const Route = createFileRoute("/explorar")({
   component: Explorar,
 });
 
-/** "Perto de mim" é simulado: usamos o Centro Histórico de São Luís como posição. */
-const POSICAO_SIMULADA = { lat: -2.5297, lng: -44.3028, nome: "Centro Histórico de São Luís" };
 const RAIO_PERTO_KM = 50;
 
 const normalizar = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -61,7 +61,19 @@ const DURACOES = [
   { valor: "dia", rotulo: "Dia inteiro" },
 ] as const;
 
-function filtrar(busca: BuscaExplorar) {
+const AVISOS: Record<Exclude<Localizacao["status"], "real">, string> = {
+  buscando: "Procurando sua localização…",
+  fora: "Você parece estar fora do Maranhão, então partimos do centro de São Luís.",
+  negada: "Sem permissão para ver sua localização, então partimos do centro de São Luís.",
+  indisponivel: "Não deu para achar sua localização, então partimos do centro de São Luís.",
+};
+
+function AvisoLocalizacao({ status }: { status: Localizacao["status"] }) {
+  if (status === "real") return null;
+  return <span className="text-legenda">{AVISOS[status]}</span>;
+}
+
+function filtrar(busca: BuscaExplorar, origem: Coordenada) {
   const q = busca.q ? normalizar(busca.q) : "";
   let lista: (Item & { km?: number })[] = itens.filter((i) => {
     if (busca.categoria && i.categoria !== busca.categoria) return false;
@@ -83,7 +95,7 @@ function filtrar(busca: BuscaExplorar) {
   });
   if (busca.perto) {
     lista = lista
-      .map((i) => ({ ...i, km: distanciaKm(POSICAO_SIMULADA, i) }))
+      .map((i) => ({ ...i, km: distanciaKm(origem, i) }))
       .filter((i) => i.km <= RAIO_PERTO_KM)
       .sort((a, b) => a.km - b.km);
   }
@@ -93,7 +105,8 @@ function filtrar(busca: BuscaExplorar) {
 function Explorar() {
   const busca = Route.useSearch();
   const navigate = useNavigate({ from: "/explorar" });
-  const resultado = useMemo(() => filtrar(busca), [busca]);
+  const local = useLocalizacao(Boolean(busca.perto));
+  const resultado = useMemo(() => filtrar(busca, local.posicao), [busca, local.posicao]);
   const ver = busca.ver ?? "lista";
 
   const atualizar = (mudanca: Mudanca) =>
@@ -212,10 +225,9 @@ function Explorar() {
             {busca.perto && (
               <>
                 {" "}
-                a até {RAIO_PERTO_KM} km de você.{" "}
-                <span className="text-legenda">
-                  (Simulação: usando o {POSICAO_SIMULADA.nome} como sua localização.)
-                </span>
+                a até {RAIO_PERTO_KM} km{" "}
+                {local.status === "real" ? "de você." : `do ${POSICAO_RESERVA.nome}.`}{" "}
+                <AvisoLocalizacao status={local.status} />
               </>
             )}
           </p>

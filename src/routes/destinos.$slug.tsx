@@ -5,6 +5,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { CalendarDays, Car, ChevronRight, MapPin } from "lucide-react";
 import { useMemo, type ReactNode } from "react";
 import { botao } from "@/components/azulejo/botao";
+import { ComoChegar } from "@/components/azulejo/ComoChegar";
 import { CardItem, CardRoteiro } from "@/components/azulejo/cards";
 import { MarcaCategoria, PontoGuara, Tag } from "@/components/azulejo/etiquetas";
 import { Favoritar } from "@/components/azulejo/Favoritar";
@@ -132,6 +133,7 @@ function PaginaDestino() {
                 </li>
               ))}
             </ul>
+            <ComoChegar destino={destino} nome={destino.nome} className="mt-6 max-w-sm" />
           </div>
         </div>
         <dl className="h-fit divide-y divide-linha rounded-md bg-areia p-5 md:p-6">

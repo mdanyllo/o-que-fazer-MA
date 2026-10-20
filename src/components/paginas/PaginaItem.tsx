@@ -6,6 +6,7 @@ import { ChevronRight, Gauge } from "lucide-react";
 import { useMemo } from "react";
 import { CardItem, CardRoteiro } from "@/components/azulejo/cards";
 import { corDaCategoria } from "@/components/azulejo/cores";
+import { ComoChegar } from "@/components/azulejo/ComoChegar";
 import { CardEmpresa, InfoPraticas } from "@/components/azulejo/detalhes";
 import { MarcaCategoria, Tag } from "@/components/azulejo/etiquetas";
 import { Favoritar } from "@/components/azulejo/Favoritar";
@@ -266,6 +267,7 @@ export function PaginaItem(props: Props) {
               </div>
             }
           />
+          <ComoChegar destino={dados} nome={dados.nome} />
           <MapaInterativo pontos={pontosMapa} agrupar={false} className="h-72 rounded-md" />
         </aside>
       </div>
