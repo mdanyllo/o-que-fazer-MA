@@ -33,3 +33,6 @@ dist-ssr
 
 # Supabase CLI (cache local e projeto ligado)
 supabase/.temp/
+
+# Vercel (build local e projeto ligado)
+.vercel/
