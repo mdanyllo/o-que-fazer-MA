@@ -13,6 +13,8 @@
     "test:banco": "node supabase/tests/permissoes.mjs",
     "test:real": "node supabase/tests/fluxo-real.mjs",
     "test:admin-real": "node supabase/tests/fluxo-admin-real.mjs",
+    "test:pro": "node supabase/tests/fluxo-pro-sandbox.mjs",
+    "pagar:sandbox": "node supabase/tests/pagar-sandbox.mjs",
     "seed:gerar": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/gerar-seed.ts"
   },
   "dependencies": {

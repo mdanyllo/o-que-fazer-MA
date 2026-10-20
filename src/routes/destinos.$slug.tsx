@@ -46,7 +46,7 @@ export const Route = createFileRoute("/destinos/$slug")({
   component: PaginaDestino,
 });
 
-const secao = "mx-auto flex max-w-7xl flex-col gap-8 px-5 py-12 md:px-12 md:py-20";
+const secao = "mx-auto flex max-w-site flex-col gap-8 px-site py-12 md:py-20";
 
 function PaginaDestino() {
   const { destino } = Route.useLoaderData();
@@ -60,7 +60,7 @@ function PaginaDestino() {
 
   return (
     <PageShell>
-      <div className="mx-auto max-w-7xl px-5 pt-8 md:px-12 md:pt-12">
+      <div className="mx-auto max-w-site px-site pt-8 md:pt-12">
         <nav aria-label="Você está em" className="text-legenda text-ink-suave">
           <ol className="flex items-center gap-1">
             <li>
@@ -116,7 +116,7 @@ function PaginaDestino() {
       {/* resumo + fatos */}
       <section
         aria-label="Resumo"
-        className="mx-auto grid max-w-7xl gap-10 px-5 py-12 md:px-12 md:py-20 lg:grid-cols-[1.4fr_1fr]"
+        className="mx-auto grid max-w-site gap-10 px-site py-12 md:py-20 lg:grid-cols-[1.4fr_1fr]"
       >
         <div className="flex flex-col gap-6">
           <p className="medida text-[1.1875rem]">{destino.resumo}</p>
@@ -183,7 +183,7 @@ function PaginaDestino() {
 
       {!negociosOk && (
         <section aria-label="Onde comer e onde ficar" className="bg-areia">
-          <div className="mx-auto max-w-7xl px-5 py-12 md:px-12 md:py-20">
+          <div className="mx-auto max-w-site px-site py-12 md:py-20">
             <AvisoNegocios className="bg-louca" />
           </div>
         </section>
@@ -191,7 +191,7 @@ function PaginaDestino() {
 
       {negociosOk && (ondeComer.length > 0 || ondeFicar.length > 0) && (
         <section aria-label="Onde comer e onde ficar" className="bg-areia">
-          <div className="mx-auto grid max-w-7xl gap-12 px-5 py-12 md:grid-cols-2 md:px-12 md:py-20">
+          <div className="mx-auto grid max-w-site gap-12 px-site py-12 md:grid-cols-2 md:py-20">
             <ListaCurta
               titulo="Onde comer"
               itens={ondeComer}

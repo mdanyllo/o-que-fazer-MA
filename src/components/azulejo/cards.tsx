@@ -12,12 +12,15 @@ import {
   type Item,
   type Roteiro,
 } from "@/data";
+import { useRef } from "react";
 import { useMarcarExemplo } from "@/lib/aviso-exemplo";
+import { useContarAparicao } from "@/lib/estatisticas";
 import { cn } from "@/lib/utils";
 import { corDaCategoria, type CorMaranhense } from "./cores";
 import { MarcaCategoria, Tag } from "./etiquetas";
 import { Favoritar } from "./Favoritar";
 import { Foto } from "./Foto";
+import { SeloVerificado } from "./SeloVerificado";
 
 /*
  * Cards no estilo da referência: foto com raio de 10px, título em Bricolage 600,
@@ -97,8 +100,10 @@ export function CardItem({
 }) {
   const categoria = categoriaPorId[item.categoria];
   useMarcarExemplo(item.exemplo);
+  const ref = useRef<HTMLElement>(null);
+  useContarAparicao(ref, item.negocioId);
   return (
-    <article className={cn("group relative flex min-w-0 flex-col gap-3", className)}>
+    <article ref={ref} className={cn("group relative flex min-w-0 flex-col gap-3", className)}>
       <Foto
         src={item.foto}
         alt={item.nome}
@@ -129,6 +134,7 @@ export function CardItem({
         >
           {item.nome}
         </Link>
+        {item.verificado && <SeloVerificado className="ml-1.5" />}
       </h3>
       <p className="text-base text-ink-suave">{item.resumo}</p>
       <div className="mt-auto flex flex-wrap gap-2">
@@ -307,6 +313,8 @@ export function CardHospedagem({
 }) {
   const classeLink = cn(linkEsticado, "hover:text-cobalto");
   useMarcarExemplo(h.exemplo);
+  const ref = useRef<HTMLElement>(null);
+  useContarAparicao(ref, h.negocioId);
   return (
     <article className={cn("group relative flex min-w-0 flex-col gap-2", className)}>
       <Foto
@@ -328,17 +336,20 @@ export function CardHospedagem({
       </Foto>
       <p className="text-legenda text-ink-suave">{nomeDestino(h.destino)}</p>
       {/* nome numa linha só; nota e preço presos na base, alinhados entre os cards */}
-      <h3 className="truncate text-t3">
+      <h3 className="flex min-w-0 items-center gap-1.5 text-t3">
         {/* com página própria vai para o lugar; senão, para a página da cidade */}
-        {h.lugar ? (
-          <Link to="/lugares/$slug" params={{ slug: h.lugar }} className={classeLink}>
-            {h.nome}
-          </Link>
-        ) : (
-          <Link to="/destinos/$slug" params={{ slug: h.destino }} className={classeLink}>
-            {h.nome}
-          </Link>
-        )}
+        <span className="truncate">
+          {h.lugar ? (
+            <Link to="/lugares/$slug" params={{ slug: h.lugar }} className={classeLink}>
+              {h.nome}
+            </Link>
+          ) : (
+            <Link to="/destinos/$slug" params={{ slug: h.destino }} className={classeLink}>
+              {h.nome}
+            </Link>
+          )}
+        </span>
+        {h.verificado && <SeloVerificado />}
       </h3>
       <div className="mt-auto flex flex-col gap-2">
         {h.avaliacao != null && h.avaliacoes != null && (

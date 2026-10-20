@@ -67,12 +67,14 @@ async function como(papel, uid, descricao, sql, espera) {
   await db.exec("begin");
   let ok;
   let detalhe;
+  let linhas;
   try {
     await db.exec(
       `set local role ${papel}; select set_config('request.jwt.claim.sub', '${uid ?? ""}', true);`,
     );
     const { rows } = await db.query(sql);
     await db.exec("commit");
+    linhas = rows;
     ok =
       espera !== "erro" &&
       typeof espera !== "object" &&
@@ -86,6 +88,7 @@ async function como(papel, uid, descricao, sql, espera) {
   if (ok) passaram++;
   else falhas.push(`${secao} › ${descricao}\n      ${detalhe}`);
   console.log(`  ${ok ? "✓" : "✗"} ${descricao}${ok ? "" : `\n      ${detalhe}`}`);
+  return linhas;
 }
 const visitante = (d, sql, e) => como("anon", null, d, sql, e);
 const dona = (d, sql, e) => como("authenticated", U.dona, d, sql, e);
@@ -324,8 +327,13 @@ await dona(
 );
 await dona(
   "em análise, não pode apagar campo obrigatório",
-  "update negocios set horario = null where slug = 'bar-da-um-sao-luis-2'",
-  { erro: "falta: horário" },
+  "update negocios set faixa_preco = null where slug = 'bar-da-um-sao-luis-2'",
+  { erro: "falta: faixa de preço" },
+);
+await dona(
+  "o horário de funcionamento é opcional (pode apagar em análise)",
+  "update negocios set horario = null where slug = 'bar-da-um-sao-luis-2' returning id",
+  uma,
 );
 
 titulo("Dono só muda o status para enviar à análise");
@@ -767,13 +775,60 @@ await outro(
   valor(0),
 );
 
+titulo("Convite para o dono assumir");
+const idEquipe2 = (await linha("equipe-2")).id;
+await dona("dono comum não gera convite", `select public.gerar_convite('${idEquipe2}')`, "erro");
+await visitante("visitante não gera convite", `select public.gerar_convite('${idEquipe2}')`, "erro");
+await admin(
+  "não gera convite para negócio que já tem dono",
+  `select public.gerar_convite((select id from negocios where slug = 'equipe-1'))`,
+  { erro: "já tem dono" },
+);
+const primeiro = (await como("authenticated", U.admin, "admin gera o convite", `select public.gerar_convite('${idEquipe2}') ->> 'token' as t`, uma))?.[0]?.t;
+const conviteDe = async () =>
+  (await como("authenticated", U.admin, "admin gera outro convite", `select public.gerar_convite('${idEquipe2}') ->> 'token' as t`, uma))?.[0]?.t;
+const token = await conviteDe();
+confere("o token é longo e diferente do anterior", token?.length === 64 && token !== primeiro, `${primeiro} / ${token}`);
+await visitante("o convite anterior deixa de valer", `select public.ver_convite('${primeiro}') ->> 'situacao'`, valor("invalido"));
+await admin("admin vê o convite que está valendo", `select public.convite_do_negocio('${idEquipe2}') ->> 'token'`, valor(token));
+await dona("dono comum não vê os convites", `select public.convite_do_negocio('${idEquipe2}')`, "erro");
+await visitante("visitante vê o nome do negócio no convite", `select public.ver_convite('${token}') ->> 'nome'`, valor("Equipe 2"));
+await visitante("token inventado é inválido", "select public.ver_convite('abc') ->> 'situacao'", valor("invalido"));
+await visitante("ninguém lê a tabela de convites", "select * from negocio_convites", "erro");
+await admin("nem o admin lê a tabela direto", "select * from negocio_convites", "erro");
+await visitante("sem login não aceita", `select public.aceitar_convite('${token}')`, "erro");
+await terceira(
+  "quem está logado aceita e vira o dono",
+  `select public.aceitar_convite('${token}') ->> 'nome'`,
+  valor("Equipe 2"),
+);
+await terceira(
+  "o negócio aparece para o novo dono",
+  `select count(*)::int from negocios where id = '${idEquipe2}' and dono_id = auth.uid()`,
+  valor(1),
+);
+await outro("o convite não serve duas vezes", `select public.aceitar_convite('${token}')`, { erro: "já foi usado" });
+await visitante("depois de usado, aparece como usado", `select public.ver_convite('${token}') ->> 'situacao'`, valor("usado"));
+await admin(
+  "convite vencido",
+  `select public.gerar_convite((select id from negocios where slug = 'equipe-3')) ->> 'token'`,
+  uma,
+);
+await db.query("update negocio_convites set expira_em = now() - interval '1 minute' where usado_em is null");
+{
+  const { rows } = await db.query("select token from negocio_convites where usado_em is null");
+  await visitante("…aparece como expirado", `select public.ver_convite('${rows[0].token}') ->> 'situacao'`, valor("expirado"));
+  await outro("…e não é aceito", `select public.aceitar_convite('${rows[0].token}')`, { erro: "expirou" });
+}
+
 titulo("Contas (admin_usuarios)");
 await visitante("visitante não lista contas", "select * from public.admin_usuarios()", "erro");
 await dona("dono não lista contas", "select * from public.admin_usuarios()", "erro");
 await admin(
   "admin lista contas com e-mail e número de negócios",
   "select email, negocios::int from public.admin_usuarios() where email = 'terceira@x.com'",
-  (r) => r.length === 1 && r[0].negocios === 6,
+  // 6, mais o que ela assumiu pelo convite
+  (r) => r.length === 1 && r[0].negocios === 7,
 );
 await admin("…todas as contas", "select count(*)::int from public.admin_usuarios()", valor(4));
 
@@ -791,6 +846,55 @@ await admin(
   `delete from storage.objects where name = '${idBar}/x.webp' returning id`,
   uma,
 );
+
+titulo("Plano Pro: assinaturas");
+const servidor = (d, sql, e) => como("service_role", null, d, sql, e);
+await dona("o dono não cria a própria assinatura", `insert into assinaturas (perfil_id, status, pro_ate) values ('${U.dona}', 'ativa', now() + interval '1 year')`, "erro");
+await servidor("o servidor (service_role) cria a assinatura", `insert into assinaturas (perfil_id, plano, forma, status, cpf_cnpj) values ('${U.dona}', 'mensal', 'pix', 'aguardando_pagamento', '12345678909') returning perfil_id`, uma);
+await dona("o dono lê a própria assinatura", "select status from assinaturas", valor("aguardando_pagamento"));
+await dona("o dono não se dá Pro", "update assinaturas set pro_ate = now() + interval '1 year'", "erro");
+await dona("o dono não apaga a assinatura", "delete from assinaturas", "erro");
+await outro("outro dono não vê a assinatura da dona", "select count(*)::int from assinaturas", valor(0));
+await visitante("visitante não vê assinaturas", "select count(*) from assinaturas", "erro");
+await admin("admin vê todas", "select count(*)::int from assinaturas", valor(1));
+await admin("nem o admin escreve pela API", `update assinaturas set pro_ate = now() + interval '1 year' where perfil_id = '${U.dona}'`, "erro");
+await visitante("sem pagamento, não é Pro", `select public.eh_pro('${U.dona}')`, valor(false));
+await visitante("sem Pro, nenhum selo", "select count(*)::int from public.negocios_verificados()", valor(0));
+await servidor("pagamento confirmado: Pro até o próximo vencimento + 3 dias", `update assinaturas set status = 'ativa', pro_ate = now() + interval '33 days' where perfil_id = '${U.dona}' returning status`, valor("ativa"));
+await visitante("agora é Pro", `select public.eh_pro('${U.dona}')`, valor(true));
+await visitante("o negócio publicado da dona ganha o selo", `select count(*)::int from public.negocios_verificados() id where id = '${idBar}'`, valor(1));
+await visitante("rascunho não ganha selo", `select count(*)::int from public.negocios_verificados() id where id = '${idBarco}'`, valor(0));
+await visitante("só os negócios dela têm selo", "select count(*)::int from public.negocios_verificados()", valor(1));
+
+titulo("Plano Pro: estatísticas");
+await visitante("visitante registra uma visita", `select public.registrar_evento('${idBar}', 'visita')`, uma);
+await visitante("…e um clique no WhatsApp", `select public.registrar_evento('${idBar}', 'whatsapp')`, uma);
+await visitante("…outra visita", `select public.registrar_evento('${idBar}', 'visita')`, uma);
+await visitante("tipo desconhecido é ignorado", `select public.registrar_evento('${idBar}', 'hackear')`, uma);
+await visitante("negócio não publicado não conta", `select public.registrar_evento('${idBarco}', 'visita')`, uma);
+{
+  const { rows } = await db.query("select negocio_id, tipo, total from negocio_estatisticas order by tipo");
+  confere("contou 2 visitas e 1 WhatsApp, só do publicado", rows.length === 2 && rows[0].tipo === "visita" && rows[0].total === 2 && rows[1].total === 1 && rows.every((r) => r.negocio_id === idBar), JSON.stringify(rows));
+}
+await visitante("visitante não lê a tabela de estatísticas", "select * from negocio_estatisticas", "erro");
+await dona("nem o dono lê a tabela direto", "select * from negocio_estatisticas", "erro");
+await dona("o dono Pro lê as estatísticas do próprio negócio", `select sum(total)::int from public.estatisticas_negocio('${idBar}', current_date - 30)`, valor(3));
+await outro("outro dono não lê", `select * from public.estatisticas_negocio('${idBar}', current_date - 30)`, { erro: "plano Pro" });
+await visitante("visitante não lê", `select * from public.estatisticas_negocio('${idBar}', current_date - 30)`, "erro");
+await admin("admin lê", `select sum(total)::int from public.estatisticas_negocio('${idBar}', current_date - 30)`, valor(3));
+await servidor("parou de pagar: passou da data, acabou o Pro", `update assinaturas set status = 'atrasada', pro_ate = now() - interval '1 minute' where perfil_id = '${U.dona}' returning status`, valor("atrasada"));
+await dona("sem Pro, o dono não lê mais as estatísticas", `select * from public.estatisticas_negocio('${idBar}', current_date - 30)`, { erro: "plano Pro" });
+await visitante("…e o selo some", "select count(*)::int from public.negocios_verificados()", valor(0));
+await visitante("os eventos continuam sendo contados no Gratuito", `select public.registrar_evento('${idBar}', 'site')`, uma);
+for (const canal of ["whatsapp", "instagram", "link", "link"])
+  await visitante(`compartilhou (${canal})`, `select public.registrar_evento('${idBar}', 'compartilhar_${canal}')`, uma);
+{
+  const { rows } = await db.query("select tipo, total from negocio_estatisticas where tipo like 'compartilhar_%' order by tipo");
+  confere("conta os compartilhamentos por canal", JSON.stringify(rows) === JSON.stringify([{ tipo: "compartilhar_instagram", total: 1 }, { tipo: "compartilhar_link", total: 2 }, { tipo: "compartilhar_whatsapp", total: 1 }]), JSON.stringify(rows));
+}
+await visitante("canal inventado é ignorado", `select public.registrar_evento('${idBar}', 'compartilhar_orkut')`, uma);
+await visitante("visitante não lê os avisos do Asaas", "select * from asaas_eventos", "erro");
+await admin("nem o admin lê os avisos do Asaas pela API", "select * from asaas_eventos", "erro");
 
 titulo("Excluir");
 await visitante("visitante não apaga", "delete from negocios where slug = 'barco-do-ze'", "erro");
@@ -811,6 +915,30 @@ confere(
       `select count(*)::int n from negocio_fotos where negocio_id in ('${idBar}', '${idBarco}')`,
     )
   ).rows[0].n === 0,
+);
+
+// ——— entrar com o Google ———
+secao = "Perfil de quem entra com o Google";
+await db.exec(`
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('55555555-5555-5555-5555-555555555555', 'google@x.com', '{"full_name": "Maria do Google", "name": "Maria"}'),
+  ('66666666-6666-6666-6666-666666666666', 'so-name@x.com', '{"name": "  Zé  "}');`);
+const nomeDoPerfil = async (id) =>
+  (await db.query(`select nome from perfis where id = '${id}'`)).rows[0]?.nome;
+confere(
+  "usa o full_name do Google",
+  (await nomeDoPerfil("55555555-5555-5555-5555-555555555555")) === "Maria do Google",
+);
+confere(
+  "sem full_name, usa o name",
+  (await nomeDoPerfil("66666666-6666-6666-6666-666666666666")) === "Zé",
+);
+confere(
+  "cadastro por e-mail continua usando o nome do formulário",
+  (await nomeDoPerfil(U.outro)) === "Dono Dois",
+);
+await db.exec(
+  "delete from auth.users where id in ('55555555-5555-5555-5555-555555555555', '66666666-6666-6666-6666-666666666666')",
 );
 
 // ——— resultado ———

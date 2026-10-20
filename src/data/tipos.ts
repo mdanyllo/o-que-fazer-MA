@@ -41,8 +41,15 @@ export type Destino = Coordenada & {
 
 /** O que só os negócios do banco têm (a página usa para a galeria, o contato e a ficha). */
 export type DetalhesNegocio = {
+  /** id na tabela negocios (estatísticas) */
+  id: string;
   tipo: TipoNegocio;
   exemplo: boolean;
+  /** dono com plano Pro: selo de verificado */
+  verificado: boolean;
+  /** perfil sem @ */
+  instagram?: string;
+  site?: string;
   /** fotos do próprio negócio, na ordem do dono (a primeira é a capa) */
   fotos: string[];
   /** só dígitos, com 55 */
@@ -146,6 +153,10 @@ export type Hospedagem = {
   foto: string;
   /** slug do lugar com página própria, quando a hospedagem tem página */
   lugar?: string;
+  /** id na tabela negocios (estatísticas de aparição) */
+  negocioId?: string;
+  /** dono com plano Pro: selo de verificado */
+  verificado?: boolean;
   /** negócio de exemplo (exemplo = true): liga o aviso do rodapé */
   exemplo?: boolean;
 };

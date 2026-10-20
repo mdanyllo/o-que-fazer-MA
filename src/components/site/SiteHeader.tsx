@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import {
   ChevronDown,
+  CreditCard,
   Heart,
   LogIn,
   LogOut,
@@ -26,6 +27,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { nomeParaMostrar, useAuth } from "@/lib/auth";
 import { useMinhaViagem } from "@/lib/minha-viagem";
 import { cn } from "@/lib/utils";
+import { MODO_ESCURO_LIGADO } from "@/lib/tema";
 import { BotaoTema } from "./BotaoTema";
 import { NAV_EXTRA, NAV_INFERIOR, NAV_PRINCIPAL } from "./nav";
 
@@ -38,10 +40,10 @@ export function SiteHeader() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-linha bg-louca text-ink">
-      <div className="flex h-16 items-center justify-between gap-4 px-[clamp(20px,5vw,80px)] md:h-20">
+      <div className="flex h-16 items-center justify-between gap-4 px-site md:h-20">
         <Link
           to="/"
-          className="flex h-9 items-center rounded-md md:h-10"
+          className="flex h-9 shrink-0 items-center rounded-md md:h-10"
           aria-label="Azulejo, início"
         >
           <Logo className="h-full" />
@@ -52,7 +54,7 @@ export function SiteHeader() {
             <Link
               key={item.to}
               to={item.to}
-              className="group relative flex min-h-11 items-center rounded-md px-3 text-base font-bold transition-colors duration-150 hover:text-cobalto data-[status=active]:text-cobalto"
+              className="group relative flex min-h-11 items-center rounded-md px-2 text-base font-bold transition-colors xl:px-3 duration-150 hover:text-cobalto data-[status=active]:text-cobalto"
             >
               {item.rotulo}
               {ativo(item.to) && (
@@ -69,7 +71,7 @@ export function SiteHeader() {
 
         <div className="ml-auto flex items-center gap-1 lg:ml-4">
           <MenuConta />
-          <BotaoTema className="hidden hover:bg-areia sm:grid" />
+          {MODO_ESCURO_LIGADO && <BotaoTema className="hidden hover:bg-areia sm:grid" />}
           <Link
             to="/minha-viagem"
             aria-label={`Minha viagem${salvos ? `, ${salvos} salvos` : ""}`}
@@ -83,8 +85,8 @@ export function SiteHeader() {
             )}
           </Link>
           <Link to="/planejar" className={cn(botao(), "ml-1 px-4 sm:px-5")}>
-            <span className="sm:hidden">Planejar</span>
-            <span className="hidden sm:inline">Planejar viagem</span>
+            <span className="sm:hidden lg:inline xl:hidden">Planejar</span>
+            <span className="hidden sm:inline lg:hidden xl:inline">Planejar viagem</span>
           </Link>
           <MenuCelular />
         </div>
@@ -125,10 +127,12 @@ function MenuCelular() {
             </Link>
           ))}
         </nav>
-        <div className="mx-3 flex min-h-12 items-center justify-between border-t border-linha px-3 pt-2 font-bold sm:hidden">
-          Tema
-          <BotaoTema className="hover:bg-areia" />
-        </div>
+        {MODO_ESCURO_LIGADO && (
+          <div className="mx-3 flex min-h-12 items-center justify-between border-t border-linha px-3 pt-2 font-bold sm:hidden">
+            Tema
+            <BotaoTema className="hover:bg-areia" />
+          </div>
+        )}
         <ContaCelular fechar={fechar} />
         <div className="mt-auto border-t border-linha p-4">
           <Link to="/planejar" onClick={fechar} className={cn(botao({ tamanho: "lg" }), "w-full")}>
@@ -140,7 +144,10 @@ function MenuCelular() {
   );
 }
 
-/** Conta no desktop: "Entrar" discreto, ou o menu com o nome de quem está logado. */
+/**
+ * Conta no desktop: sem login, o convite para negócios (quem já tem conta entra pela mesma
+ * tela, em "Já tem conta? Entrar"); com login, o menu com o nome.
+ */
 function MenuConta() {
   const { carregando, usuario, perfil, sair } = useAuth();
   const navigate = useNavigate();
@@ -150,10 +157,13 @@ function MenuConta() {
   if (!usuario)
     return (
       <Link
-        to="/entrar"
-        className="hidden min-h-11 items-center rounded-md px-3 text-[0.9375rem] text-ink-suave transition-colors duration-150 hover:text-cobalto lg:inline-flex"
+        to="/cadastrar"
+        className="hidden min-h-11 items-center gap-2 rounded-md px-3 text-[0.9375rem] font-bold whitespace-nowrap text-ink-suave transition-colors duration-150 hover:text-cobalto lg:inline-flex"
       >
-        Entrar
+        <Store className="hidden size-5 xl:block" aria-hidden />
+        {/* em telas médias o menu fica apertado: rótulo curto */}
+        <span className="xl:hidden">Seu negócio</span>
+        <span className="hidden xl:inline">Cadastre seu negócio</span>
       </Link>
     );
 
@@ -176,6 +186,11 @@ function MenuConta() {
         <DropdownMenuItem asChild className={item}>
           <Link to="/painel">
             <Store className="size-5" aria-hidden /> Meus negócios
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild className={item}>
+          <Link to="/painel/assinatura">
+            <CreditCard className="size-5" aria-hidden /> Plano e pagamento
           </Link>
         </DropdownMenuItem>
         {perfil?.papel === "admin" && (
@@ -211,9 +226,12 @@ function ContaCelular({ fechar }: { fechar: () => void }) {
 
   if (!usuario)
     return (
-      <div className="mx-3 border-t border-linha pt-2">
+      <div className="mx-3 flex flex-col gap-1 border-t border-linha pt-2">
+        <Link to="/cadastrar" onClick={fechar} className={classe}>
+          <Store className="size-5" aria-hidden /> Cadastre seu negócio
+        </Link>
         <Link to="/entrar" onClick={fechar} className={cn(classe, "font-normal text-ink-suave")}>
-          <LogIn className="size-5" aria-hidden /> Entrar
+          <LogIn className="size-5" aria-hidden /> Já tenho conta: entrar
         </Link>
       </div>
     );
@@ -225,6 +243,9 @@ function ContaCelular({ fechar }: { fechar: () => void }) {
       </p>
       <Link to="/painel" onClick={fechar} className={classe}>
         <Store className="size-5" aria-hidden /> Meus negócios
+      </Link>
+      <Link to="/painel/assinatura" onClick={fechar} className={classe}>
+        <CreditCard className="size-5" aria-hidden /> Plano e pagamento
       </Link>
       {perfil?.papel === "admin" && (
         <Link to="/admin" onClick={fechar} className={classe}>

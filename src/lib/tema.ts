@@ -5,11 +5,19 @@ export type Tema = "dia" | "noite";
 const CHAVE = "azulejo:tema";
 
 /**
+ * Modo escuro pausado por enquanto: o botão some do header e o site abre sempre claro,
+ * mesmo para quem tinha escolhido o escuro. Para voltar, troque para true.
+ */
+export const MODO_ESCURO_LIGADO = false;
+
+/**
  * Roda inline no <head>, antes da primeira pintura:
  * - adiciona a classe `js` (as animações de entrada só escondem conteúdo quando há JS);
  * - aplica o tema salvo, sem piscar o tema errado.
  */
-export const themeBootScript = `(function(){var d=document.documentElement;d.classList.add('js');try{if(localStorage.getItem('${CHAVE}')==='noite')d.setAttribute('data-theme','noite')}catch(e){}})();`;
+export const themeBootScript = MODO_ESCURO_LIGADO
+  ? `(function(){var d=document.documentElement;d.classList.add('js');try{if(localStorage.getItem('${CHAVE}')==='noite')d.setAttribute('data-theme','noite')}catch(e){}})();`
+  : `document.documentElement.classList.add('js');`;
 
 const ouvintes = new Set<() => void>();
 

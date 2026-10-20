@@ -123,6 +123,9 @@ export type Rascunho = {
   horario: string;
   duracao: string;
   ponto_encontro: string;
+  /** ponto marcado no mapa pelo dono; null = centro da cidade */
+  latitude: number | null;
+  longitude: number | null;
 };
 
 export const RASCUNHO_VAZIO: Rascunho = {
@@ -142,6 +145,8 @@ export const RASCUNHO_VAZIO: Rascunho = {
   horario: "",
   duracao: "",
   ponto_encontro: "",
+  latitude: null,
+  longitude: null,
 };
 
 const reaisInput = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
@@ -164,6 +169,8 @@ export function rascunhoDe(n: NegocioDono): Rascunho {
     horario: n.horario ?? "",
     duracao: n.duracao ?? "",
     ponto_encontro: n.ponto_encontro ?? "",
+    latitude: n.latitude,
+    longitude: n.longitude,
   };
 }
 
@@ -322,7 +329,6 @@ export function validar(r: Rascunho, nivel: "rascunho" | "completo", fotos: numb
     if (completo && !preenchido(r.culinaria)) e.culinaria = "Conte o tipo de culinária.";
     if (r.culinaria.trim().length > 40) e.culinaria = "Use até 40 caracteres.";
     if (completo && !r.faixa_preco) e.faixa_preco = "Escolha a faixa de preço.";
-    if (completo && !preenchido(r.horario)) e.horario = "Informe o horário de funcionamento.";
   }
   if (r.tipo === "passeio") {
     if (completo && !preenchido(r.preco)) e.preco = "Informe o preço por pessoa.";
@@ -339,7 +345,7 @@ export function validar(r: Rascunho, nivel: "rascunho" | "completo", fotos: numb
 }
 
 /** Só os campos que o dono pode gravar, já no formato do banco. */
-function payload(r: Rascunho, mudouCidade: boolean) {
+function payload(r: Rascunho) {
   const vazio = (v: string) => (v.trim() ? v.trim() : null);
   const tipo = r.tipo!;
   const cidade = getCidade(r.cidade);
@@ -361,11 +367,13 @@ function payload(r: Rascunho, mudouCidade: boolean) {
           : null,
     preco: tipo === "restaurante" ? null : lerPreco(r.preco),
     faixa_preco: tipo === "restaurante" ? r.faixa_preco || null : null,
-    horario: tipo === "restaurante" ? vazio(r.horario) : null,
+    horario: vazio(r.horario),
     duracao: tipo === "passeio" ? vazio(r.duracao) : null,
     ponto_encontro: tipo === "passeio" ? vazio(r.ponto_encontro) : null,
-    // o centro da cidade; só muda quando a cidade muda (a equipe pode ter ajustado o ponto)
-    ...(mudouCidade ? { latitude: cidade?.lat ?? null, longitude: cidade?.lng ?? null } : {}),
+    // o ponto marcado no mapa; sem ele, o centro da cidade (o formulário desmarca o ponto
+    // quando a cidade muda)
+    latitude: r.latitude ?? cidade?.lat ?? null,
+    longitude: r.longitude ?? cidade?.lng ?? null,
   };
 }
 
@@ -378,7 +386,7 @@ const ehSlugRepetido = (e: { code?: string; message?: string } | null) =>
  */
 export async function criarNegocio(r: Rascunho, equipe?: { exemplo: boolean }) {
   const dados = {
-    ...payload(r, true),
+    ...payload(r),
     status: "rascunho" as const,
     ...(equipe ? { dono_id: null, exemplo: equipe.exemplo } : {}),
   };
@@ -399,7 +407,7 @@ export async function salvarNegocio(
   { enviar = false }: { enviar?: boolean } = {},
 ) {
   const dados = {
-    ...payload(r, (original.cidade ?? "") !== r.cidade),
+    ...payload(r),
     ...(enviar ? { status: "pendente" as const } : {}),
   };
   for (let tentativa = 0; ; tentativa++) {

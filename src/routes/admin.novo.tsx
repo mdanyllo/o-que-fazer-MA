@@ -14,7 +14,7 @@ export const Route = createFileRoute("/admin/novo")({
   component: () => (
     <AreaRestrita papel="admin">
       {() => (
-        <LayoutAdmin titulo="Cadastrar negócio" largura="max-w-4xl">
+        <LayoutAdmin titulo="Cadastrar negócio">
           <FormularioNegocio modo="equipe" />
         </LayoutAdmin>
       )}

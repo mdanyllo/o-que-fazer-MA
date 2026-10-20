@@ -131,8 +131,12 @@ function precoTexto(n: NegocioPublico) {
 function detalhes(n: NegocioPublico): DetalhesNegocio {
   const subtipo = n.tipo === "hospedagem" ? TIPO_HOSPEDAGEM[n.subtipo ?? ""] : undefined;
   return {
+    id: n.id,
     tipo: n.tipo,
     exemplo: n.exemplo,
+    verificado: Boolean(n.verificado),
+    ...(n.instagram ? { instagram: n.instagram } : {}),
+    ...(n.site ? { site: n.site } : {}),
     fotos: fotosEmOrdem(n),
     ...(n.whatsapp ? { whatsapp: n.whatsapp } : {}),
     ...(subtipo ? { subtipo } : {}),
@@ -145,7 +149,7 @@ function detalhes(n: NegocioPublico): DetalhesNegocio {
 function base(n: NegocioPublico) {
   // sem valores padrão: o que o negócio não informou fica vazio e some da ficha
   const info: InfoPratica = {
-    horario: n.tipo === "hospedagem" ? "" : (n.horario ?? ""),
+    horario: n.horario ?? "",
     preco: precoTexto(n),
     duracao: (n.tipo === "passeio" ? n.duracao : n.extras.duracaoTexto) ?? "",
     dicas: n.extras.dicas ?? [],
@@ -209,6 +213,8 @@ function paraHospedagem(n: NegocioPublico): Hospedagem | null {
     // com página própria, o card leva para ela; senão, para a cidade
     ...(temPagina(n) ? { lugar: n.slug } : {}),
     ...(n.exemplo ? { exemplo: true } : {}),
+    negocioId: n.id,
+    ...(n.verificado ? { verificado: true } : {}),
   };
 }
 
@@ -233,6 +239,8 @@ function lugarParaItem(x: Lugar, negocio?: TipoNegocio): Item {
     tags: x.tags,
     ...(x.ficticio ? { ficticio: true } : {}),
     ...(x.exemplo ? { exemplo: true } : {}),
+    ...(x.negocio ? { negocioId: x.negocio.id } : {}),
+    ...(x.negocio?.verificado ? { verificado: true } : {}),
     ...(negocio ? { negocio } : {}),
     lat: x.lat,
     lng: x.lng,
@@ -254,6 +262,8 @@ function experienciaParaItem(x: Experiencia): Item {
     foto: x.foto,
     tags: x.tags,
     ...(x.exemplo ? { exemplo: true } : {}),
+    ...(x.negocio ? { negocioId: x.negocio.id } : {}),
+    ...(x.negocio?.verificado ? { verificado: true } : {}),
     negocio: "passeio",
     lat: x.lat,
     lng: x.lng,

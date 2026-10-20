@@ -37,7 +37,7 @@ function Eventos() {
         titulo="Eventos e festas"
         apoio="O calendário do Maranhão mês a mês. As datas exatas mudam todo ano: confira a programação oficial antes de viajar."
       />
-      <div className="mx-auto max-w-7xl px-5 pb-16 md:px-12 md:pb-24">
+      <div className="mx-auto max-w-site px-site pb-16 md:pb-24">
         <div
           role="group"
           aria-label="Escolher mês"

@@ -62,7 +62,7 @@ function MinhaViagem() {
         titulo="Minha viagem"
         apoio="Seus roteiros e lugares salvos. Fica tudo guardado só neste navegador, sem cadastro."
       />
-      <div className="mx-auto flex max-w-7xl flex-col gap-16 px-5 pb-16 md:px-12 md:pb-24">
+      <div className="mx-auto flex max-w-site flex-col gap-16 px-site pb-16 md:pb-24">
         {vazio && <Vazio />}
         {/* sem o banco, favoritos de restaurantes, hospedagens e passeios não aparecem */}
         {!vazio && !negociosOk && <AvisoNegocios />}

@@ -29,6 +29,7 @@ import {
 import type { SubtipoHospedagem, TipoNegocio } from "@/lib/negocios";
 import { cn } from "@/lib/utils";
 import { CampoArea, CampoCidade, GrupoOpcoes } from "./campos";
+import { CampoLocalizacao } from "./CampoLocalizacao";
 import { EtapaFotos } from "./EtapaFotos";
 import { ExcluirNegocio } from "./ExcluirNegocio";
 import { PreviaNegocio } from "./PreviaNegocio";
@@ -117,7 +118,12 @@ export function FormularioNegocio({
   }, [alterado]);
 
   const mudar = <K extends keyof Rascunho>(campo: K, valor: Rascunho[K]) => {
-    setR((atual) => ({ ...atual, [campo]: valor }));
+    setR((atual) => ({
+      ...atual,
+      [campo]: valor,
+      // outra cidade: o ponto marcado no mapa não vale mais
+      ...(campo === "cidade" && valor !== atual.cidade ? { latitude: null, longitude: null } : {}),
+    }));
     if (erros[campo]) setErros(({ [campo]: _, ...resto }) => resto);
     // o resumo "Faltam N itens" vale para o envio que falhou; ao corrigir, sai
     setErroGeral(null);
@@ -507,15 +513,6 @@ function EtapaDados({ r, erros, mudar }: PropsEtapa) {
             erro={erros.faixa_preco}
             className="sm:grid-cols-3"
           />
-          <CampoTexto
-            id={id("horario")}
-            rotulo="Horário"
-            valor={r.horario}
-            aoMudar={(v) => mudar("horario", v)}
-            erro={erros.horario}
-            maxLength={160}
-            placeholder="Terça a domingo, das 11h às 22h"
-          />
         </>
       )}
 
@@ -533,9 +530,28 @@ function EtapaDados({ r, erros, mudar }: PropsEtapa) {
           />
         </>
       )}
+
+      {r.tipo && (
+        <CampoTexto
+          id={id("horario")}
+          rotulo="Horário de funcionamento"
+          opcional
+          valor={r.horario}
+          aoMudar={(v) => mudar("horario", v)}
+          erro={erros.horario}
+          maxLength={160}
+          placeholder={EXEMPLO_HORARIO[r.tipo]}
+        />
+      )}
     </div>
   );
 }
+
+const EXEMPLO_HORARIO: Record<TipoNegocio, string> = {
+  hospedagem: "Recepção das 7h às 22h, check-in a partir das 14h",
+  restaurante: "Terça a domingo, das 11h às 22h",
+  passeio: "Saídas todos os dias às 8h e às 14h",
+};
 
 function CampoPreco({
   r,
@@ -566,7 +582,7 @@ function EtapaContato({ r, erros, mudar }: PropsEtapa) {
       <h2 className="text-t2">Contato</h2>
       <CampoTexto
         id={id("whatsapp")}
-        rotulo="WhatsApp"
+        rotulo="WhatsApp Comercial"
         type="tel"
         inputMode="tel"
         autoComplete="tel-national"
@@ -574,7 +590,7 @@ function EtapaContato({ r, erros, mudar }: PropsEtapa) {
         aoMudar={(v) => mudar("whatsapp", digitosWhatsapp(v))}
         erro={erros.whatsapp}
         placeholder="(98) 99123-4567"
-        dica="Com DDD. É por onde quem viaja vai falar com você."
+        dica="Número onde os clientes mandam mensagem para você. Com DDD."
       />
       <CampoTexto
         id={id("instagram")}
@@ -622,14 +638,16 @@ function EtapaContato({ r, erros, mudar }: PropsEtapa) {
           placeholder="Porto de Barreirinhas, em frente à praça"
         />
       )}
-      <div className="rounded-md bg-areia p-5">
-        <p className="text-rotulo">Localização no mapa</p>
-        <p className="mt-1 medida text-ink-suave">
-          {r.cidade
-            ? `O negócio aparece no centro de ${r.cidade}. A equipe do Azulejo ajusta o ponto exato antes de publicar.`
-            : "Escolha a cidade em Dados básicos. A equipe do Azulejo ajusta o ponto exato no mapa."}
-        </p>
-      </div>
+      <CampoLocalizacao
+        cidade={r.cidade}
+        latitude={r.latitude}
+        longitude={r.longitude}
+        passeio={r.tipo === "passeio"}
+        aoMudar={(lat, lng) => {
+          mudar("latitude", lat);
+          mudar("longitude", lng);
+        }}
+      />
     </div>
   );
 }
@@ -671,7 +689,6 @@ function EtapaRevisao({
       ? [
           { rotulo: "Culinária", valor: r.culinaria, etapa: 2 },
           { rotulo: "Faixa de preço", valor: r.faixa_preco, etapa: 2 },
-          { rotulo: "Horário", valor: r.horario, etapa: 2 },
         ]
       : []),
     ...(r.tipo === "passeio"
@@ -681,10 +698,21 @@ function EtapaRevisao({
           { rotulo: "Ponto de encontro", valor: r.ponto_encontro, etapa: 3 },
         ]
       : []),
-    { rotulo: "WhatsApp", valor: mascararWhatsapp(r.whatsapp), etapa: 3 },
+    { rotulo: "Horário de funcionamento", valor: r.horario || "—", etapa: 2 },
+    { rotulo: "WhatsApp Comercial", valor: mascararWhatsapp(r.whatsapp), etapa: 3 },
     { rotulo: "Instagram", valor: r.instagram || "—", etapa: 3 },
     { rotulo: "Site", valor: r.site || "—", etapa: 3 },
     { rotulo: "Endereço", valor: r.endereco || "—", etapa: 3 },
+    {
+      rotulo: "Localização",
+      valor:
+        r.latitude != null
+          ? "Marcada no mapa"
+          : r.cidade
+            ? `Não marcada (centro de ${r.cidade})`
+            : "Não marcada",
+      etapa: 3,
+    },
     { rotulo: "Fotos", valor: `${fotos.length} de 8`, etapa: 4 },
   ];
   const itensFaltando = Object.values(faltando);
@@ -743,9 +771,8 @@ function EtapaRevisao({
         base={{
           id: negocio.id,
           slug: negocio.slug,
-          // o ponto ajustado pela equipe só vale enquanto a cidade não muda
-          latitude: (negocio.cidade ?? "") === r.cidade ? negocio.latitude : null,
-          longitude: (negocio.cidade ?? "") === r.cidade ? negocio.longitude : null,
+          latitude: r.latitude,
+          longitude: r.longitude,
         }}
       />
     </div>

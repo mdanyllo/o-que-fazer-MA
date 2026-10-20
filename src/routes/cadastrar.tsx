@@ -11,6 +11,7 @@ import {
   validarEmail,
   validarSenha,
 } from "@/components/conta/formulario";
+import { EntrarComGoogle } from "@/components/conta/EntrarComGoogle";
 import { LayoutConta } from "@/components/conta/LayoutConta";
 import { mensagemDeErro, urlDoSite, useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -170,6 +171,7 @@ function Cadastrar() {
           {enviando ? "Criando a conta…" : "Criar conta"}
         </Botao>
       </form>
+      <EntrarComGoogle termos />
       <p className="border-t border-linha pt-6 text-ink-suave">
         Já tem conta?{" "}
         <Link to="/entrar" className={linkConta}>

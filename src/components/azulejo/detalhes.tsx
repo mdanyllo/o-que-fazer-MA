@@ -1,4 +1,15 @@
-import { CalendarCheck, Check, Clock, Lightbulb, MessageCircle, Star, Wallet } from "lucide-react";
+import {
+  CalendarCheck,
+  Check,
+  Clock,
+  Globe,
+  Instagram,
+  Lightbulb,
+  MessageCircle,
+  Star,
+  Wallet,
+} from "lucide-react";
+import { registrarEvento, useEhPrevia } from "@/lib/estatisticas";
 import { useId, useState, type FormEvent, type ReactNode } from "react";
 import { toast } from "sonner";
 import {
@@ -21,12 +32,15 @@ export function InfoPraticas({
   info,
   extra,
   acao,
+  compartilhar,
   exemplo = true,
 }: {
   info: InfoPratica;
   extra?: ReactNode;
   /** botão no fim da ficha (ex.: Falar no WhatsApp) */
   acao?: ReactNode;
+  /** botão ao lado do título (Compartilhar) */
+  compartilhar?: ReactNode;
   exemplo?: boolean;
 }) {
   const linhas: [ReactNode, string, string][] = [
@@ -40,7 +54,10 @@ export function InfoPraticas({
   ];
   return (
     <div className="rounded-md bg-areia p-5 md:p-6">
-      <h2 className="text-t3">Informações práticas</h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-t3">Informações práticas</h2>
+        {compartilhar}
+      </div>
       <dl className="mt-4 divide-y divide-linha">
         {linhas
           .filter(([, , v]) => v && v !== "—")
@@ -104,19 +121,73 @@ export function LinhaInfo({
   );
 }
 
-/** Link para o WhatsApp do negócio, com a mensagem pronta. */
-export function FalarNoWhatsapp({ numero, nome }: { numero: string; nome: string }) {
+/**
+ * Contatos do negócio: WhatsApp (com a mensagem pronta), Instagram e site. Cada clique conta
+ * nas estatísticas do plano Pro (fora da prévia do painel).
+ */
+export function ContatosNegocio({
+  negocioId,
+  nome,
+  whatsapp,
+  instagram,
+  site,
+}: {
+  negocioId: string;
+  nome: string;
+  whatsapp?: string | undefined;
+  instagram?: string | undefined;
+  site?: string | undefined;
+}) {
+  const previa = useEhPrevia();
+  const contar = (evento: "whatsapp" | "instagram" | "site") => () => {
+    if (!previa) registrarEvento(negocioId, evento);
+  };
   const texto = `Olá! Vi ${nome} no Azulejo e gostaria de mais informações.`;
+  const linkSecundario =
+    "inline-flex min-h-11 items-center gap-2 font-bold text-cobalto underline-offset-4 hover:underline [&_svg]:size-5";
   return (
-    <a
-      href={`https://wa.me/${numero.replace(/\D/g, "")}?text=${encodeURIComponent(texto)}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`${botao({ tamanho: "lg" })} w-full`}
-    >
-      <MessageCircle aria-hidden /> Falar no WhatsApp
-      <span className="sr-only"> (abre em outra aba)</span>
-    </a>
+    <div className="flex flex-col gap-2">
+      {whatsapp && (
+        <a
+          href={`https://wa.me/${whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(texto)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={contar("whatsapp")}
+          className={`${botao({ tamanho: "lg" })} w-full`}
+        >
+          <MessageCircle aria-hidden /> Falar no WhatsApp
+          <span className="sr-only"> (abre em outra aba)</span>
+        </a>
+      )}
+      {(instagram || site) && (
+        <div className="flex flex-wrap gap-x-6">
+          {instagram && (
+            <a
+              href={`https://instagram.com/${instagram}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={contar("instagram")}
+              className={linkSecundario}
+            >
+              <Instagram aria-hidden /> @{instagram}
+              <span className="sr-only"> no Instagram (abre em outra aba)</span>
+            </a>
+          )}
+          {site && (
+            <a
+              href={site}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={contar("site")}
+              className={linkSecundario}
+            >
+              <Globe aria-hidden /> Site
+              <span className="sr-only"> de {nome} (abre em outra aba)</span>
+            </a>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 

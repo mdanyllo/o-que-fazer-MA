@@ -32,6 +32,7 @@ import {
   type Roteiro,
   type TipoHospedagem,
 } from "@/data";
+import { useIrParaOsNegociosAoChegar } from "@/lib/auth";
 import { useCatalogo } from "@/lib/use-catalogo";
 import { cn } from "@/lib/utils";
 
@@ -93,11 +94,12 @@ const CATEGORIAS_HOME: CategoriaId[] = [
 
 /** respiro vertical igual em todas as seções da Home */
 const respiro = "py-[clamp(72px,9vw,128px)]";
-const secao = `mx-auto max-w-7xl px-5 md:px-12 ${respiro}`;
+const secao = `mx-auto max-w-site px-site ${respiro}`;
 
 const seta = <ArrowRight className="size-4" aria-hidden />;
 
 function Home() {
+  useIrParaOsNegociosAoChegar();
   const comecar = POR_ONDE_COMECAR.map((c) => ({ ...c, destino: getDestino(c.slug) })).filter(
     (c): c is typeof c & { destino: Destino } => Boolean(c.destino),
   );
@@ -175,7 +177,7 @@ function Home() {
       {/* Mapa: a faixa forte da página, em cobalto */}
       <section aria-labelledby="mapa" className="bg-cobalto text-sobre-cobalto">
         <div
-          className={`mx-auto grid max-w-7xl items-center gap-10 px-5 md:px-12 ${respiro} lg:grid-cols-[1fr_1.3fr]`}
+          className={`mx-auto grid max-w-site items-center gap-10 px-site ${respiro} lg:grid-cols-[1fr_1.3fr]`}
         >
           <Revelar variante="esquerda" className="flex flex-col gap-4">
             <h2 id="mapa" className="text-t1">
@@ -230,7 +232,7 @@ function Home() {
       {/* Chamada para planejar: bloco cobalto com o padrão inteiro por trás, como o painel do hero */}
       <section
         aria-labelledby="planejar"
-        className="mx-auto max-w-7xl px-5 pb-[clamp(72px,9vw,128px)] md:px-12"
+        className="mx-auto max-w-site px-site pb-[clamp(72px,9vw,128px)]"
       >
         <Revelar
           variante="escala"
@@ -395,7 +397,7 @@ function MesDeBoi() {
   return (
     <section aria-labelledby="boi" className="bg-areia">
       <div
-        className={`mx-auto grid max-w-7xl items-center gap-10 px-5 md:px-12 ${respiro} lg:grid-cols-2 lg:gap-16`}
+        className={`mx-auto grid max-w-site items-center gap-10 px-site ${respiro} lg:grid-cols-2 lg:gap-16`}
       >
         <div>
           <Foto

@@ -119,6 +119,10 @@ export type Item = Coordenada & {
   negocio?: TipoNegocio;
   /** negócio de exemplo (exemplo = true): liga o aviso do rodapé */
   exemplo?: boolean;
+  /** id na tabela negocios (estatísticas de aparição) */
+  negocioId?: string;
+  /** dono com plano Pro: selo de verificado */
+  verificado?: boolean;
   href: "/lugares/$slug" | "/experiencias/$slug";
 };
 

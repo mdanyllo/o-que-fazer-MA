@@ -22,11 +22,14 @@ export function ExcluirNegocio({
   negocio,
   aoExcluir,
   chave = ["meus-negocios"],
+  naBarra = false,
 }: {
   negocio: NegocioDono;
   aoExcluir: () => void;
   /** consulta a recarregar depois (painel do dono ou admin) */
   chave?: string[];
+  /** na barra do dono na página pública: sem a linha de cima e com rótulo curto */
+  naBarra?: boolean;
 }) {
   const queryClient = useQueryClient();
   const [aberto, setAberto] = useState(false);
@@ -50,10 +53,15 @@ export function ExcluirNegocio({
   }
 
   return (
-    <section aria-label="Excluir negócio" className="border-t border-linha pt-6">
+    <section
+      aria-label="Excluir negócio"
+      className={naBarra ? undefined : "border-t border-linha pt-6"}
+    >
       <AlertDialog open={aberto} onOpenChange={(a) => !excluindo && setAberto(a)}>
-        <AlertDialogTrigger className={cn(botao({ variante: "fantasma" }), "-ml-3 text-guara")}>
-          <Trash2 aria-hidden /> Excluir negócio
+        <AlertDialogTrigger
+          className={cn(botao({ variante: "fantasma" }), naBarra ? "px-3" : "-ml-3", "text-guara")}
+        >
+          <Trash2 aria-hidden /> {naBarra ? "Excluir" : "Excluir negócio"}
         </AlertDialogTrigger>
         <AlertDialogContent className="rounded-md border-linha bg-louca text-ink">
           <AlertDialogHeader>

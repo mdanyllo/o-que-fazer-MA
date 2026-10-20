@@ -10,6 +10,7 @@ import {
   linkConta,
   validarEmail,
 } from "@/components/conta/formulario";
+import { EntrarComGoogle } from "@/components/conta/EntrarComGoogle";
 import { LayoutConta } from "@/components/conta/LayoutConta";
 import { destinoSeguro, mensagemDeErro, urlDoSite, useAuth } from "@/lib/auth";
 import { hashInicial, supabase } from "@/lib/supabase";
@@ -40,7 +41,13 @@ function Entrar() {
   const [enviando, setEnviando] = useState(false);
   // link do e-mail que chegou expirado ou já usado (lido depois da hidratação)
   const [linkVencido, setLinkVencido] = useState(false);
-  useEffect(() => setLinkVencido(hashInicial.get("error_code") === "otp_expired"), []);
+  // volta do Google com erro (a pessoa cancelou, por exemplo)
+  const [erroGoogle, setErroGoogle] = useState(false);
+  useEffect(() => {
+    const codigo = hashInicial.get("error_code");
+    setLinkVencido(codigo === "otp_expired");
+    setErroGoogle(Boolean(hashInicial.get("error")) && codigo !== "otp_expired");
+  }, []);
 
   // já entrou (ou acabou de confirmar o e-mail pelo link): segue para onde ia
   useEffect(() => {
@@ -83,9 +90,14 @@ function Entrar() {
   return (
     <LayoutConta
       titulo="Entrar"
-      apoio="Para quem cadastra restaurante, hospedagem ou passeio no Azulejo."
+      apoio="Para quem tem restaurante, hospedagem ou passeio no Azulejo."
     >
       <form onSubmit={enviar} noValidate className="flex flex-col gap-5">
+        {erroGoogle && !erroGeral && (
+          <CaixaErro>
+            Não deu para entrar com o Google. Tente de novo ou use seu e-mail e senha.
+          </CaixaErro>
+        )}
         {linkVencido && !erroGeral && (
           <CaixaErro>
             Esse link expirou ou já foi usado. Entre com seu e-mail e senha; se a conta ainda não
@@ -133,10 +145,11 @@ function Entrar() {
           {enviando ? "Entrando…" : "Entrar"}
         </Botao>
       </form>
+      <EntrarComGoogle redirect={redirect} />
       <p className="border-t border-linha pt-6 text-ink-suave">
         Ainda não tem conta?{" "}
         <Link to="/cadastrar" className={linkConta}>
-          Cadastre seu negócio
+          Cadastre sua conta
         </Link>
       </p>
     </LayoutConta>

@@ -15,7 +15,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { listarContas, listarNegociosAdmin, transferir, type Conta } from "@/lib/admin";
+import {
+  listarContas,
+  listarNegociosAdmin,
+  listarPlanos,
+  transferir,
+  type Conta,
+  type PlanoConta,
+} from "@/lib/admin";
 import { LIMITE_NEGOCIOS, mensagemErroNegocio } from "@/lib/meus-negocios";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +37,7 @@ const data = new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium" });
 
 function Usuarios() {
   const contas = useQuery({ queryKey: ["admin-contas"], queryFn: listarContas });
+  const planos = useQuery({ queryKey: ["admin-planos"], queryFn: listarPlanos });
   return (
     <LayoutAdmin titulo="Usuários">
       <p className="-mt-4 medida text-ink-suave">
@@ -62,6 +70,7 @@ function Usuarios() {
                   {c.papel === "admin" && (
                     <Tag className="bg-cobalto text-sobre-cobalto">Admin</Tag>
                   )}
+                  <EtiquetaPlano plano={planos.data?.get(c.id)} />
                 </p>
                 <p className="truncate text-legenda text-ink-suave">{c.email}</p>
                 <p className="mt-1 text-legenda">
@@ -158,5 +167,25 @@ function Transferir({ conta }: { conta: Conta }) {
         </Botao>
       </DialogContent>
     </Dialog>
+  );
+}
+
+/** Pro (até quando, mensal ou anual) ou nada, para quem está no Gratuito. */
+function EtiquetaPlano({ plano }: { plano: PlanoConta | undefined }) {
+  if (!plano?.pro_ate || new Date(plano.pro_ate) <= new Date()) {
+    if (plano?.status === "aguardando_pagamento") return <Tag>Pro aguardando pagamento</Tag>;
+    return null;
+  }
+  return (
+    <Tag className="bg-ouro text-sobre-ouro">
+      Pro{" "}
+      {plano.plano === "anual" ? "anual" : `mensal (${plano.forma === "pix" ? "Pix" : "cartão"})`}{" "}
+      até {new Date(plano.pro_ate).toLocaleDateString("pt-BR")}
+      {plano.status === "atrasada"
+        ? ", em atraso"
+        : plano.status === "cancelada"
+          ? ", cancelado"
+          : ""}
+    </Tag>
   );
 }

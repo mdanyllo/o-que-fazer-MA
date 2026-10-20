@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { LoadingAzulejo } from "@/components/azulejo/LoadingAzulejo";
+import { ConviteDono } from "@/components/admin/ConviteDono";
 import { LayoutAdmin } from "@/components/admin/LayoutAdmin";
 import {
   AcoesNegocio,
@@ -66,10 +67,14 @@ function NegocioAdmin() {
   const n = consulta.data;
   const recarregar = () => consulta.refetch();
   return (
-    <LayoutAdmin titulo={n.nome} largura="max-w-7xl">
+    <LayoutAdmin titulo={n.nome} largura="max-w-site">
       <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_24rem]">
         <aside className="flex flex-col gap-6 lg:order-2">
           <AcoesNegocio negocio={n} recarregar={recarregar} />
+          {/* os dados de exemplo também não têm dono, mas não são de ninguém */}
+          {!n.dono_id && !n.exemplo && (
+            <ConviteDono negocioId={n.id} nome={n.nome} whatsapp={n.whatsapp} />
+          )}
           <EditorPosicao
             key={`${n.id}-${n.latitude}-${n.longitude}`}
             negocio={n}

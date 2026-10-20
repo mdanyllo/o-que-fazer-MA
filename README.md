@@ -1050,7 +1050,12 @@ No painel do Supabase, abra o **SQL Editor** e rode, nesta ordem, o conteúdo de
 4. `supabase/migrations/20261009120000_revisao_e_slug.sql`
 5. `supabase/migrations/20261010120000_cadastro_dono.sql`
 6. `supabase/migrations/20261011120000_admin.sql`
-7. `supabase/seed.sql` (os 24 negócios de exemplo, publicados e marcados como exemplo)
+7. `supabase/migrations/20261014120000_plano_pro.sql` (assinaturas, selo e estatísticas; veja a seção 6)
+8. `supabase/migrations/20261018120000_convites.sql` (link para o dono assumir um negócio cadastrado pela equipe)
+9. `supabase/migrations/20261020120000_perfil_google.sql` (nome do perfil de quem entra com o Google)
+10. `supabase/migrations/20261020130000_compartilhamentos.sql` (compartilhamentos nas estatísticas)
+11. `supabase/migrations/20261021120000_horario_opcional.sql` (horário de funcionamento opcional)
+12. `supabase/seed.sql` (os 24 negócios de exemplo, publicados e marcados como exemplo)
 
 Com a [Supabase CLI](https://supabase.com/docs/guides/cli), o mesmo é `supabase link` + `supabase db push` e, para o seed, rodar `supabase/seed.sql` no SQL Editor.
 
@@ -1069,6 +1074,30 @@ Em **Authentication → URL Configuration**:
 
 Em **Authentication → Sign In / Providers → Email**, deixe **Confirm email** ligado. Os textos dos e-mails podem ser traduzidos em **Authentication → Emails**. O envio padrão do Supabase tem limite baixo de e-mails por hora; para produção, configure um SMTP próprio em **Authentication → SMTP Settings**.
 
+#### E-mail de aprovação
+
+Quando o admin aprova um negócio, a função `avisar-aprovacao` manda um e-mail para o dono ("Seu negócio está no ar", com os botões "Ver a página" e "Abrir meu painel"). O envio é pelo [Resend](https://resend.com) (grátis até 3.000 e-mails por mês):
+
+1. Crie a conta no Resend e, em **Domains**, adicione e verifique o domínio do site (ex.: `azulejo.com.br`). Sem domínio verificado, o Resend só entrega para o e-mail da própria conta.
+2. Em **API Keys**, crie uma chave e grave nas Edge Functions (no terminal, nunca no `.env` do site):
+   `npx supabase secrets set RESEND_API_KEY=... EMAIL_REMETENTE="Azulejo <contato@azulejo.com.br>"`
+3. `SITE_URL` (seção 6) define o endereço dos botões; sem ele, vale o endereço de onde o admin aprovou.
+
+Sem `RESEND_API_KEY`, a aprovação funciona normalmente e só o e-mail não sai.
+
+#### Entrar com o Google
+
+O botão "Continuar com o Google" em `/entrar` e `/cadastrar` só aparece quando o Google está ligado no Supabase (o site confere sozinho). Para ligar:
+
+1. No [Google Cloud Console](https://console.cloud.google.com/), em **APIs e serviços → Tela de permissão OAuth**, configure o app (tipo **Externo**, nome "Azulejo", e-mail de suporte, logo opcional) e publique (**Em produção**).
+2. Em **APIs e serviços → Credenciais → Criar credenciais → ID do cliente OAuth**, escolha **Aplicativo da Web**:
+   - **Origens JavaScript autorizadas**: `http://localhost:8080` e o domínio de produção.
+   - **URIs de redirecionamento autorizados**: `https://<seu-projeto>.supabase.co/auth/v1/callback` (o Supabase mostra o endereço exato na tela do provedor Google).
+3. Copie o **ID do cliente** e a **Chave secreta** para **Authentication → Sign In / Providers → Google** no Supabase e ligue o provedor. A chave secreta fica só no Supabase, nunca no `.env` do site.
+4. Em **Authentication → URL Configuration → Redirect URLs**, acrescente `http://localhost:*/entrar**` e o mesmo no domínio de produção (o `**` deixa passar o `?redirect=`).
+
+Quem entra pelo Google pela primeira vez ganha conta de dono com o nome do Google. Se o e-mail já tinha conta com senha, o Supabase junta as duas na mesma conta.
+
 ### 5. Primeiro admin
 
 Ninguém vira admin pelo site. Crie a conta normalmente em `/cadastrar`, confirme o e-mail e rode no SQL Editor:
@@ -1080,3 +1109,44 @@ where id = (select id from auth.users where email = 'seu-email@exemplo.com');
 ```
 
 Para tirar o acesso, rode o mesmo comando com `'dono'`. A pessoa precisa sair e entrar de novo para o menu mudar.
+
+### 6. Plano Pro (pagamento pelo Asaas)
+
+O plano Gratuito é o de toda conta nova. O Pro (por conta) dá o selo de verificado nos negócios publicados e a página de estatísticas (`/painel/estatisticas/:id`). Preços e regras ficam em `supabase/functions/_shared/precos.ts`, usado pelo site e pelo servidor:
+
+- **Mensal:** R$ 29,90, assinatura no Asaas, no Pix (a pessoa paga o QR Code de cada mês; não é débito automático) ou no cartão (cobrado sozinho). Sem pagamento, o Pro vale até 3 dias depois do vencimento e acaba.
+- **Anual:** R$ 329,90 à vista ou em até 12x com juros (tabela Price, `JUROS_MES`), só no cartão. Dá 12 meses de Pro e não renova sozinho.
+
+O Pro só liga quando o Asaas avisa o pagamento (webhook). Quem decide se a conta é Pro é a data `assinaturas.pro_ate`; só o servidor escreve nessa tabela.
+
+**Peças:**
+
+- `supabase/functions/asaas-assinar`: cria o cliente e a cobrança no Asaas e devolve o link da fatura.
+- `supabase/functions/asaas-cancelar`: cancela a assinatura mensal (o Pro vai até a data já paga).
+- `supabase/functions/asaas-webhook`: recebe os avisos do Asaas, liga, estende e encerra o Pro e pede a nota fiscal.
+
+**Segredos das funções** (nunca em variáveis `VITE_*` nem no git). Guarde no `.env.local` e grave no Supabase com a CLI:
+
+| Segredo | O que é |
+| --- | --- |
+| `ASAAS_API_KEY` | chave de API do Asaas (Integrações → Chaves de API) |
+| `ASAAS_API_URL` | `https://api-sandbox.asaas.com/v3` (testes) ou `https://api.asaas.com/v3` (produção) |
+| `ASAAS_WEBHOOK_TOKEN` | token do webhook; o `--configurar` abaixo gera |
+| `SITE_URL` | opcional: endereço do site (ex.: `https://azulejo.com.br`). Com ele, o Asaas volta para `/painel/assinatura` depois do pagamento. O domínio precisa estar cadastrado no Asaas (Minha Conta → Informações), senão a cobrança é recusada. |
+| `ASAAS_NFSE_SERVICO_ID`, `ASAAS_NFSE_SERVICO_CODIGO`, `ASAAS_NFSE_SERVICO_NOME`, `ASAAS_NFSE_ISS` | serviço municipal da nota fiscal e alíquota de ISS (%). Sem eles, a nota não é emitida. |
+
+```sh
+npx supabase login
+npm run test:pro -- --configurar      # gera o token e cadastra o webhook no Asaas sandbox
+# grave os segredos (um arquivo só com as linhas ASAAS_*):
+npx supabase secrets set --env-file segredos.env --project-ref SEU-PROJETO
+npx supabase functions deploy asaas-assinar asaas-cancelar --use-api --project-ref SEU-PROJETO
+npx supabase functions deploy asaas-webhook --no-verify-jwt --use-api --project-ref SEU-PROJETO
+npm run test:pro                      # fluxo completo no sandbox (contas de teste 1 e 3)
+```
+
+O webhook é publicado sem verificação de JWT porque quem chama é o Asaas; a proteção é o token, conferido no cabeçalho `asaas-access-token`. Avisos repetidos são ignorados (tabela `asaas_eventos`).
+
+**Nota fiscal:** configure os dados fiscais da empresa no painel do Asaas, em **Notas Fiscais** (certificado, inscrição municipal, regime). Os códigos de serviço aceitos pela prefeitura saem de `GET /fiscalInfo/services?description=...` na API do Asaas.
+
+**Indo para produção:** crie a chave na conta de produção do Asaas, troque `ASAAS_API_KEY` e `ASAAS_API_URL`, cadastre o webhook na conta de produção (Integrações → Webhooks, URL `https://SEU-PROJETO.supabase.co/functions/v1/asaas-webhook`, o mesmo token, os eventos `PAYMENT_CREATED`, `PAYMENT_CONFIRMED`, `PAYMENT_RECEIVED`, `PAYMENT_OVERDUE`, `PAYMENT_REFUNDED`, `PAYMENT_CHARGEBACK_REQUESTED`, `SUBSCRIPTION_DELETED` e `SUBSCRIPTION_INACTIVATED`) e publique as funções de novo. O `npm run test:pro` só roda no sandbox.

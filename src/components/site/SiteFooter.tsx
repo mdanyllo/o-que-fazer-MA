@@ -12,7 +12,7 @@ export function SiteFooter() {
   const haExemplo = useHaExemplo();
   return (
     <footer className="bg-faixa text-sobre-faixa">
-      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 pt-12 pb-28 md:px-12 md:pb-12">
+      <div className="mx-auto flex max-w-site flex-col gap-8 px-site pt-12 pb-28 md:pb-12">
         <div className="flex flex-wrap items-center justify-between gap-6">
           <Link to="/" aria-label="Azulejo, início" className="inline-flex h-9 rounded-md">
             <Logo sobre="jucara" className="h-full" />
@@ -31,6 +31,9 @@ export function SiteFooter() {
             </Link>
             <Link to="/cadastrar" className={classeLink}>
               Cadastre seu negócio
+            </Link>
+            <Link to="/planos" className={classeLink}>
+              Plano Pro
             </Link>
           </nav>
         </div>

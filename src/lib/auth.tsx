@@ -1,4 +1,5 @@
 import type { Session, User } from "@supabase/supabase-js";
+import { useNavigate } from "@tanstack/react-router";
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { supabase } from "./supabase";
 
@@ -104,6 +105,26 @@ export function useAuth() {
 /** Nome para mostrar no menu: o do perfil ou, sem ele, o começo do e-mail. */
 export function nomeParaMostrar(usuario: User | null, perfil: Perfil | null) {
   return perfil?.nome?.trim() || usuario?.email?.split("@")[0] || "Minha conta";
+}
+
+/**
+ * O site foi aberto pela página inicial (digitando o endereço, pelo favorito...)?
+ * Lido uma vez, quando o app carrega: navegar até o início depois (pelo logo) não conta.
+ */
+let abriuPeloInicio = typeof window !== "undefined" && window.location.pathname === "/";
+
+/**
+ * Quem tem conta e abre o site pelo início vai direto para "Meus negócios". Vale uma vez
+ * por carregamento: depois disso o início abre normalmente (ex.: clicando no logo).
+ */
+export function useIrParaOsNegociosAoChegar() {
+  const { carregando, usuario } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (carregando || !abriuPeloInicio) return;
+    abriuPeloInicio = false;
+    if (usuario) void navigate({ to: "/painel", replace: true });
+  }, [carregando, usuario, navigate]);
 }
 
 /** Só aceita caminhos internos no ?redirect= (nada de mandar para outro site). */

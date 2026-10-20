@@ -9,7 +9,9 @@ import {
   type FotoDono,
   type Rascunho,
 } from "@/lib/meus-negocios";
+import { ContextoPrevia } from "@/lib/estatisticas";
 import type { NegocioPublico } from "@/lib/negocios";
+import { Miniatura } from "./Miniatura";
 
 /** O formulário no formato do site público (sem `extras`: o site usa os padrões do tipo). */
 function comoPublico(
@@ -68,49 +70,57 @@ export function PreviaNegocio({
   );
 
   return (
-    <section aria-labelledby="previa" className="flex flex-col gap-8">
-      <div>
-        <h2 id="previa" className="text-t2">
-          Como vai aparecer
-        </h2>
-        <p className="mt-2 medida text-ink-suave">
-          O card e a página do seu negócio no Azulejo, com os dados de agora. A localização no mapa
-          é o centro da cidade até a equipe ajustar o ponto exato.
-        </p>
-      </div>
+    <ContextoPrevia.Provider value>
+      <section aria-labelledby="previa" className="flex flex-col gap-8">
+        <div>
+          <h2 id="previa" className="text-t2">
+            Como vai aparecer
+          </h2>
+          <p className="mt-2 medida text-ink-suave">
+            O card e a página do seu negócio no Azulejo, com os dados de agora. O ponto no mapa é o
+            que você marcou em Contato.
+          </p>
+        </div>
 
-      <div className="flex flex-col gap-3">
-        <p className="text-rotulo">Card</p>
-        <div inert className="w-full max-w-xs">
-          {hospedagem ? (
-            <CardHospedagem hospedagem={hospedagem} />
-          ) : item ? (
-            <CardItem item={item} />
+        <div className="flex flex-col gap-3">
+          <p className="text-rotulo">Card</p>
+          <div inert className="w-full max-w-xs">
+            {hospedagem ? (
+              <CardHospedagem hospedagem={hospedagem} />
+            ) : item ? (
+              <CardItem item={item} />
+            ) : (
+              <SemPagina />
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <p className="text-rotulo">Página</p>
+          {lugar || experiencia ? (
+            <div inert className="overflow-hidden rounded-md border border-linha bg-louca">
+              <Miniatura>
+                {experiencia ? (
+                  <ConteudoItem
+                    tipo="experiencia"
+                    dados={experiencia}
+                    {...(item ? { itemPrevia: item } : {})}
+                  />
+                ) : (
+                  <ConteudoItem
+                    tipo="lugar"
+                    dados={lugar!}
+                    {...(item ? { itemPrevia: item } : {})}
+                  />
+                )}
+              </Miniatura>
+            </div>
           ) : (
             <SemPagina />
           )}
         </div>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <p className="text-rotulo">Página</p>
-        {lugar || experiencia ? (
-          <div inert className="overflow-hidden rounded-md border border-linha bg-louca">
-            {experiencia ? (
-              <ConteudoItem
-                tipo="experiencia"
-                dados={experiencia}
-                {...(item ? { itemPrevia: item } : {})}
-              />
-            ) : (
-              <ConteudoItem tipo="lugar" dados={lugar!} {...(item ? { itemPrevia: item } : {})} />
-            )}
-          </div>
-        ) : (
-          <SemPagina />
-        )}
-      </div>
-    </section>
+      </section>
+    </ContextoPrevia.Provider>
   );
 }
 

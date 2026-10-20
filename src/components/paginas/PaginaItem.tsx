@@ -5,10 +5,12 @@ import { Link } from "@tanstack/react-router";
 import { BedDouble, ChevronRight, Gauge, MapPin } from "lucide-react";
 import { useMemo } from "react";
 import { CardItem, CardRoteiro } from "@/components/azulejo/cards";
+import { ComoChegar } from "@/components/azulejo/ComoChegar";
+import { Compartilhar } from "@/components/azulejo/Compartilhar";
 import { corDaCategoria } from "@/components/azulejo/cores";
 import {
   CardEmpresa,
-  FalarNoWhatsapp,
+  ContatosNegocio,
   InfoPraticas,
   LinhaInfo,
 } from "@/components/azulejo/detalhes";
@@ -18,6 +20,9 @@ import { Foto } from "@/components/azulejo/Foto";
 import { SecaoTitulo } from "@/components/azulejo/SecaoTitulo";
 import { MapaInterativo } from "@/components/mapa/MapaInterativo";
 import { GaleriaNegocio } from "./GaleriaNegocio";
+import { SeloVerificado } from "@/components/azulejo/SeloVerificado";
+import { AcoesDono } from "@/components/painel/AcoesDono";
+import { useContarVisita } from "@/lib/estatisticas";
 import { PageShell } from "@/components/site/PageShell";
 import { useMarcarExemplo } from "@/lib/aviso-exemplo";
 import { urlFoto } from "@/lib/imagens";
@@ -53,6 +58,7 @@ export function ConteudoItem(props: Props & { itemPrevia?: Item }) {
   const { tipo, dados } = props;
   const { experiencias, getItem, getLugar, proximos, roteirosQueIncluem } = useCatalogo();
   useMarcarExemplo(dados.exemplo);
+  useContarVisita(dados.negocio?.id);
   const destino = getDestino(dados.destino);
   const categoria = categoriaPorId[dados.categoria];
   const cor = corDaCategoria(dados.categoria);
@@ -119,7 +125,7 @@ export function ConteudoItem(props: Props & { itemPrevia?: Item }) {
 
   return (
     <>
-      <div className="mx-auto max-w-7xl px-5 pt-8 md:px-12 md:pt-12">
+      <div className="mx-auto max-w-site px-site pt-8 md:pt-12">
         <nav aria-label="Você está em" className="text-legenda text-ink-suave">
           <ol className="flex flex-wrap items-center gap-1">
             <li>
@@ -151,14 +157,20 @@ export function ConteudoItem(props: Props & { itemPrevia?: Item }) {
           </ol>
         </nav>
 
-        <header className="mt-6 flex flex-wrap items-end justify-between gap-6">
+        {/* categoria e selo; à direita, as ações do dono (só ele vê, e nunca na prévia) */}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+          <p className="flex items-center gap-2 text-legenda text-ink-suave">
+            <MarcaCategoria categoria={dados.categoria} tamanho="sm" />
+            {categoria.nome}
+            {tipo === "experiencia" && <Tag>Experiência</Tag>}
+            {"ficticio" in dados && dados.ficticio && <Tag>Exemplo</Tag>}
+            {dados.negocio?.verificado && <SeloVerificado variante="etiqueta" />}
+          </p>
+          {!props.itemPrevia && <AcoesDono negocioId={dados.negocio?.id} />}
+        </div>
+
+        <header className="mt-4 flex flex-wrap items-end justify-between gap-6">
           <div className="flex max-w-4xl flex-col gap-4">
-            <p className="flex items-center gap-2 text-legenda text-ink-suave">
-              <MarcaCategoria categoria={dados.categoria} tamanho="sm" />
-              {categoria.nome}
-              {tipo === "experiencia" && <Tag>Experiência</Tag>}
-              {"ficticio" in dados && dados.ficticio && <Tag>Exemplo</Tag>}
-            </p>
             <TituloAnimado texto={dados.nome} className="text-display text-pretty text-cobalto" />
             {/* negócio real: o resumo é a 1ª frase da descrição, que já aparece em "Sobre" */}
             {!(negocio && !negocio.exemplo) && (
@@ -214,7 +226,7 @@ export function ConteudoItem(props: Props & { itemPrevia?: Item }) {
         )}
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-12 px-5 py-12 md:px-12 md:py-20 lg:grid-cols-[1.4fr_1fr]">
+      <div className="mx-auto grid max-w-site gap-12 px-site py-12 md:py-20 lg:grid-cols-[1.4fr_1fr]">
         <div className="flex min-w-0 flex-col gap-12">
           <section aria-labelledby="sobre">
             <h2 id="sobre" className="text-t2">
@@ -289,6 +301,16 @@ export function ConteudoItem(props: Props & { itemPrevia?: Item }) {
           <InfoPraticas
             info={dados.info}
             exemplo={negocio ? negocio.exemplo : true}
+            compartilhar={
+              <Compartilhar
+                caminho={`/${tipo === "lugar" ? "lugares" : "experiencias"}/${dados.slug}`}
+                nome={dados.nome}
+                onde={negocio?.cidade ?? destino?.nome}
+                resumo={dados.resumo}
+                foto={dados.foto}
+                negocioId={negocio?.id}
+              />
+            }
             extra={
               <>
                 {negocio?.subtipo && (
@@ -313,8 +335,18 @@ export function ConteudoItem(props: Props & { itemPrevia?: Item }) {
                 )}
               </>
             }
-            {...(negocio?.whatsapp
-              ? { acao: <FalarNoWhatsapp numero={negocio.whatsapp} nome={dados.nome} /> }
+            {...(negocio && (negocio.whatsapp || negocio.instagram || negocio.site)
+              ? {
+                  acao: (
+                    <ContatosNegocio
+                      negocioId={negocio.id}
+                      nome={dados.nome}
+                      whatsapp={negocio.whatsapp}
+                      instagram={negocio.instagram}
+                      site={negocio.site}
+                    />
+                  ),
+                }
               : {})}
           />
           <div className="flex flex-col gap-2">
@@ -330,13 +362,16 @@ export function ConteudoItem(props: Props & { itemPrevia?: Item }) {
                 {negocio.cidade}, Maranhão
               </p>
             )}
+            {item && (item.lat !== 0 || item.lng !== 0) && (
+              <ComoChegar lat={item.lat} lng={item.lng} nome={dados.nome} className="mt-2" />
+            )}
           </div>
         </aside>
       </div>
 
       {roteiros.length > 0 && (
         <section aria-labelledby="roteiros-aqui" className="bg-areia">
-          <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-12 md:px-12 md:py-20">
+          <div className="mx-auto flex max-w-site flex-col gap-8 px-site py-12 md:py-20">
             <SecaoTitulo id="roteiros-aqui" titulo="Roteiros que passam aqui" />
             <GradeRevelar colunas={2} className="grid gap-6 md:grid-cols-2">
               {roteiros.slice(0, 4).map((r) => (
@@ -350,7 +385,7 @@ export function ConteudoItem(props: Props & { itemPrevia?: Item }) {
       {perto.length > 0 && (
         <section
           aria-labelledby="perto"
-          className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-12 md:px-12 md:py-20"
+          className="mx-auto flex max-w-site flex-col gap-8 px-site py-12 md:py-20"
         >
           <SecaoTitulo id="perto" titulo="Perto daqui" apoio="Dá para encaixar no mesmo dia." />
           <GradeRevelar colunas={3} className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">

@@ -67,6 +67,23 @@ export async function listarContas() {
   return (data ?? []) as Conta[];
 }
 
+export type PlanoConta = {
+  perfil_id: string;
+  plano: "mensal" | "anual" | null;
+  forma: "pix" | "cartao" | null;
+  status: string;
+  pro_ate: string | null;
+};
+
+/** Plano de cada conta (o admin lê a tabela assinaturas inteira). */
+export async function listarPlanos() {
+  const { data, error } = await cliente()
+    .from("assinaturas")
+    .select("perfil_id, plano, forma, status, pro_ate");
+  if (error) throw error;
+  return new Map((data as PlanoConta[]).map((p) => [p.perfil_id, p]));
+}
+
 export async function lerNotasInternas(id: string) {
   const { data, error } = await cliente().rpc("notas_internas", { negocio: id });
   if (error) throw error;
@@ -80,7 +97,19 @@ async function atualizar(id: string, dados: Record<string, unknown>) {
   if (!data?.length) throw new ErroNegocio("Não encontramos esse negócio.");
 }
 
-export const aprovar = (id: string) => atualizar(id, { status: "publicado" });
+/**
+ * Publica o negócio e avisa o dono por e-mail (função avisar-aprovacao). O e-mail não segura
+ * a aprovação: se o envio falhar ou não estiver configurado, o negócio continua publicado.
+ */
+export async function aprovar(id: string) {
+  await atualizar(id, { status: "publicado" });
+  void cliente()
+    .functions.invoke("avisar-aprovacao", { body: { negocio: id } })
+    .then(({ data, error }) => {
+      if (error || !data?.enviado)
+        console.warn("[aprovar] e-mail para o dono não enviado", error ?? data);
+    });
+}
 
 export function recusar(id: string, motivo: string) {
   if (!motivo.trim()) throw new ErroNegocio("Escreva o motivo da recusa para o dono.");

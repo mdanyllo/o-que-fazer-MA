@@ -123,7 +123,7 @@ function Explorar() {
       />
 
       <div className="sticky top-16 z-30 border-y border-linha bg-louca/95 backdrop-blur-sm md:top-20">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-5 py-3 md:px-12">
+        <div className="mx-auto flex max-w-site flex-wrap items-center gap-3 px-site py-3">
           <CampoBusca valor={busca.q ?? ""} aoMudar={(q) => atualizar({ q: q || undefined })} />
           <Chip
             ativo={Boolean(busca.perto)}
@@ -191,7 +191,7 @@ function Explorar() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-8 md:px-12 md:py-12 lg:grid-cols-[260px_1fr]">
+      <div className="mx-auto grid max-w-site gap-10 px-site py-8 md:py-12 lg:grid-cols-[260px_1fr]">
         <aside aria-label="Filtros" className="hidden lg:block">
           <div className="sticky top-44">
             <Filtros busca={busca} atualizar={atualizar} />

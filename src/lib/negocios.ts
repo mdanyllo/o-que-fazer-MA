@@ -69,6 +69,8 @@ export type NegocioPublico = {
   exemplo: boolean;
   extras: ExtrasNegocio;
   negocio_fotos: FotoNegocio[];
+  /** o dono tem o plano Pro (selo de verificado); vem de negocios_verificados() */
+  verificado?: boolean;
 };
 
 /**
@@ -111,17 +113,24 @@ async function carregar(): Promise<NegocioPublico[] | null> {
   const controle = new AbortController();
   const limite = setTimeout(() => controle.abort(), TEMPO_LIMITE_MS);
   try {
-    const { data, error } = await supabase
-      .from("negocios")
-      .select(COLUNAS_NEGOCIO_PUBLICO)
-      .eq("status", "publicado")
-      .order("nome")
-      .abortSignal(controle.signal);
+    const [{ data, error }, verificados] = await Promise.all([
+      supabase
+        .from("negocios")
+        .select(COLUNAS_NEGOCIO_PUBLICO)
+        .eq("status", "publicado")
+        .order("nome")
+        .abortSignal(controle.signal),
+      // selo de verificado (dono com Pro); se falhar, o site segue sem selos
+      supabase.rpc("negocios_verificados").abortSignal(controle.signal),
+    ]);
     if (error) {
       console.error("[negocios] erro ao carregar:", error.message);
       return null;
     }
-    return (data ?? []) as unknown as NegocioPublico[];
+    const comSelo = new Set((verificados.data as string[] | null) ?? []);
+    return ((data ?? []) as unknown as NegocioPublico[]).map((n) =>
+      comSelo.has(n.id) ? { ...n, verificado: true } : n,
+    );
   } catch (erro) {
     console.error("[negocios] erro ao carregar:", erro);
     return null;

@@ -1,10 +1,26 @@
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { BadgeCheck } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { LoadingAzulejo } from "@/components/azulejo/LoadingAzulejo";
 import { Pagina404 } from "@/components/site/Pagina404";
 import { PageShell } from "@/components/site/PageShell";
 import { useAuth, type Perfil } from "@/lib/auth";
+import { MolduraPainel } from "@/components/painel/MolduraPainel";
+import { linkConta } from "./formulario";
 import type { User } from "@supabase/supabase-js";
+
+/** Como funciona, no bloco ao lado do formulário (desktop). */
+const PASSOS = [
+  { titulo: "Crie sua conta", texto: "Com e-mail e senha ou com o Google. É grátis." },
+  {
+    titulo: "Cadastre o negócio",
+    texto: "Fotos, horário, preço, WhatsApp e a localização no mapa.",
+  },
+  {
+    titulo: "A equipe revisa",
+    texto: "Depois de aprovado, seu negócio aparece nos destinos, no mapa e nos roteiros.",
+  },
+];
 
 /**
  * Páginas de conta (entrar, cadastrar, senha): uma coluna estreita, celular primeiro.
@@ -22,7 +38,7 @@ export function LayoutConta({
   const { disponivel } = useAuth();
   return (
     <PageShell>
-      <div className="mx-auto grid max-w-7xl gap-12 px-5 pt-10 pb-16 md:px-12 md:pt-16 md:pb-24 lg:grid-cols-[minmax(0,28rem)_1fr] lg:gap-24">
+      <div className="mx-auto grid max-w-site gap-12 px-site pt-10 pb-16 md:pt-16 md:pb-24 lg:grid-cols-[minmax(0,28rem)_1fr] lg:gap-24">
         <div className="flex min-w-0 flex-col gap-8">
           <div className="flex flex-col gap-3">
             <h1 className="text-t1 text-cobalto">{titulo}</h1>
@@ -46,20 +62,48 @@ export function LayoutConta({
             Quem viaja continua usando o Azulejo sem conta. O login é só para quem cadastra um
             negócio. Antes de ir para o site, a equipe revisa cada cadastro.
           </p>
+          <ol className="mt-8 flex flex-col gap-5 border-t border-linha pt-8">
+            {PASSOS.map((passo, i) => (
+              <li key={passo.titulo} className="flex gap-4">
+                <span
+                  className="grid size-9 shrink-0 place-items-center rounded-full bg-cobalto font-bold text-sobre-cobalto"
+                  aria-hidden
+                >
+                  {i + 1}
+                </span>
+                <div>
+                  <p className="font-bold">{passo.titulo}</p>
+                  <p className="text-ink-suave">{passo.texto}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-8 flex flex-col gap-2 rounded-md bg-louca p-5">
+            <p className="flex items-center gap-2 font-bold">
+              <BadgeCheck className="size-5 text-cobalto" aria-hidden /> Quer aparecer mais?
+            </p>
+            <p className="text-ink-suave">
+              Com o Pro, seu negócio ganha o selo de verificado e você vê quantas pessoas visitam a
+              página, chamam no WhatsApp e compartilham.
+            </p>
+            <Link to="/planos" className={`${linkConta} self-start`}>
+              Conhecer o Pro
+            </Link>
+          </div>
         </aside>
       </div>
     </PageShell>
   );
 }
 
-/** Tela de espera enquanto a sessão é lida no navegador. */
+/** Tela de espera enquanto a sessão é lida no navegador (só o painel e o admin usam). */
 export function TelaCarregando() {
   return (
-    <PageShell>
+    <MolduraPainel>
       <div className="grid min-h-[50svh] place-items-center px-5">
         <LoadingAzulejo rotulo="Carregando sua conta" />
       </div>
-    </PageShell>
+    </MolduraPainel>
   );
 }
 

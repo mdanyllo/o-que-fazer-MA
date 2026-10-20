@@ -294,7 +294,12 @@ Restaurantes, hospedagens e passeios saíram dos arquivos mockados e vêm do Sup
 ### 10.3 Rotas
 
 - Públicas: `/entrar`, `/cadastrar`, `/esqueci-senha`, `/redefinir-senha` (destino do link do e-mail), `/termos` e `/privacidade` (texto provisório, marcado como rascunho para revisão jurídica).
+- **Entrar com o Google:** botão "Continuar com o Google" em `/entrar` e `/cadastrar` (`EntrarComGoogle`), visível só quando o provedor está ligado no Supabase (o site lê `/auth/v1/settings`). Volta para `/entrar?redirect=…`. Conta nova pelo Google ganha perfil com `full_name`/`name` (migração `20261020120000_perfil_google.sql`). Configuração no README, seção 4.
 - `/painel` ("Meus negócios"): exige login; sem login vai para `/entrar?redirect=/painel`.
+- **Horário de funcionamento:** campo opcional nos três tipos (migração `20261021120000_horario_opcional.sql`), aparece em "Informações práticas".
+- **E-mail de aprovação:** `aprovar()` publica e chama a Edge Function `avisar-aprovacao` (Resend; secrets `RESEND_API_KEY`, `EMAIL_REMETENTE`, `SITE_URL`). Falha no e-mail não desfaz a aprovação.
+- **Localização:** na etapa Contato o dono marca o ponto (toque no mapa, arrastar o pin ou "Usar minha localização atual"; `CampoLocalizacao`). Sem marcar, fica o centro da cidade; trocar de cidade desmarca. Na página pública, "Como chegar" abre o ponto no Google Maps, no Waze e no Uber (`ComoChegar`, só links).
+- **Moldura do painel** (`MolduraPainel`): `/painel/*` e `/admin/*` não usam o header e o rodapé do site. Topo só com o logo e o nome; menu lateral (gaveta no celular) com "Seu negócio" (Meus negócios, Estatísticas, Plano e pagamento), "Equipe Azulejo" para admin (Negócios, Usuários, Cadastrar negócio), "Ver o site" e "Sair". `/painel/estatisticas` lista os negócios para escolher (com um só, vai direto). Quem tem conta e abre o site pelo início vai direto para `/painel` (uma vez por carregamento).
 - `/admin`, `/admin/:id`, `/admin/novo` e `/admin/usuarios`: exigem papel admin; para os outros (logados ou não) mostram "Página não encontrada".
 - Header: deslogado, um "Entrar" discreto em `--ink-suave` (no celular, dentro do menu); logado, menu com o nome, "Meus negócios", "Administração" (só admin) e "Sair". Rodapé: link "Cadastre seu negócio".
 
@@ -320,6 +325,7 @@ Restaurantes, hospedagens e passeios saíram dos arquivos mockados e vêm do Sup
 - **`/admin/:id`**: o mesmo `FormularioNegocio` do dono em `modo="equipe"` (edita tudo, inclusive fotos, com um botão "Salvar") e, ao lado, os cartões:
   - **Status**: Aprovar e publicar (o banco grava `aprovado_por` e `aprovado_em` e limpa o motivo antigo), Recusar (diálogo com motivo obrigatório, que o dono vê no painel), Marcar como revisado (só tira a marca de alterado, sem mudar status nem aprovação), Despublicar (volta para rascunho) e Excluir (com confirmação, apagando as fotos do Storage). Mostra o que falta antes de publicar.
   - **Posição no mapa**: pin arrastável, clique no mapa move o pin, campos de latitude e longitude para o ajuste fino e "Salvar posição". O mapa tem 384px de altura (`h-96`) e a atribuição fica compacta no canto inferior direito (classe `mapa-posicao`: 10px, até 70% da largura, alinhada à direita), longe do pin centralizado e sem virar uma faixa sobre os nomes do mapa.
+  - **Convite para o dono** (só em negócio sem dono e que não é exemplo): "Gerar link de convite" cria `/convite/<token>`, de uso único e válido por 7 dias. Tem "Copiar link", "Enviar no WhatsApp" (para o WhatsApp do negócio, com mensagem pronta) e "Gerar outro", que invalida o anterior. Quem abre o link e entra (ou cria a conta) clica em "Assumir" e vira o dono. Sem conta, o token fica guardado no navegador e o `/painel` traz a pessoa de volta ao convite depois de confirmar o e-mail. Banco: tabela `negocio_convites` (sem acesso direto) e as funções `gerar_convite`, `convite_do_negocio`, `ver_convite` e `aceitar_convite` (migração `20261018120000_convites.sql`).
   - **Notas internas**: lidas pela função `notas_internas(id)` e gravadas direto (o banco recusa para quem não é admin).
   - **Histórico**: dono, criado em, última alteração, última edição do dono, aprovado quando e por quem, endereço no site.
   - A coluna `extras` não aparece nem é editada em lugar nenhum da interface.
@@ -348,3 +354,34 @@ Vale para restaurantes, hospedagens e passeios do banco (`/lugares/:slug`, `/exp
 ### 10.8 Formulários
 
 Label sempre visível, campos de 48px, borda 2px `--linha` e foco em `--cobalto`, erro em `--guara` abaixo do campo (ligado por `aria-describedby`) e foco no primeiro campo com erro ao enviar. Mensagens em português, sem detalhe técnico (`mensagemDeErro` em `src/lib/auth.tsx`). Sem sombras, gradientes ou ícones de brilho; celular primeiro.
+
+## 11. Plano Pro
+
+### 11.1 O que é
+
+- **Gratuito:** o de toda conta nova (cadastrar, publicar e editar negócios).
+- **Pro:** vale para a conta inteira. Dá o selo de verificado (`SeloVerificado`) em todos os negócios publicados dela e a página de estatísticas de cada negócio.
+- **Mensal:** R$ 29,90, Pix ou cartão. Parou de pagar, o Pro acaba 3 dias depois do vencimento.
+- **Anual:** R$ 329,90, só no cartão, à vista ou em até 12x com juros. Dá 12 meses e não renova sozinho; nos últimos 30 dias, `/painel/assinatura` oferece renovar (os meses se somam).
+- Preços e regras: `supabase/functions/_shared/precos.ts` (o site importa por `src/lib/plano.ts`).
+
+### 11.2 Pagamento (Asaas)
+
+- A pessoa escolhe o plano em `/painel/assinatura`, informa nome e CPF/CNPJ e paga na fatura do Asaas (link aberto em nova aba). A tela consulta de novo a cada 5 s até o pagamento cair.
+- Funções do servidor (Supabase Edge Functions): `asaas-assinar`, `asaas-cancelar` e `asaas-webhook`. Chaves só nos segredos do Supabase. Passo a passo no README, seção "6. Plano Pro".
+- O Pro liga só pelo webhook. A regra é `eh_pro(perfil)`: `assinaturas.pro_ate` maior que agora. Estorno ou contestação encerram na hora.
+
+### 11.3 Estatísticas
+
+- Tabela `negocio_estatisticas`: um total por negócio, dia (horário de Brasília) e tipo: `visita`, `whatsapp`, `instagram`, `site` e `aparicao` (o card apareceu numa lista).
+- O site grava por `registrar_evento` (`src/lib/estatisticas.ts`). Visita e aparição contam uma vez por sessão do navegador; nada conta na prévia do painel. A contagem vale para todos os negócios publicados, também os do Gratuito, para quem assinar já encontrar o histórico.
+- **Compartilhar** (ao lado de "Informações práticas", em lugares e experiências): janela com a prévia do link e três canais — WhatsApp (`wa.me` com texto pronto), Instagram (folha de compartilhar do sistema no celular; no computador copia o link e diz onde colar) e Copiar link. Em negócio do banco, cada canal conta como `compartilhar_whatsapp`, `compartilhar_instagram` ou `compartilhar_link` (migração `20261020130000_compartilhamentos.sql`); o painel mostra o total, a divisão por canal e o gráfico por dia.
+- **Prévia do link** (WhatsApp, Instagram, Facebook): `metaDaPagina` em `src/lib/compartilhar.ts` gera og:title ("Nome · Cidade"), og:description (resumo), og:url e og:image com endereço completo. Foto do Storage passa pelo recorte do Supabase (1200×630, `render/image`); sem foto, `/og-image.jpg`.
+- Só o dono Pro ou o admin leem (`estatisticas_negocio`). Quem é Gratuito vê a tela bloqueada com o convite para o Pro.
+
+### 11.4 Rotas
+
+- `/planos`: comparativo Gratuito × Pro, mensal/anual e perguntas frequentes.
+- `/painel/assinatura`: status, assinar, pagar, cancelar e renovar.
+- `/painel/estatisticas/$id`: períodos de 7, 30 e 90 dias, comparação com o período anterior, gráfico por dia (recharts, uma série por gráfico, em cobalto) e tabela.
+- `/admin/usuarios` mostra o plano de cada conta.

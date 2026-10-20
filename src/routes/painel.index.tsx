@@ -1,15 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import type { User } from "@supabase/supabase-js";
-import { LogOut, Plus } from "lucide-react";
-import { botao, Botao } from "@/components/azulejo/botao";
+import { Plus } from "lucide-react";
+import { useEffect } from "react";
+import { botao } from "@/components/azulejo/botao";
 import { LoadingAzulejo } from "@/components/azulejo/LoadingAzulejo";
 import { CaixaErro } from "@/components/conta/formulario";
 import { AreaRestrita } from "@/components/conta/LayoutConta";
 import { CardMeuNegocio } from "@/components/painel/CardMeuNegocio";
-import { PageShell } from "@/components/site/PageShell";
-import { nomeParaMostrar, useAuth, type Perfil } from "@/lib/auth";
+import { conteudoPainel } from "@/components/painel/LayoutPainel";
+import { MolduraPainel } from "@/components/painel/MolduraPainel";
+import { nomeParaMostrar, type Perfil } from "@/lib/auth";
+import { lerConvitePendente } from "@/lib/convites";
 import { LIMITE_NEGOCIOS, listarMeusNegocios } from "@/lib/meus-negocios";
+import { ResumoPlano } from "@/components/painel/ResumoPlano";
 
 export const Route = createFileRoute("/painel/")({
   head: () => ({
@@ -19,7 +23,12 @@ export const Route = createFileRoute("/painel/")({
 });
 
 function Painel({ usuario, perfil }: { usuario: User; perfil: Perfil | null }) {
-  const { sair } = useAuth();
+  const navigate = useNavigate();
+  // chegou aqui depois de criar a conta (ou entrar) a partir de um convite: volta para ele
+  useEffect(() => {
+    const token = lerConvitePendente();
+    if (token) void navigate({ to: "/convite/$token", params: { token }, replace: true });
+  }, [navigate]);
   const consulta = useQuery({
     queryKey: ["meus-negocios", usuario.id],
     queryFn: () => listarMeusNegocios(usuario.id),
@@ -28,24 +37,18 @@ function Painel({ usuario, perfil }: { usuario: User; perfil: Perfil | null }) {
   const noLimite = total >= LIMITE_NEGOCIOS;
 
   return (
-    <PageShell>
-      <div className="mx-auto flex max-w-5xl flex-col gap-8 px-5 pt-10 pb-16 md:px-12 md:pt-16 md:pb-24">
+    <MolduraPainel>
+      <div className={`${conteudoPainel} max-w-site`}>
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-ink-suave">Olá, {nomeParaMostrar(usuario, perfil)}.</p>
             <h1 className="mt-1 text-t1 text-cobalto">Meus negócios</h1>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {total > 0 && !noLimite && (
-              <Link to="/painel/novo" className={botao()}>
-                <Plus aria-hidden /> Cadastrar negócio
-              </Link>
-            )}
-            {/* ao sair, a AreaRestrita leva para o início */}
-            <Botao variante="fantasma" onClick={() => void sair()}>
-              <LogOut aria-hidden /> Sair
-            </Botao>
-          </div>
+          {total > 0 && !noLimite && (
+            <Link to="/painel/novo" className={botao()}>
+              <Plus aria-hidden /> Cadastrar negócio
+            </Link>
+          )}
         </header>
 
         {consulta.isPending ? (
@@ -73,6 +76,7 @@ function Painel({ usuario, perfil }: { usuario: User; perfil: Perfil | null }) {
           </section>
         ) : (
           <>
+            <ResumoPlano perfilId={usuario.id} />
             {noLimite && (
               <p role="status" className="rounded-md border border-linha bg-areia p-4">
                 Você chegou ao limite de {LIMITE_NEGOCIOS} negócios por conta. Para cadastrar outro,
@@ -89,6 +93,6 @@ function Painel({ usuario, perfil }: { usuario: User; perfil: Perfil | null }) {
           </>
         )}
       </div>
-    </PageShell>
+    </MolduraPainel>
   );
 }
