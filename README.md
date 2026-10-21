@@ -996,16 +996,6 @@ Quero um PROTÓTIPO VISUAL MUITO BEM ACABADO que demonstre claramente como esse 
 
 Faça parecer que estamos vendo a primeira versão de um produto que poderia ser lançado comercialmente amanhã.
 
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/aee9fb8e-e6ac-47e0-9b17-78b0233613e8).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
 ## Development
 
 Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
@@ -1036,7 +1026,7 @@ Restaurantes, hospedagens e passeios vêm do banco (Supabase). Destinos, atrativ
    VITE_SUPABASE_ANON_KEY=eyJ...   # a chave "anon public"
    ```
 
-3. Reinicie o `npm run dev`. Em produção (Lovable/Cloudflare), cadastre as mesmas duas variáveis no ambiente de build.
+3. Reinicie o `npm run dev`. Em produção (Vercel), cadastre as mesmas duas variáveis no ambiente de build.
 
 Nunca use a chave `service_role` no site: ela ignora todas as regras de segurança.
 

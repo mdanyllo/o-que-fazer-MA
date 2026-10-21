@@ -86,12 +86,15 @@ const reais = new Intl.NumberFormat("pt-BR");
 
 const normalizar = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 
-const destinoPorNome = new Map(destinos.map((d) => [normalizar(d.nome), d.slug]));
+// montado no primeiro uso: no bundle de produção há importação circular e `destinos`
+// ainda não existe quando este módulo carrega
+let destinoPorNome: Map<string, string> | undefined;
 
 /** A coluna cidade guarda o nome ("São Luís"); o site usa o slug do destino. */
 function destinoDaCidade(cidade: string | null) {
   if (!cidade) return "";
   const nome = normalizar(cidade);
+  destinoPorNome ??= new Map(destinos.map((d) => [normalizar(d.nome), d.slug]));
   return destinoPorNome.get(nome) ?? nome.replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 

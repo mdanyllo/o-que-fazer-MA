@@ -36,3 +36,8 @@ supabase/.temp/
 
 # Vercel (build local e projeto ligado)
 .vercel/
+
+# Variáveis de ambiente (chaves do Supabase etc.)
+.env
+.env.*
+!.env.example
